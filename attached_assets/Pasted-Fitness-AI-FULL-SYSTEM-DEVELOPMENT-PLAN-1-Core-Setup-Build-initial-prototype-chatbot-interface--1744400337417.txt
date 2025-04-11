@@ -1,0 +1,149 @@
+Fitness AI – FULL SYSTEM DEVELOPMENT PLAN
+1. Core Setup
+ Build initial prototype (chatbot interface with health tone)
+
+ Integrate Gemini 1.5 Flash latest
+
+ Use Vertex AI SDK via Firebase (chat flow, sentiment, voice)
+
+ English language default with language switcher
+
+2. AI Assistant Personality
+ts
+Copiar
+Editar
+// systemPrompt.ts
+export const systemPrompt = `
+You are Fitness AI — a friendly and powerful AI fitness coach.
+- Personality: energetic, motivational, precise.
+- Behavior: ask one question at a time, suggest personalized exercises.
+- Goal: help the user build daily consistency across fitness, sleep, and nutrition.
+`;
+3. Must-Have Features
+ API integrations with:
+
+Google Fit
+
+Apple HealthKit
+
+Fitbit API
+
+Strava (optional)
+
+ Voice coaching functionality:
+
+Enable guided voice workouts
+
+Count reps or time aloud
+
+ Visual tracker:
+
+Daily, weekly, monthly progress charts
+
+Display sleep, steps, heart rate, mood
+
+ Workout library with categories:
+
+Bodyweight / Gym / HIIT / Cardio / Flexibility / Posture / Yoga
+
+ Ask daily:
+
+“How are you feeling?”
+
+“Ready for today’s session?”
+
+4. UI + Interaction Design
+ Zoom-like chat UI
+
+Avatar on left, fullscreen chat
+
+Voice + QR + Camera + Uploads on sidebar
+
+ Adaptive UI for:
+
+Web
+
+Tablet
+
+Mobile
+
+ Visual tracker dashboard
+
+ Modal to upload progress pics or metrics
+
+ Floating chatbot button
+
+5. Gamification + Rewards
+ Point system for daily check-ins
+
+ Streak tracking
+
+ Levels and badges (hydration, steps, discipline)
+
+ Leaderboard (optional, opt-in)
+
+6. Notifications & Coaching Flow
+ Smart reminders
+
+Based on previous schedule
+
+ Motivational messages based on mood
+
+ Voice-triggered workouts ("Start stretching", "Play cooldown")
+
+7. Admin + Super Admin Dashboard
+ Track user performance (metrics, engagement)
+
+ Activate/Deactivate modules
+
+ AI feedback logs and suggestions
+
+ View integration health (Google Fit, Gemini)
+
+ Add new workouts via admin panel
+
+8. Monetization Layer
+ Stripe connected
+
+ Plans:
+
+Free (limited workouts)
+
+Silver (basic coaching)
+
+Gold (video support, integrations)
+
+Diamond (1-on-1 avatar coaching + live chat)
+
+ Paywall toggle per feature
+
+ Referral code system
+
+9. AI Flow & Smart Questionnaire
+ Onboarding: ask 1 question at a time:
+
+Height / weight / goal
+
+Schedule preference
+
+Style (yoga, gym, low-impact, etc.)
+
+ Save all responses in Firestore
+
+ Generate Smart Workout Plan weekly
+
+ Integrate avatar for guided response
+
+10. QC & Deployment Checklist
+ Gemini response validation
+
+ Firebase logs tracking
+
+ Crash/error notifications to admin
+
+ Language switch works
+
+ All APIs respond with 200
+
+ User can complete onboarding + get suggested plan
+
