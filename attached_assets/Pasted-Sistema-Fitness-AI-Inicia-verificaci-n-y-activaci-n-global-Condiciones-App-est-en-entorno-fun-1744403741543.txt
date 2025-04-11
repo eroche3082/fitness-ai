@@ -1,0 +1,77 @@
+Sistema Fitness AI: Inicia verificación y activación global.
+
+Condiciones:
+- App está en entorno funcional (preview)
+- Todos los secrets están configurados
+- Los API Keys de Google Cloud están activos
+- El archivo de credenciales JSON global está en su lugar
+- Todos los módulos base están instalados
+
+Objetivo:
+Activar, verificar e implementar todos los tabs, herramientas y módulos visibles en la UI, asegurando que cada uno tenga contenido funcional, lógica activa, y conexión con APIs correspondientes.
+
+Instrucciones por módulo:
+
+1. **Voice Input**
+   - Activar STT (Speech-to-Text) con Google Cloud.
+   - Verificar reconocimiento en tiempo real y que se guarden logs.
+   - Habilitar respuestas contextuales desde el AI Coach.
+
+2. **Form Check**
+   - Activar el sistema de análisis visual (Vision AI).
+   - Permitir subida de imágenes o captura desde cámara.
+   - Ejecutar corrección de postura y devolver feedback en pantalla.
+
+3. **QR Scanner**
+   - Activar cámara del dispositivo.
+   - Permitir escaneo de planes de ejercicios, códigos de nutrición o retos.
+   - Desbloquear contenido oculto según código escaneado.
+
+4. **Upload File**
+   - Permitir al usuario subir archivos (PDFs, Excel, CSV).
+   - Leer y parsear datos relacionados con nutrición, sueño o rutinas.
+   - Guardar en Firebase y procesar con Natural Language API si es texto.
+
+5. **Workout Plan**
+   - Activar conexión con base de datos de rutinas personalizadas.
+   - Verificar que el sistema de seguimiento funcione.
+   - Mostrar próximos ejercicios y métricas completadas.
+
+6. **Nutrition Coach**
+   - Integrar tabla con macros diarios.
+   - Permitir entrada manual de comidas o por voz.
+   - Sugerir recetas automáticas según metas del usuario.
+
+7. **Habit Builder**
+   - Mostrar hábitos activos y progreso visual.
+   - Permitir crear nuevos hábitos personalizados.
+   - Activar recordatorios inteligentes según el horario y comportamiento.
+
+8. **Sleep Optimizer**
+   - Conectar con API de sueño (opcional: Google Fit / dispositivos).
+   - Permitir entrada manual de horas de sueño.
+   - Activar sugerencias para mejorar la calidad del descanso.
+
+9. **Dashboard General**
+   - Activar:
+     - Day Streak con badges automáticos.
+     - Workouts (barra de progreso).
+     - Hidratación con sugerencias en tiempo real.
+     - Steps con animación de meta alcanzada.
+   - Mostrar estadísticas por semana y tendencias.
+
+10. **AI Fitness Coach (Chat)**
+   - Activar sistema conversacional basado en Gemini o OpenAI.
+   - Integrar contexto del usuario (rutina, sueño, hábitos, métricas).
+   - Permitir conversaciones en inglés y español.
+   - Guardar el historial por usuario.
+
+Verifica todo el sistema y responde con:
+- Estado de cada módulo (activo, en progreso, error)
+- Notificaciones internas si alguna integración falla
+- Sugerencias automáticas de mejora basadas en uso
+
+Resultado esperado:
+Una plataforma de fitness 100% activa, funcional, y preparada para usuarios finales con interacción AI inteligente y feedback en tiempo real.
+
+Comando Maestro: `FitnessAI.activateAllModules({ fullCheck: true, language: "en", user: "Alex" });`

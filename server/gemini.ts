@@ -1,103 +1,138 @@
 import { Request, Response } from 'express';
 import { systemPrompt } from '@shared/systemPrompt';
+import fetch from 'node-fetch';
 
-// This is a placeholder implementation of the Gemini integration
-// In a real implementation, you would use the Vertex AI SDK to interact with Gemini 1.5
+// Gemini API response types
+interface GeminiPart {
+  text: string;
+}
 
+interface GeminiContent {
+  parts: GeminiPart[];
+  role?: string;
+}
+
+interface GeminiCandidate {
+  content: GeminiContent;
+  finishReason?: string;
+  index?: number;
+  safetyRatings?: any[];
+}
+
+interface GeminiResponse {
+  candidates: GeminiCandidate[];
+  promptFeedback?: any;
+}
+
+// Real implementation of the Gemini integration using Google's Generative AI API
 export async function generateGeminiResponse(messages: { role: string; content: string }[]): Promise<string> {
   try {
-    // In a real implementation, this would be a call to the Gemini API
-    // Using the system prompt and the conversation history
+    const apiKey = process.env.GOOGLE_API_KEY;
     
-    // For now, we'll simulate a response based on the last user message
-    const lastUserMessage = messages
-      .filter(msg => msg.role === 'user')
-      .slice(-1)[0]?.content.toLowerCase() || '';
-    
-    let response = '';
-    
-    if (lastUserMessage.includes('workout') || lastUserMessage.includes('exercise')) {
-      response = `Here's a personalized workout plan for you:
-
-## 3-Day Gym Split Plan
-
-### Day 1: Lower Body Focus
-- Squats: 3 sets x 10-12 reps
-- Leg Press: 3 sets x 12-15 reps
-- Romanian Deadlifts: 3 sets x 10-12 reps
-- Calf Raises: 3 sets x 15-20 reps
-- 20 min moderate-intensity cardio
-
-### Day 2: Upper Body & Core
-- Bench Press: 3 sets x 10-12 reps
-- Bent-over Rows: 3 sets x 10-12 reps
-- Shoulder Press: 3 sets x 10-12 reps
-- Plank: 3 sets x 30-45 seconds
-- 20 min HIIT (30s work/30s rest)
-
-### Day 3: Full Body Circuit
-- Deadlifts: 3 sets x 8-10 reps
-- Push-ups: 3 sets x max reps
-- Dumbbell Lunges: 3 sets x 12 per leg
-- Pull-ups/Assisted Pull-ups: 3 sets x max reps
-- 25 min steady-state cardio
-
-How does this plan look to you? We can adjust it based on your experience level and equipment availability.`;
-    } else if (lastUserMessage.includes('nutrition') || lastUserMessage.includes('diet') || lastUserMessage.includes('food')) {
-      response = `Here are some nutrition tips to support your fitness goals:
-
-## Nutrition Plan for Weight Loss & Muscle Building
-
-### Daily Targets:
-- Slight caloric deficit (10-15% below maintenance)
-- Protein: 1.6-2g per kg of bodyweight
-- Carbs: 3-4g per kg on training days
-- Fats: 0.8-1g per kg of bodyweight
-- Water: Minimum 3L per day
-
-### Key Strategies:
-- Eat protein with every meal (lean meats, eggs, Greek yogurt)
-- Time carbs around workouts for better energy and recovery
-- Include vegetables in at least 2 meals per day
-- Limit processed foods and added sugars
-- Consider intermittent fasting (16:8) if it fits your schedule
-
-Would you like me to create a sample meal plan based on these guidelines?`;
-    } else if (lastUserMessage.includes('goal') || lastUserMessage.includes('weight loss')) {
-      response = `Thanks for sharing your fitness goals! Losing weight while building muscle is a great approach for overall body composition.
-
-I'd like to understand a bit more about your current situation:
-
-1. How many days a week can you commit to exercising?
-2. Do you have any equipment at home besides your gym access?
-3. Are there any specific areas you'd like to focus on?
-4. Do you have any injuries or limitations I should be aware of?
-
-This information will help me create a plan that fits your lifestyle and goals perfectly.`;
-    } else {
-      response = `Thanks for your message! I'm your Fitness AI coach, powered by Gemini 1.5.
-
-I can help you with:
-- Creating personalized workout plans
-- Providing nutrition guidance
-- Tracking your progress
-- Suggesting exercises based on your goals
-- Answering fitness and health questions
-
-What specific aspect of your fitness journey would you like help with today?`;
+    if (!apiKey) {
+      console.error('GOOGLE_API_KEY not found in environment variables');
+      throw new Error('Gemini API key not configured');
     }
     
-    return response;
+    // Format messages for Gemini API
+    const formattedMessages: { role: string; parts: { text: string }[] }[] = [];
+    
+    // Add system prompt as first message if it doesn't exist
+    const hasSystemPrompt = messages.some(msg => msg.role === 'system');
+    if (!hasSystemPrompt) {
+      formattedMessages.push({
+        role: 'system',
+        parts: [{ text: systemPrompt }]
+      });
+    }
+    
+    // Map user and assistant messages
+    messages.forEach(message => {
+      // Skip system messages as we've already added the system prompt
+      if (message.role === 'system') return;
+      
+      // Map 'user' to 'user' and 'assistant' to 'model'
+      const role = message.role === 'assistant' ? 'model' : 'user';
+      formattedMessages.push({
+        role: role,
+        parts: [{ text: message.content }]
+      });
+    });
+    
+    // Create request payload
+    const payload = {
+      contents: formattedMessages,
+      generationConfig: {
+        temperature: 0.7,
+        topK: 40,
+        topP: 0.95,
+        maxOutputTokens: 1024,
+      },
+      safetySettings: [
+        {
+          category: "HARM_CATEGORY_HARASSMENT",
+          threshold: "BLOCK_ONLY_HIGH"
+        },
+        {
+          category: "HARM_CATEGORY_HATE_SPEECH",
+          threshold: "BLOCK_ONLY_HIGH"
+        },
+        {
+          category: "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+          threshold: "BLOCK_ONLY_HIGH"
+        },
+        {
+          category: "HARM_CATEGORY_DANGEROUS_CONTENT",
+          threshold: "BLOCK_ONLY_HIGH"
+        }
+      ]
+    };
+    
+    // Call Gemini API
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(payload)
+      }
+    );
+    
+    if (!response.ok) {
+      const errorData = await response.text();
+      console.error('Gemini API error:', errorData);
+      throw new Error(`Gemini API error: ${response.status} ${response.statusText}`);
+    }
+    
+    const data = await response.json() as GeminiResponse;
+    
+    // Get response text from the generated content
+    if (data.candidates && data.candidates.length > 0 && 
+        data.candidates[0].content && 
+        data.candidates[0].content.parts && 
+        data.candidates[0].content.parts.length > 0) {
+      return data.candidates[0].content.parts[0].text;
+    }
+    
+    throw new Error('No response generated from Gemini API');
   } catch (error) {
     console.error('Error generating Gemini response:', error);
-    throw new Error('Failed to generate AI response');
+    
+    // Fallback response if the API call fails
+    return `I'm sorry, I'm having trouble connecting to my AI systems right now. Please try again in a moment or ask about something else related to fitness and health.`;
   }
 }
 
-// In a real implementation, this would be replaced with Vertex AI SDK configuration
+// Configure the Gemini API
 export function configureGemini(): void {
-  console.log('Configuring Gemini 1.5 Flash integration');
-  // Actual implementation would initialize the Vertex AI SDK here
+  const apiKey = process.env.GOOGLE_API_KEY;
+  if (!apiKey) {
+    console.warn('WARNING: GOOGLE_API_KEY not found. Gemini integration will not work correctly.');
+  } else {
+    console.log('Gemini 1.5 Flash integration configured successfully');
+  }
 }
 
 // Helper function for handling the systemPrompt
