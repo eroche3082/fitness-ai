@@ -1,52 +1,46 @@
-import { Request, Response, Router } from 'express';
-import * as googleFit from './google-fit';
-import * as appleHealth from './apple-health';
-import * as fitbit from './fitbit';
-import * as strava from './strava';
+import { Router } from 'express';
+import { googleFitRouter } from './google-fit';
+import { appleHealthRouter } from './apple-health';
+import { fitbitRouter } from './fitbit';
+import { stravaRouter } from './strava';
 
-// Create router for fitness tracker APIs
-export const fitnessTrackerRouter = Router();
-
-// Google Fit routes
-fitnessTrackerRouter.get('/google-fit/auth', googleFit.handleGoogleFitAuth);
-fitnessTrackerRouter.get('/google-fit/callback', googleFit.handleGoogleFitCallback);
-fitnessTrackerRouter.post('/google-fit/data', googleFit.handleGetFitnessData);
-
-// Apple Health routes - mainly receives data from the client
-fitnessTrackerRouter.post('/apple-health/sync', appleHealth.handleAppleHealthSync);
-
-// Fitbit routes
-fitnessTrackerRouter.get('/fitbit/auth', fitbit.handleFitbitAuth);
-fitnessTrackerRouter.get('/fitbit/callback', fitbit.handleFitbitCallback);
-fitnessTrackerRouter.post('/fitbit/data', fitbit.handleGetFitbitData);
-
-// Strava routes
-fitnessTrackerRouter.get('/strava/auth', strava.handleStravaAuth);
-fitnessTrackerRouter.get('/strava/callback', strava.handleStravaCallback);
-fitnessTrackerRouter.post('/strava/data', strava.handleGetStravaData);
-
-// Health check endpoint
-fitnessTrackerRouter.get('/health', (req: Request, res: Response) => {
-  res.json({
-    status: 'ok',
-    availableServices: {
-      googleFit: !!process.env.GOOGLE_CLIENT_ID && !!process.env.GOOGLE_CLIENT_SECRET,
-      appleHealth: true, // Client side integration, always available
-      fitbit: !!process.env.FITBIT_CLIENT_ID && !!process.env.FITBIT_CLIENT_SECRET,
-      strava: !!process.env.STRAVA_CLIENT_ID && !!process.env.STRAVA_CLIENT_SECRET
-    }
-  });
-});
-
-// Function to register fitness tracker routes with main Express app
-export function registerFitnessTrackerRoutes(router: Router) {
-  router.use('/fitness-trackers', fitnessTrackerRouter);
+/**
+ * Base interface for all fitness tracker services
+ */
+export interface FitnessTrackerService {
+  name: string;
+  id: string;
+  isConfigured: boolean;
+  getAuthUrl(userId: number): Promise<string>;
+  handleCallback(userId: number, code: string): Promise<boolean>;
+  syncData(userId: number): Promise<any>;
+  disconnect(userId: number): Promise<boolean>;
 }
 
-// Export all fitness tracker services
-export {
-  googleFit,
-  appleHealth,
-  fitbit,
-  strava
-};
+/**
+ * Register all fitness tracker routes
+ * @param router Express router
+ */
+export function registerFitnessTrackerRoutes(router: Router): void {
+  // Main health endpoint for all services
+  router.get('/fitness-trackers/health', (req, res) => {
+    // Check which services are available
+    const availableServices = {
+      'google-fit': process.env.GOOGLE_API_KEY !== undefined,
+      'apple-health': false, // Requires iOS app
+      'fitbit': process.env.FITBIT_CLIENT_ID !== undefined,
+      'strava': process.env.STRAVA_CLIENT_ID !== undefined
+    };
+    
+    res.json({
+      status: 'ok',
+      availableServices
+    });
+  });
+  
+  // Register each service router
+  router.use('/fitness-trackers/google-fit', googleFitRouter);
+  router.use('/fitness-trackers/apple-health', appleHealthRouter);
+  router.use('/fitness-trackers/fitbit', fitbitRouter);
+  router.use('/fitness-trackers/strava', stravaRouter);
+}

@@ -1,362 +1,313 @@
-import { Request, Response } from 'express';
+import { Router } from 'express';
+import { FitnessTrackerService } from './index';
+import { storage } from '../../storage';
 import fetch from 'node-fetch';
 
-// Configure OAuth client details for Strava
-const STRAVA_CLIENT_ID = process.env.STRAVA_CLIENT_ID;
-const STRAVA_CLIENT_SECRET = process.env.STRAVA_CLIENT_SECRET;
-const STRAVA_REDIRECT_URI = process.env.REDIRECT_URL || 'http://localhost:5000/api/strava/callback';
-const STRAVA_API_URL = 'https://www.strava.com/api/v3';
+const router = Router();
 
-// Get authentication URL for Strava
-export function getStravaAuthUrl() {
-  const scopes = ['read', 'activity:read', 'profile:read_all'];
+// Strava API endpoints
+const STRAVA_API_BASE = 'https://www.strava.com/api/v3';
+const STRAVA_AUTH_URL = 'https://www.strava.com/oauth/authorize';
+const STRAVA_TOKEN_URL = 'https://www.strava.com/oauth/token';
+
+// Strava OAuth scopes
+const SCOPES = [
+  'read',
+  'activity:read',
+  'read_all'
+].join(',');
+
+/**
+ * Strava fitness tracker service
+ */
+class StravaService implements FitnessTrackerService {
+  name = 'Strava';
+  id = 'strava';
   
-  const authUrl = new URL('https://www.strava.com/oauth/authorize');
-  authUrl.searchParams.append('client_id', STRAVA_CLIENT_ID || '');
-  authUrl.searchParams.append('response_type', 'code');
-  authUrl.searchParams.append('redirect_uri', STRAVA_REDIRECT_URI);
-  authUrl.searchParams.append('scope', scopes.join(','));
+  get isConfigured(): boolean {
+    return process.env.STRAVA_CLIENT_ID !== undefined && 
+           process.env.STRAVA_CLIENT_SECRET !== undefined;
+  }
   
-  return authUrl.toString();
-}
-
-// Exchange authorization code for access token
-export async function exchangeCodeForToken(code: string) {
-  try {
-    if (!STRAVA_CLIENT_ID || !STRAVA_CLIENT_SECRET) {
-      throw new Error('Strava client ID or secret not configured');
+  /**
+   * Generate OAuth URL for Strava
+   */
+  async getAuthUrl(userId: number): Promise<string> {
+    if (!this.isConfigured) {
+      throw new Error('Strava integration is not configured');
     }
     
-    const response = await fetch('https://www.strava.com/oauth/token', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        client_id: STRAVA_CLIENT_ID,
-        client_secret: STRAVA_CLIENT_SECRET,
-        code,
-        grant_type: 'authorization_code'
-      })
-    });
+    const redirectUri = `${process.env.APP_URL || 'http://localhost:5000'}/api/fitness-trackers/strava/callback`;
+    const state = `user-${userId}`;
     
-    if (!response.ok) {
-      const errorData = await response.text();
-      throw new Error(`Strava API error: ${errorData}`);
-    }
+    const authUrl = `${STRAVA_AUTH_URL}?client_id=${process.env.STRAVA_CLIENT_ID}&response_type=code&redirect_uri=${encodeURIComponent(redirectUri)}&approval_prompt=force&scope=${encodeURIComponent(SCOPES)}&state=${state}`;
     
-    const data = await response.json();
-    
-    return {
-      success: true,
-      tokens: {
-        access_token: data.access_token,
-        refresh_token: data.refresh_token,
-        expires_at: data.expires_at,
-        athlete: data.athlete
-      }
-    };
-  } catch (error) {
-    console.error('Error exchanging code for Strava token:', error);
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : 'Unknown error'
-    };
+    return authUrl;
   }
-}
-
-// Refresh access token using refresh token
-export async function refreshAccessToken(refreshToken: string) {
-  try {
-    if (!STRAVA_CLIENT_ID || !STRAVA_CLIENT_SECRET) {
-      throw new Error('Strava client ID or secret not configured');
-    }
-    
-    const response = await fetch('https://www.strava.com/oauth/token', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        client_id: STRAVA_CLIENT_ID,
-        client_secret: STRAVA_CLIENT_SECRET,
-        refresh_token: refreshToken,
-        grant_type: 'refresh_token'
-      })
-    });
-    
-    if (!response.ok) {
-      const errorData = await response.text();
-      throw new Error(`Strava API error: ${errorData}`);
-    }
-    
-    const data = await response.json();
-    
-    return {
-      success: true,
-      tokens: {
-        access_token: data.access_token,
-        refresh_token: data.refresh_token,
-        expires_at: data.expires_at
+  
+  /**
+   * Handle OAuth callback from Strava
+   */
+  async handleCallback(userId: number, code: string): Promise<boolean> {
+    try {
+      if (!this.isConfigured) {
+        throw new Error('Strava integration is not configured');
       }
-    };
-  } catch (error) {
-    console.error('Error refreshing Strava token:', error);
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : 'Unknown error'
-    };
-  }
-}
-
-// Get athlete profile from Strava
-export async function getAthleteProfile(accessToken: string) {
-  try {
-    const response = await fetch(`${STRAVA_API_URL}/athlete`, {
-      headers: {
-        'Authorization': `Bearer ${accessToken}`
-      }
-    });
-    
-    if (!response.ok) {
-      const errorData = await response.text();
-      throw new Error(`Strava API error: ${errorData}`);
-    }
-    
-    const data = await response.json();
-    
-    return {
-      success: true,
-      profile: data
-    };
-  } catch (error) {
-    console.error('Error fetching Strava athlete profile:', error);
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : 'Unknown error'
-    };
-  }
-}
-
-// Get activities from Strava
-export async function getActivities(accessToken: string, params: {
-  before?: number;
-  after?: number;
-  page?: number;
-  per_page?: number;
-} = {}) {
-  try {
-    const queryParams = new URLSearchParams();
-    
-    if (params.before) queryParams.append('before', params.before.toString());
-    if (params.after) queryParams.append('after', params.after.toString());
-    if (params.page) queryParams.append('page', params.page.toString());
-    if (params.per_page) queryParams.append('per_page', params.per_page.toString());
-    
-    const url = `${STRAVA_API_URL}/athlete/activities?${queryParams.toString()}`;
-    
-    const response = await fetch(url, {
-      headers: {
-        'Authorization': `Bearer ${accessToken}`
-      }
-    });
-    
-    if (!response.ok) {
-      const errorData = await response.text();
-      throw new Error(`Strava API error: ${errorData}`);
-    }
-    
-    const data = await response.json();
-    
-    return {
-      success: true,
-      activities: data
-    };
-  } catch (error) {
-    console.error('Error fetching Strava activities:', error);
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : 'Unknown error'
-    };
-  }
-}
-
-// Get activity detail from Strava
-export async function getActivityDetail(accessToken: string, activityId: string) {
-  try {
-    const response = await fetch(`${STRAVA_API_URL}/activities/${activityId}`, {
-      headers: {
-        'Authorization': `Bearer ${accessToken}`
-      }
-    });
-    
-    if (!response.ok) {
-      const errorData = await response.text();
-      throw new Error(`Strava API error: ${errorData}`);
-    }
-    
-    const data = await response.json();
-    
-    return {
-      success: true,
-      activity: data
-    };
-  } catch (error) {
-    console.error('Error fetching Strava activity detail:', error);
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : 'Unknown error'
-    };
-  }
-}
-
-// Get athlete stats from Strava
-export async function getAthleteStats(accessToken: string, athleteId: number) {
-  try {
-    const response = await fetch(`${STRAVA_API_URL}/athletes/${athleteId}/stats`, {
-      headers: {
-        'Authorization': `Bearer ${accessToken}`
-      }
-    });
-    
-    if (!response.ok) {
-      const errorData = await response.text();
-      throw new Error(`Strava API error: ${errorData}`);
-    }
-    
-    const data = await response.json();
-    
-    return {
-      success: true,
-      stats: data
-    };
-  } catch (error) {
-    console.error('Error fetching Strava athlete stats:', error);
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : 'Unknown error'
-    };
-  }
-}
-
-// Express route handler for Strava authentication
-export async function handleStravaAuth(req: Request, res: Response) {
-  try {
-    if (!STRAVA_CLIENT_ID || !STRAVA_CLIENT_SECRET) {
-      return res.status(500).json({
-        success: false,
-        message: 'Strava integration not configured'
+      
+      // Exchange code for access token
+      const response = await fetch(STRAVA_TOKEN_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          client_id: process.env.STRAVA_CLIENT_ID,
+          client_secret: process.env.STRAVA_CLIENT_SECRET,
+          code,
+          grant_type: 'authorization_code'
+        })
       });
+      
+      if (!response.ok) {
+        throw new Error(`Failed to exchange code: ${response.statusText}`);
+      }
+      
+      const data = await response.json();
+      
+      // Store tokens in database (in a real app)
+      console.log(`Received Strava tokens for user ${userId}`);
+      
+      return true;
+    } catch (error) {
+      console.error('Error exchanging code for Strava tokens:', error);
+      return false;
     }
-    
-    const authUrl = getStravaAuthUrl();
-    res.json({ success: true, authUrl });
-  } catch (error) {
-    console.error('Strava auth error:', error);
-    res.status(500).json({
-      success: false,
-      message: error instanceof Error ? error.message : 'Unknown error'
-    });
   }
-}
-
-// Express route handler for Strava callback
-export async function handleStravaCallback(req: Request, res: Response) {
-  try {
-    const { code } = req.query;
-    
-    if (!code || typeof code !== 'string') {
-      return res.status(400).json({
-        success: false,
-        message: 'Authorization code not provided'
-      });
-    }
-    
-    const result = await exchangeCodeForToken(code);
-    
-    if (!result.success) {
-      return res.status(500).json({
-        success: false,
-        message: result.error
-      });
-    }
-    
-    // In a real app, you would save the tokens and athlete data to your database
-    // and associate them with the user's account
-    
-    // Redirect to a success page
-    res.redirect('/fitness-tracker-connected?provider=strava');
-  } catch (error) {
-    console.error('Strava callback error:', error);
-    res.status(500).json({
-      success: false,
-      message: error instanceof Error ? error.message : 'Unknown error'
-    });
-  }
-}
-
-// Express route handler for fetching Strava data
-export async function handleGetStravaData(req: Request, res: Response) {
-  try {
-    const { accessToken, dataType, activityId, athleteId, params } = req.body;
-    
-    if (!accessToken || !dataType) {
-      return res.status(400).json({
-        success: false,
-        message: 'Missing required parameters: accessToken, dataType'
-      });
-    }
-    
-    let result;
-    
-    switch (dataType) {
-      case 'profile':
-        result = await getAthleteProfile(accessToken);
-        break;
-      case 'activities':
-        result = await getActivities(accessToken, params || {});
-        break;
-      case 'activity':
-        if (!activityId) {
-          return res.status(400).json({
-            success: false,
-            message: 'Missing required parameter: activityId'
-          });
+  
+  /**
+   * Sync data from Strava
+   */
+  async syncData(userId: number): Promise<any> {
+    try {
+      if (!this.isConfigured) {
+        throw new Error('Strava integration is not configured');
+      }
+      
+      // In a real implementation, you would:
+      // 1. Get user's token from database
+      // 2. Fetch data from Strava API
+      // 3. Process and store data
+      
+      // This is a simplified example:
+      // Fetch user's recent activities
+      /*
+      const response = await fetch(`${STRAVA_API_BASE}/athlete/activities?per_page=10`, {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`
         }
-        result = await getActivityDetail(accessToken, activityId);
-        break;
-      case 'stats':
-        if (!athleteId) {
-          return res.status(400).json({
-            success: false,
-            message: 'Missing required parameter: athleteId'
-          });
-        }
-        result = await getAthleteStats(accessToken, athleteId);
-        break;
-      default:
-        return res.status(400).json({
-          success: false,
-          message: `Invalid data type: ${dataType}`
-        });
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Failed to fetch Strava data: ${response.statusText}`);
+      }
+      
+      const data = await response.json();
+      */
+      
+      // Simulated response for demonstration
+      const simulatedData = {
+        activities: [
+          {
+            id: 1234567890,
+            type: 'Run',
+            name: 'Morning Run',
+            distance: 5280, // meters
+            moving_time: 1800, // seconds
+            elapsed_time: 1900, // seconds
+            total_elevation_gain: 50, // meters
+            start_date: new Date().toISOString(),
+            average_speed: 2.93, // meters per second
+            max_speed: 4.5 // meters per second
+          },
+          {
+            id: 9876543210,
+            type: 'Ride',
+            name: 'Evening Bike Ride',
+            distance: 15280, // meters
+            moving_time: 2700, // seconds
+            elapsed_time: 3000, // seconds
+            total_elevation_gain: 120, // meters
+            start_date: new Date(Date.now() - 86400000).toISOString(), // yesterday
+            average_speed: 5.66, // meters per second
+            max_speed: 8.2 // meters per second
+          }
+        ]
+      };
+      
+      return simulatedData;
+    } catch (error) {
+      console.error('Error syncing Strava data:', error);
+      throw error;
     }
+  }
+  
+  /**
+   * Disconnect from Strava
+   */
+  async disconnect(userId: number): Promise<boolean> {
+    try {
+      if (!this.isConfigured) {
+        throw new Error('Strava integration is not configured');
+      }
+      
+      // In a real implementation, you would:
+      // 1. Get user's token from database
+      // 2. Revoke the token with Strava API
+      // 3. Remove token from database
+      
+      // This is a simplified example:
+      // const response = await fetch(`${STRAVA_API_BASE}/oauth/deauthorize`, {...});
+      
+      console.log(`Disconnected Strava for user ${userId}`);
+      return true;
+    } catch (error) {
+      console.error('Error disconnecting from Strava:', error);
+      return false;
+    }
+  }
+}
+
+// Create service instance
+const stravaService = new StravaService();
+
+// Configure routes
+router.get('/auth', async (req, res) => {
+  try {
+    // In a real app, get userId from session
+    const userId = req.query.userId ? parseInt(req.query.userId as string) : 1;
     
-    if (!result.success) {
-      return res.status(500).json({
+    if (!stravaService.isConfigured) {
+      return res.status(503).json({
         success: false,
-        message: result.error
+        message: 'Strava integration is not configured'
       });
     }
+    
+    const authUrl = await stravaService.getAuthUrl(userId);
     
     res.json({
       success: true,
-      data: result
+      authUrl
     });
   } catch (error) {
-    console.error('Error fetching Strava data:', error);
+    console.error('Error generating Strava auth URL:', error);
     res.status(500).json({
       success: false,
-      message: error instanceof Error ? error.message : 'Unknown error'
+      message: 'Failed to generate authorization URL'
     });
   }
-}
+});
+
+router.get('/callback', async (req, res) => {
+  try {
+    const { code, state, error } = req.query;
+    
+    if (error) {
+      return res.redirect(`/?provider=strava&error=${error}`);
+    }
+    
+    if (!code || !state) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid callback parameters'
+      });
+    }
+    
+    // Extract userId from state
+    const stateStr = state as string;
+    const userId = parseInt(stateStr.replace('user-', ''));
+    
+    if (isNaN(userId)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid state parameter'
+      });
+    }
+    
+    const success = await stravaService.handleCallback(userId, code as string);
+    
+    if (success) {
+      // Redirect to the fitness trackers page with success message
+      res.redirect(`/?provider=strava&connected=true`);
+    } else {
+      res.redirect(`/?provider=strava&error=true`);
+    }
+  } catch (error) {
+    console.error('Error handling Strava callback:', error);
+    res.redirect(`/?provider=strava&error=true`);
+  }
+});
+
+router.get('/sync', async (req, res) => {
+  try {
+    // In a real app, get userId from session
+    const userId = req.query.userId ? parseInt(req.query.userId as string) : 1;
+    
+    if (!stravaService.isConfigured) {
+      return res.status(503).json({
+        success: false,
+        message: 'Strava integration is not configured'
+      });
+    }
+    
+    const data = await stravaService.syncData(userId);
+    
+    res.json({
+      success: true,
+      data
+    });
+  } catch (error) {
+    console.error('Error syncing Strava data:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to sync data from Strava'
+    });
+  }
+});
+
+router.post('/disconnect', async (req, res) => {
+  try {
+    // In a real app, get userId from session
+    const userId = req.body.userId ? parseInt(req.body.userId) : 1;
+    
+    if (!stravaService.isConfigured) {
+      return res.status(503).json({
+        success: false,
+        message: 'Strava integration is not configured'
+      });
+    }
+    
+    const success = await stravaService.disconnect(userId);
+    
+    res.json({
+      success
+    });
+  } catch (error) {
+    console.error('Error disconnecting from Strava:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to disconnect from Strava'
+    });
+  }
+});
+
+// Health check endpoint
+router.get('/status', (req, res) => {
+  res.json({
+    service: stravaService.name,
+    id: stravaService.id,
+    configured: stravaService.isConfigured
+  });
+});
+
+export { router as stravaRouter, StravaService };

@@ -186,7 +186,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  app.get("/api/users/:userId/workouts", async (req, res) => {
+  apiRouter.get("/users/:userId/workouts", async (req, res) => {
     try {
       const userId = parseInt(req.params.userId);
       
@@ -202,7 +202,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Progress routes
-  app.post("/api/progress", async (req, res) => {
+  apiRouter.post("/progress", async (req, res) => {
     try {
       const progressData = insertProgressSchema.parse(req.body);
       const progress = await storage.createProgress(progressData);
@@ -215,7 +215,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  app.get("/api/users/:userId/progress", async (req, res) => {
+  apiRouter.get("/users/:userId/progress", async (req, res) => {
     try {
       const userId = parseInt(req.params.userId);
       const type = req.query.type as string | undefined;
@@ -240,13 +240,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Google Cloud API integration routes
   
   // Form Check Analysis API
-  app.post("/api/form-check", handleFormCheckAnalysis);
+  apiRouter.post("/form-check", handleFormCheckAnalysis);
   
   // Speech-to-Text API
-  app.post("/api/speech-to-text", handleSpeechToText);
+  apiRouter.post("/speech-to-text", handleSpeechToText);
   
   // Text-to-Speech API
-  app.post("/api/text-to-speech", handleTextToSpeech);
+  apiRouter.post("/text-to-speech", handleTextToSpeech);
   
   return httpServer;
 }
