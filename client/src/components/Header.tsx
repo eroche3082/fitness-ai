@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link } from "wouter";
 import LanguageSwitcher from "./LanguageSwitcher";
 import { useUser } from "@/contexts/UserContext";
 import { Button } from "@/components/ui/button";
@@ -10,6 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Activity } from "lucide-react";
 
 export default function Header() {
   const { user, logout } = useUser();
@@ -29,6 +31,14 @@ export default function Header() {
       </div>
       
       <div className="flex items-center space-x-4">
+        <Link href="/" className="text-sm font-medium hover:text-primary transition-colors">
+          Inicio
+        </Link>
+        <Link href="/fitness-trackers" className="flex items-center text-sm font-medium hover:text-primary transition-colors">
+          <Activity className="h-4 w-4 mr-1" />
+          Dispositivos
+        </Link>
+        
         <LanguageSwitcher />
         
         <DropdownMenu>
@@ -45,13 +55,19 @@ export default function Header() {
             </div>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuLabel>My Account</DropdownMenuLabel>
+            <DropdownMenuLabel>Mi Cuenta</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>Profile</DropdownMenuItem>
-            <DropdownMenuItem>Settings</DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link href="/fitness-trackers">
+                <Activity className="h-4 w-4 mr-2" />
+                Dispositivos de Fitness
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem>Perfil</DropdownMenuItem>
+            <DropdownMenuItem>Configuración</DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={handleLogout}>
-              Logout
+              Cerrar Sesión
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
