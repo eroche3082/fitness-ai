@@ -1,4 +1,4 @@
-import express, { type Express } from "express";
+import express, { type Express, Router } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { generateGeminiResponse, configureGemini } from "./gemini";
@@ -13,6 +13,7 @@ import {
 } from "@shared/schema";
 import { handleFormCheckAnalysis } from "./services/vision-service";
 import { handleSpeechToText, handleTextToSpeech } from "./services/speech-service";
+import { registerFitnessTrackerRoutes } from "./services/fitness-trackers";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Initialize Gemini configuration
@@ -21,10 +22,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Create HTTP server
   const httpServer = createServer(app);
   
-  // We're removing the WebSocket setup temporarily to simplify the application
+  // Create API router
+  const apiRouter = Router();
+  app.use('/api', apiRouter);
+  
+  // Register fitness tracker routes
+  registerFitnessTrackerRoutes(apiRouter);
   
   // User routes
-  app.post("/api/users", async (req, res) => {
+  apiRouter.post("/users", async (req, res) => {
     try {
       const userData = insertUserSchema.parse(req.body);
       const existingUser = await storage.getUserByUsername(userData.username);
@@ -44,7 +50,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Authentication route (simplified for demo)
-  app.post("/api/auth/login", async (req, res) => {
+  apiRouter.post("/auth/login", async (req, res) => {
     try {
       const { username, password } = req.body;
       
@@ -73,7 +79,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Conversation routes
-  app.post("/api/conversations", async (req, res) => {
+  apiRouter.post("/conversations", async (req, res) => {
     try {
       const conversationData = insertConversationSchema.parse(req.body);
       const conversation = await storage.createConversation(conversationData);
@@ -87,7 +93,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Message route (replacing WebSocket functionality)
-  app.post("/api/conversations/:conversationId/messages", async (req, res) => {
+  apiRouter.post("/conversations/:conversationId/messages", async (req, res) => {
     try {
       const conversationId = parseInt(req.params.conversationId);
       const { content, userId } = req.body;
@@ -136,7 +142,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  app.get("/api/users/:userId/conversations", async (req, res) => {
+  apiRouter.get("/users/:userId/conversations", async (req, res) => {
     try {
       const userId = parseInt(req.params.userId);
       
@@ -151,7 +157,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
   
-  app.get("/api/conversations/:conversationId/messages", async (req, res) => {
+  apiRouter.get("/conversations/:conversationId/messages", async (req, res) => {
     try {
       const conversationId = parseInt(req.params.conversationId);
       
@@ -167,7 +173,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
   
   // Workout routes
-  app.post("/api/workouts", async (req, res) => {
+  apiRouter.post("/workouts", async (req, res) => {
     try {
       const workoutData = insertWorkoutSchema.parse(req.body);
       const workout = await storage.createWorkout(workoutData);

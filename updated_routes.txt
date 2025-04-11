@@ -1,0 +1,27 @@
+// Message route (replacing WebSocket functionality)
+apiRouter.post("/conversations/:conversationId/messages", async (req, res) => {
+
+apiRouter.get("/users/:userId/conversations", async (req, res) => {
+
+apiRouter.get("/conversations/:conversationId/messages", async (req, res) => {
+
+// Workout routes
+apiRouter.post("/workouts", async (req, res) => {
+
+apiRouter.get("/users/:userId/workouts", async (req, res) => {
+
+// Progress routes
+apiRouter.post("/progress", async (req, res) => {
+
+apiRouter.get("/users/:userId/progress", async (req, res) => {
+
+// Google Cloud API integration routes
+
+// Form Check Analysis API
+apiRouter.post("/form-check", handleFormCheckAnalysis);
+
+// Speech-to-Text API
+apiRouter.post("/speech-to-text", handleSpeechToText);
+
+// Text-to-Speech API
+apiRouter.post("/text-to-speech", handleTextToSpeech);
