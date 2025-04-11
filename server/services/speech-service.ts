@@ -26,8 +26,9 @@ export async function transcribeAudio(
       content: audioBuffer.toString('base64'),
     };
     
+    const encoding = 'LINEAR16';
     const config = {
-      encoding: 'LINEAR16' as protos.google.cloud.speech.v1.RecognitionConfig.AudioEncoding,
+      encoding: encoding as unknown as protos.google.cloud.speech.v1.RecognitionConfig.AudioEncoding,
       sampleRateHertz: sampleRateHertz,
       languageCode: languageCode,
       model: 'default',
