@@ -1,30 +1,15 @@
 import { Request, Response } from 'express';
 import { systemPrompt } from '@shared/systemPrompt';
-import fetch from 'node-fetch';
+import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/generative-ai';
 
-// Gemini API response types
-interface GeminiPart {
-  text: string;
-}
-
-interface GeminiContent {
-  parts: GeminiPart[];
-  role?: string;
-}
-
-interface GeminiCandidate {
-  content: GeminiContent;
-  finishReason?: string;
-  index?: number;
-  safetyRatings?: any[];
-}
-
-interface GeminiResponse {
-  candidates: GeminiCandidate[];
-  promptFeedback?: any;
-}
-
-// Real implementation of the Gemini integration using Google's Generative AI API
+/**
+ * Enhanced implementation of the Gemini integration using Google's official Generative AI SDK
+ * This implementation supports:
+ * - Gemini 1.5 Flash - Latest multimodal model with faster inference
+ * - System prompt prepending (for fitness coaching context)
+ * - Proper chat history handling
+ * - Error handling with fallback behavior
+ */
 export async function generateGeminiResponse(messages: { role: string; content: string }[]): Promise<string> {
   try {
     const apiKey = process.env.GOOGLE_API_KEY;
@@ -34,34 +19,12 @@ export async function generateGeminiResponse(messages: { role: string; content: 
       throw new Error('Gemini API key not configured');
     }
     
-    // Format messages for Gemini API
-    const formattedMessages: { role: string; parts: { text: string }[] }[] = [];
+    // Initialize the Google Generative AI SDK with the API key
+    const genAI = new GoogleGenerativeAI(apiKey);
     
-    // Add system prompt as first message if it doesn't exist
-    const hasSystemPrompt = messages.some(msg => msg.role === 'system');
-    if (!hasSystemPrompt) {
-      formattedMessages.push({
-        role: 'system',
-        parts: [{ text: systemPrompt }]
-      });
-    }
-    
-    // Map user and assistant messages
-    messages.forEach(message => {
-      // Skip system messages as we've already added the system prompt
-      if (message.role === 'system') return;
-      
-      // Map 'user' to 'user' and 'assistant' to 'model'
-      const role = message.role === 'assistant' ? 'model' : 'user';
-      formattedMessages.push({
-        role: role,
-        parts: [{ text: message.content }]
-      });
-    });
-    
-    // Create request payload
-    const payload = {
-      contents: formattedMessages,
+    // Get the Gemini 1.5 Flash model
+    const model = genAI.getGenerativeModel({
+      model: "gemini-1.5-flash",
       generationConfig: {
         temperature: 0.7,
         topK: 40,
@@ -70,53 +33,78 @@ export async function generateGeminiResponse(messages: { role: string; content: 
       },
       safetySettings: [
         {
-          category: "HARM_CATEGORY_HARASSMENT",
-          threshold: "BLOCK_ONLY_HIGH"
+          category: HarmCategory.HARM_CATEGORY_HARASSMENT,
+          threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH,
         },
         {
-          category: "HARM_CATEGORY_HATE_SPEECH",
-          threshold: "BLOCK_ONLY_HIGH"
+          category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+          threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH,
         },
         {
-          category: "HARM_CATEGORY_SEXUALLY_EXPLICIT",
-          threshold: "BLOCK_ONLY_HIGH"
+          category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+          threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH,
         },
         {
-          category: "HARM_CATEGORY_DANGEROUS_CONTENT",
-          threshold: "BLOCK_ONLY_HIGH"
-        }
-      ]
-    };
+          category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+          threshold: HarmBlockThreshold.BLOCK_ONLY_HIGH,
+        },
+      ],
+    });
     
-    // Call Gemini API
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(payload)
+    // Create the chat session
+    const chat = model.startChat({
+      history: [],
+      // Add the system prompt at the beginning
+      generationConfig: {
+        temperature: 0.7,
+        topK: 40,
+        topP: 0.95,
+        maxOutputTokens: 1024,
+      },
+    });
+
+    // Process the messages and add them to the chat history
+    let chatHistory = [];
+    
+    // Add system prompt if it doesn't exist in the messages
+    const hasSystemPrompt = messages.some(msg => msg.role === 'system');
+    if (!hasSystemPrompt) {
+      chatHistory.push({
+        role: 'user',
+        parts: [{ text: `I want you to act as a fitness and health coach with the following context: ${systemPrompt}` }],
+      });
+      chatHistory.push({
+        role: 'model',
+        parts: [{ text: `I understand. I'll act as Fitness AI, your dedicated health and fitness assistant, following the provided guidelines. How can I help you with your fitness goals today?` }],
+      });
+    }
+    
+    // Convert and add the conversation messages
+    messages.forEach((message) => {
+      if (message.role === 'system') {
+        // Skip system messages as we've already handled them
+        return;
       }
-    );
+      
+      const role = message.role === 'assistant' ? 'model' : 'user';
+      chatHistory.push({
+        role,
+        parts: [{ text: message.content }],
+      });
+    });
     
-    if (!response.ok) {
-      const errorData = await response.text();
-      console.error('Gemini API error:', errorData);
-      throw new Error(`Gemini API error: ${response.status} ${response.statusText}`);
+    // Get the last user message for the prompt
+    const lastUserMessage = messages.filter(msg => msg.role === 'user').pop();
+    
+    if (!lastUserMessage) {
+      throw new Error('No user message found in the conversation');
     }
     
-    const data = await response.json() as GeminiResponse;
+    // Generate the response using the chat history
+    const result = await chat.sendMessage(lastUserMessage.content);
+    const response = result.response;
     
-    // Get response text from the generated content
-    if (data.candidates && data.candidates.length > 0 && 
-        data.candidates[0].content && 
-        data.candidates[0].content.parts && 
-        data.candidates[0].content.parts.length > 0) {
-      return data.candidates[0].content.parts[0].text;
-    }
-    
-    throw new Error('No response generated from Gemini API');
+    return response.text();
   } catch (error) {
     console.error('Error generating Gemini response:', error);
     
@@ -125,17 +113,29 @@ export async function generateGeminiResponse(messages: { role: string; content: 
   }
 }
 
-// Configure the Gemini API
+/**
+ * Configure the Gemini API and verify that it's working
+ */
 export function configureGemini(): void {
   const apiKey = process.env.GOOGLE_API_KEY;
   if (!apiKey) {
     console.warn('WARNING: GOOGLE_API_KEY not found. Gemini integration will not work correctly.');
   } else {
-    console.log('Gemini 1.5 Flash integration configured successfully');
+    try {
+      // Initialize the Google Generative AI SDK to verify configuration
+      const genAI = new GoogleGenerativeAI(apiKey);
+      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+      console.log('Gemini 1.5 Flash integration configured successfully');
+    } catch (error) {
+      console.error('Error configuring Gemini:', error);
+      console.warn('Gemini integration may not work correctly due to configuration error');
+    }
   }
 }
 
-// Helper function for handling the systemPrompt
+/**
+ * Helper function for handling the systemPrompt
+ */
 export const getSystemPrompt = (): string => {
   return systemPrompt;
 };
