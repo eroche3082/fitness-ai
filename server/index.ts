@@ -1,6 +1,16 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import { configureGemini } from "./gemini";
+import { initializeGoogleCloudServices } from "./google-cloud-config";
+
+// Configure Google APIs
+configureGemini();
+
+// Initialize Google Cloud services (non-blocking)
+initializeGoogleCloudServices()
+  .then(() => console.log("Google Cloud services initialized successfully"))
+  .catch(err => console.warn("Google Cloud services initialization failed, some features may be limited:", err));
 
 const app = express();
 app.use(express.json());

@@ -11,6 +11,8 @@ import {
   insertWorkoutSchema,
   insertProgressSchema
 } from "@shared/schema";
+import { handleFormCheckAnalysis } from "./services/vision-service";
+import { handleSpeechToText, handleTextToSpeech } from "./services/speech-service";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Initialize Gemini configuration
@@ -228,6 +230,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to fetch progress data" });
     }
   });
+  
+  // Google Cloud API integration routes
+  
+  // Form Check Analysis API
+  app.post("/api/form-check", handleFormCheckAnalysis);
+  
+  // Speech-to-Text API
+  app.post("/api/speech-to-text", handleSpeechToText);
+  
+  // Text-to-Speech API
+  app.post("/api/text-to-speech", handleTextToSpeech);
   
   return httpServer;
 }
