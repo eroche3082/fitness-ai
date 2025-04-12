@@ -21,6 +21,7 @@ import {
 } from '@/components/ui/accordion';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import PhaseTracker from './PhaseTracker';
+import TabStatusTracker from './TabStatusTracker';
 
 // Phase status type
 type PhaseStatus = 'pending' | 'in_progress' | 'complete';
@@ -293,9 +294,10 @@ export default function AdminPanel() {
           </SheetHeader>
 
           <Tabs defaultValue="checklist" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
+            <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="checklist">Checklist</TabsTrigger>
               <TabsTrigger value="diagnostic">System Diagnostic</TabsTrigger>
+              <TabsTrigger value="tabs">Tab Status</TabsTrigger>
             </TabsList>
             
             <TabsContent value="checklist" className="mt-4">
@@ -361,6 +363,10 @@ export default function AdminPanel() {
             
             <TabsContent value="diagnostic">
               <PhaseTracker />
+            </TabsContent>
+            
+            <TabsContent value="tabs">
+              <TabStatusTracker />
             </TabsContent>
           </Tabs>
 
