@@ -21,6 +21,7 @@ import {
 } from "./services/voice-coaching";
 import { registerApiStatusRoutes } from "./services/api-status-service";
 import { registerSystemAuditRoutes } from "./services/system-audit";
+import { registerRapidApiRoutes } from "./services/rapid-api-service";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Initialize Gemini configuration
@@ -267,6 +268,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Registrar las rutas de auditoría del sistema
   registerSystemAuditRoutes(apiRouter);
   console.log("🔍 System Audit routes registered successfully");
+  
+  // Registrar las rutas de Rapid API
+  registerRapidApiRoutes(apiRouter);
   
   return httpServer;
 }
