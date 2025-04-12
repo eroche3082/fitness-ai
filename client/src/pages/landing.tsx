@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import {
   Dumbbell,
@@ -20,12 +20,17 @@ import {
   UploadCloud,
   Award,
   Mic,
-  Download
+  Download,
+  Heart as HeartIcon
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
 import { useAuth } from '../App';
+
+// Import SVG pattern
+import patternSvg from '../assets/fitness-pattern.svg';
 
 // App features based on the 20 core features identified
 const features = [
@@ -154,29 +159,48 @@ export default function LandingPage() {
   return (
     <div className="flex flex-col min-h-screen">
       {/* Top Navigation */}
-      <nav className="flex items-center justify-between p-4 bg-primary text-primary-foreground">
+      <nav className="flex items-center justify-between p-4 bg-primary text-primary-foreground sticky top-0 z-50">
         <div className="flex items-center gap-2">
-          <Activity className="h-6 w-6" />
-          <h1 className="text-xl font-bold">Fitness AI</h1>
+          <HeartIcon className="h-6 w-6 text-white animate-pulse" />
+          <h1 className="text-xl font-bold text-white">Fitness AI</h1>
         </div>
         <Button 
           onClick={() => setShowLoginModal(true)} 
-          variant="outline"
+          variant="secondary"
+          className="font-semibold shadow-md hover:shadow-lg"
         >
           Login
         </Button>
       </nav>
 
       {/* Hero Section */}
-      <div className="relative flex flex-col items-center justify-center px-6 py-24 bg-gradient-to-b from-primary/20 to-background">
-        <h1 className="text-4xl md:text-6xl font-bold text-center mb-6">Transform Your Fitness Journey with AI</h1>
-        <p className="text-xl text-center max-w-3xl mb-8">
+      <div 
+        className="relative flex flex-col items-center justify-center px-6 py-24"
+        style={{
+          backgroundImage: `url(${patternSvg})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center'
+        }}
+      >
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent"></div>
+        
+        <Badge variant="outline" className="relative mb-6 text-sm py-1 px-4 bg-white/10 backdrop-blur-sm border-primary/20">
+          <span className="animate-pulse mr-2 text-primary">●</span> Fitness Intelligence Platform
+        </Badge>
+        
+        <h1 className="relative text-4xl md:text-6xl font-bold text-center mb-6 bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary-foreground">
+          Transform Your Fitness Journey with AI
+        </h1>
+        
+        <p className="relative text-xl text-center max-w-3xl mb-8">
           Use the power of artificial intelligence to optimize your workouts, track your progress, and achieve your health goals faster.
         </p>
-        <div className="flex flex-wrap gap-4 justify-center">
+        
+        <div className="relative flex flex-wrap gap-4 justify-center">
           <Button 
             size="lg" 
             onClick={() => setShowLoginModal(true)}
+            className="bg-primary hover:bg-primary/90 text-white font-semibold shadow-lg"
           >
             Get Started
           </Button>
@@ -184,6 +208,7 @@ export default function LandingPage() {
             size="lg" 
             variant="outline" 
             onClick={() => setLocation('/chat')}
+            className="border-primary text-primary hover:bg-primary/10"
           >
             Chat with Assistant
           </Button>
