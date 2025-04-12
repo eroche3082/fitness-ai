@@ -319,7 +319,10 @@ export default function EnhancedChatbot({ forceOpen = false }: EnhancedChatbotPr
             aria-label="Open Fitness AI Assistant"
           >
             <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M17.7 12L21.7 8C22.1 7.6 22.1 7 21.7 6.6L17.4 2.3C17 1.9 16.4 1.9 16 2.3L12 6.3L8 2.3C7.6 1.9 7 1.9 6.6 2.3L2.3 6.6C1.9 7 1.9 7.6 2.3 8L6.3 12L2.3 16C1.9 16.4 1.9 17 2.3 17.4L6.6 21.7C7 22.1 7.6 22.1 8 21.7L12 17.7L16 21.7C16.4 22.1 17 22.1 17.4 21.7L21.7 17.4C22.1 17 22.1 16.4 21.7 16L17.7 12Z" fill="currentColor"/>
+              <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 13.5997 2.37562 15.1116 3.04346 16.4525C3.22094 16.8088 3.28001 17.2161 3.17712 17.6006L2.58151 19.8267C2.32295 20.793 3.20701 21.677 4.17335 21.4185L6.39939 20.8229C6.78393 20.72 7.19121 20.7791 7.54753 20.9565C8.88837 21.6244 10.4003 22 12 22Z" stroke="currentColor" stroke-width="2"/>
+              <path d="M8 12H8.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              <path d="M12 12H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              <path d="M16 12H16.01" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
             </svg>
           </Button>
         </div>
@@ -341,7 +344,10 @@ export default function EnhancedChatbot({ forceOpen = false }: EnhancedChatbotPr
               </Button>
               <div className="flex items-center gap-2">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M17.7 12L21.7 8C22.1 7.6 22.1 7 21.7 6.6L17.4 2.3C17 1.9 16.4 1.9 16 2.3L12 6.3L8 2.3C7.6 1.9 7 1.9 6.6 2.3L2.3 6.6C1.9 7 1.9 7.6 2.3 8L6.3 12L2.3 16C1.9 16.4 1.9 17 2.3 17.4L6.6 21.7C7 22.1 7.6 22.1 8 21.7L12 17.7L16 21.7C16.4 22.1 17 22.1 17.4 21.7L21.7 17.4C22.1 17 22.1 16.4 21.7 16L17.7 12Z" fill="currentColor"/>
+                  <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 13.5997 2.37562 15.1116 3.04346 16.4525C3.22094 16.8088 3.28001 17.2161 3.17712 17.6006L2.58151 19.8267C2.32295 20.793 3.20701 21.677 4.17335 21.4185L6.39939 20.8229C6.78393 20.72 7.19121 20.7791 7.54753 20.9565C8.88837 21.6244 10.4003 22 12 22Z" stroke="currentColor" strokeWidth="2"/>
+                  <path d="M8 12H8.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                  <path d="M12 12H12.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                  <path d="M16 12H16.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
                 </svg>
                 <h1 className="text-xl font-bold">Fitness AI Assistant</h1>
               </div>

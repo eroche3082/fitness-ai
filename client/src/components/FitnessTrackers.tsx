@@ -29,23 +29,36 @@ export default function FitnessTrackers() {
   
   // Fetch available trackers and their status
   const { data: trackers, isLoading, error, refetch } = useQuery({
-    queryKey: ['/api/fitness-trackers/health'],
+    queryKey: ['/api/fitness/status'],
     queryFn: getQueryFn<any>({ on401: 'returnNull' }),
-    enabled: !!user
+    enabled: !!user,
+    retry: 2,
+    refetchOnWindowFocus: false
   });
   
   // Fetch tracker authentication URL
   const getAuthUrl = async (trackerId: string) => {
     try {
-      const response = await apiRequest(`/api/fitness-trackers/${trackerId}/auth`, {
+      const response = await apiRequest(`/api/fitness/${trackerId}/auth`, {
         method: 'GET'
       });
       
-      if (response.success && response.authUrl) {
-        window.location.href = response.authUrl;
+      if (response.url) {
+        window.location.href = response.url;
+      } else {
+        toast({
+          title: `Connection Error`,
+          description: `Unable to connect to ${trackerConfig[trackerId].name}. Please try again later.`,
+          variant: "destructive"
+        });
       }
     } catch (error) {
       console.error(`Error getting auth URL for ${trackerId}:`, error);
+      toast({
+        title: `Connection Error`,
+        description: `Failed to connect to ${trackerConfig[trackerId].name}. Please check your network connection and try again.`,
+        variant: "destructive"
+      });
     }
   };
   
@@ -83,15 +96,14 @@ export default function FitnessTrackers() {
   
   // Combine API data with config data
   const trackersData: TrackerInfo[] = Object.values(trackerConfig).map(tracker => {
-    const apiData = trackers?.availableServices ? {
-      status: trackers.availableServices[tracker.id] ? 'disconnected' : 'error'
-    } : {
-      status: 'disconnected'
-    };
+    // For type safety, explicitly define the status as TrackerStatus
+    const status: TrackerStatus = trackers?.availableServices && !trackers.availableServices[tracker.id] 
+      ? 'error' 
+      : 'disconnected';
     
     return {
       ...tracker,
-      ...apiData
+      status
     };
   });
   
@@ -254,7 +266,7 @@ export default function FitnessTrackers() {
                   {tracker.status === 'disconnected' ? (
                     <Button 
                       onClick={() => handleConnect(tracker.id)}
-                      disabled={tracker.status === 'error'}
+                      disabled={tracker.status !== 'disconnected'}
                     >
                       Connect {tracker.name}
                     </Button>
