@@ -83,7 +83,11 @@ const languages: LanguageOption[] = [
   { value: 'pt', label: 'Português' }
 ];
 
-export default function EnhancedChatbot() {
+interface EnhancedChatbotProps {
+  forceOpen?: boolean;
+}
+
+export default function EnhancedChatbot({ forceOpen = false }: EnhancedChatbotProps) {
   // Refs
   const messageEndRef = useRef<HTMLDivElement>(null);
   
@@ -162,6 +166,13 @@ export default function EnhancedChatbot() {
       setIsProcessing(false);
     }
   };
+
+  // Handle forceOpen prop
+  useEffect(() => {
+    if (forceOpen && !open) {
+      setOpen(true);
+    }
+  }, [forceOpen, open]);
 
   // Scroll to the bottom when messages change
   useEffect(() => {
