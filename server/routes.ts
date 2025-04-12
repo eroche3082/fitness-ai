@@ -22,6 +22,7 @@ import {
 import { registerApiStatusRoutes } from "./services/api-status-service";
 import { registerSystemAuditRoutes } from "./services/system-audit";
 import { registerRapidApiRoutes } from "./services/rapid-api-service";
+import { registerUserProfileRoutes } from "./services/user-profile-service";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Initialize Gemini configuration
@@ -271,6 +272,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Registrar las rutas de Rapid API
   registerRapidApiRoutes(apiRouter);
+  
+  // Register user profile routes
+  registerUserProfileRoutes(apiRouter);
+  console.log("👤 User Profile routes registered successfully");
   
   return httpServer;
 }

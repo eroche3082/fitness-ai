@@ -16,7 +16,7 @@ export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
-  updateUser(id: number, data: Partial<InsertUser>): Promise<User | undefined>;
+  updateUser(id: number, data: Partial<InsertUser> & { profile?: any }): Promise<User | undefined>;
   
   // Conversation operations
   getConversation(id: number): Promise<Conversation | undefined>;
@@ -79,11 +79,24 @@ export class MemStorage implements IStorage {
     return user;
   }
   
-  async updateUser(id: number, data: Partial<InsertUser>): Promise<User | undefined> {
+  async updateUser(id: number, data: Partial<InsertUser> & { profile?: any }): Promise<User | undefined> {
     const user = await this.getUser(id);
     if (!user) return undefined;
     
-    const updatedUser: User = { ...user, ...data };
+    // Handle profile separately to avoid TypeScript errors
+    const { profile, ...restData } = data;
+    
+    // Create a copy of the user to update
+    const updatedUser: any = { ...user, ...restData };
+    
+    // Merge profile if it exists
+    if (profile) {
+      updatedUser.profile = {
+        ...(updatedUser.profile || {}),
+        ...profile
+      };
+    }
+    
     this.users.set(id, updatedUser);
     return updatedUser;
   }
