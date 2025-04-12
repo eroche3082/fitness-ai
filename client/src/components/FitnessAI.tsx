@@ -4,8 +4,8 @@ import Sidebar from "./Sidebar";
 import ChatArea from "./ChatArea";
 import MobileSidebar from "./MobileSidebar";
 import FloatingVoiceButton from "./FloatingVoiceButton";
-import Footer from "./Footer";
 import { useUser } from "@/contexts/UserContext";
+import AdminPanel from "./admin/AdminPanel";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -205,9 +205,9 @@ export default function FitnessAI() {
         <Sidebar />
         <ChatArea />
       </div>
-      <Footer />
       <MobileSidebar />
       <FloatingVoiceButton />
+      <AdminPanel />
     </div>
   );
 }
