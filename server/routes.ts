@@ -20,6 +20,7 @@ import {
   handleVoiceResponse 
 } from "./services/voice-coaching";
 import { registerApiStatusRoutes } from "./services/api-status-service";
+import { registerSystemAuditRoutes } from "./services/system-audit";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Initialize Gemini configuration
@@ -262,6 +263,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Registrar las rutas de estado de API de Google Cloud
   registerApiStatusRoutes(apiRouter);
   console.log("🔍 Google Cloud API Status routes registered successfully");
+  
+  // Registrar las rutas de auditoría del sistema
+  registerSystemAuditRoutes(apiRouter);
+  console.log("🔍 System Audit routes registered successfully");
   
   return httpServer;
 }

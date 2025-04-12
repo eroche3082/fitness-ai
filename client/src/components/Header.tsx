@@ -11,7 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Activity, Volume2, CloudCog } from "lucide-react";
+import { Activity, Volume2, CloudCog, Gauge } from "lucide-react";
 
 export default function Header() {
   const { user, logout } = useUser();
@@ -48,6 +48,11 @@ export default function Header() {
           APIs
         </Link>
         
+        <Link href="/agent-status" className="flex items-center text-sm font-medium hover:text-primary transition-colors">
+          <Gauge className="h-4 w-4 mr-1" />
+          System
+        </Link>
+        
         <LanguageSwitcher />
         
         <DropdownMenu>
@@ -82,6 +87,12 @@ export default function Header() {
               <Link href="/api-status">
                 <CloudCog className="h-4 w-4 mr-2" />
                 API Status
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link href="/agent-status">
+                <Gauge className="h-4 w-4 mr-2" />
+                System Audit
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem>Profile</DropdownMenuItem>
