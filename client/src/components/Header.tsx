@@ -11,7 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Activity, Volume2 } from "lucide-react";
+import { Activity, Volume2, CloudCog } from "lucide-react";
 
 export default function Header() {
   const { user, logout } = useUser();
@@ -43,6 +43,11 @@ export default function Header() {
           Voice Coach
         </Link>
         
+        <Link href="/api-status" className="flex items-center text-sm font-medium hover:text-primary transition-colors">
+          <CloudCog className="h-4 w-4 mr-1" />
+          APIs
+        </Link>
+        
         <LanguageSwitcher />
         
         <DropdownMenu>
@@ -71,6 +76,12 @@ export default function Header() {
               <Link href="/voice-coaching">
                 <Volume2 className="h-4 w-4 mr-2" />
                 Voice Coaching
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link href="/api-status">
+                <CloudCog className="h-4 w-4 mr-2" />
+                API Status
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem>Profile</DropdownMenuItem>
