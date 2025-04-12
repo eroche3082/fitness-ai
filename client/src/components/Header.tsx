@@ -11,7 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Activity } from "lucide-react";
+import { Activity, Volume2 } from "lucide-react";
 
 export default function Header() {
   const { user, logout } = useUser();
@@ -37,6 +37,10 @@ export default function Header() {
         <Link href="/fitness-trackers" className="flex items-center text-sm font-medium hover:text-primary transition-colors">
           <Activity className="h-4 w-4 mr-1" />
           Devices
+        </Link>
+        <Link href="/voice-coaching" className="flex items-center text-sm font-medium hover:text-primary transition-colors">
+          <Volume2 className="h-4 w-4 mr-1" />
+          Voice Coach
         </Link>
         
         <LanguageSwitcher />

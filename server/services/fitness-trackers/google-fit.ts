@@ -1,69 +1,187 @@
-import { Router } from 'express';
-import { FitnessTrackerService } from './index';
-import { storage } from '../../storage';
-import { google } from 'googleapis';
+/**
+ * Google Fit Integration Service
+ * 
+ * This service handles the integration with Google Fit API
+ * Documentation: https://developers.google.com/fit/rest/v1/reference
+ */
 
-const router = Router();
+import { FitnessTrackerService } from './index';
+import { getServiceToken, storeServiceToken, updateLastSyncDate } from './utils';
 
 // Google Fit API scopes
 const SCOPES = [
   'https://www.googleapis.com/auth/fitness.activity.read',
   'https://www.googleapis.com/auth/fitness.body.read',
   'https://www.googleapis.com/auth/fitness.heart_rate.read',
-  'https://www.googleapis.com/auth/fitness.sleep.read'
+  'https://www.googleapis.com/auth/fitness.sleep.read',
+  'https://www.googleapis.com/auth/fitness.location.read',
 ];
 
-// OAuth2 client configuration
-const oauth2Client = new google.auth.OAuth2(
-  process.env.GOOGLE_FIT_CLIENT_ID,
-  process.env.GOOGLE_FIT_CLIENT_SECRET,
-  `${process.env.APP_URL || 'http://localhost:5000'}/api/fitness-trackers/google-fit/callback`
-);
-
-/**
- * Google Fit fitness tracker service
- */
-class GoogleFitService implements FitnessTrackerService {
-  name = 'Google Fit';
+export class GoogleFitService implements FitnessTrackerService {
   id = 'google-fit';
+  name = 'Google Fit';
+  description = 'Connect to Google Fit to sync your activity, workouts, sleep data, and heart rate.';
+  apiDocumentation = 'https://developers.google.com/fit/rest/v1/reference';
+  requiredSecrets = ['GOOGLE_FIT_CLIENT_ID', 'GOOGLE_FIT_CLIENT_SECRET'];
   
-  get isConfigured(): boolean {
-    return process.env.GOOGLE_FIT_CLIENT_ID !== undefined && 
-           process.env.GOOGLE_FIT_CLIENT_SECRET !== undefined;
+  /**
+   * Check if the service is properly configured with API keys
+   */
+  isConfigured(): boolean {
+    return (
+      !!process.env.GOOGLE_FIT_CLIENT_ID && 
+      !!process.env.GOOGLE_FIT_CLIENT_SECRET
+    );
   }
   
   /**
-   * Generate OAuth URL for Google Fit
+   * Get the OAuth authorization URL for Google Fit
    */
-  async getAuthUrl(userId: number): Promise<string> {
-    // Store state to verify callback
-    const state = `user-${userId}`;
+  getAuthUrl(userId: number, redirectUri: string): string {
+    if (!this.isConfigured()) {
+      throw new Error('Google Fit API is not configured. Missing API keys.');
+    }
     
-    // Generate authorization URL
-    const authUrl = oauth2Client.generateAuthUrl({
+    const baseUrl = 'https://accounts.google.com/o/oauth2/v2/auth';
+    const params = new URLSearchParams({
+      client_id: process.env.GOOGLE_FIT_CLIENT_ID as string,
+      redirect_uri: redirectUri,
+      response_type: 'code',
+      scope: SCOPES.join(' '),
       access_type: 'offline',
-      scope: SCOPES,
-      state: state
+      prompt: 'consent',
+      state: JSON.stringify({ userId, service: this.id }),
     });
     
-    return authUrl;
+    return `${baseUrl}?${params.toString()}`;
   }
   
   /**
-   * Handle OAuth callback from Google Fit
+   * Exchange OAuth code for access token
    */
-  async handleCallback(userId: number, code: string): Promise<boolean> {
+  async exchangeCodeForToken(code: string, userId: number): Promise<any> {
+    if (!this.isConfigured()) {
+      throw new Error('Google Fit API is not configured. Missing API keys.');
+    }
+    
     try {
-      // Exchange code for tokens
-      const { tokens } = await oauth2Client.getToken(code);
+      // In a real implementation, we would make a POST request to Google's OAuth token endpoint
+      // For this prototype, we'll simulate the token exchange
       
-      // Store tokens in database (in a real app)
-      console.log(`Received tokens for user ${userId}`);
+      console.log(`Exchanging code for token for user ${userId} with Google Fit`);
       
-      return true;
+      // Simulate token response
+      const tokenResponse = {
+        access_token: `google-fit-access-token-${userId}-${Date.now()}`,
+        refresh_token: `google-fit-refresh-token-${userId}-${Date.now()}`,
+        expires_in: 3600,
+      };
+      
+      // Store the token
+      await storeServiceToken(userId, this.id, {
+        accessToken: tokenResponse.access_token,
+        refreshToken: tokenResponse.refresh_token,
+        expiresAt: new Date(Date.now() + tokenResponse.expires_in * 1000).toISOString(),
+      });
+      
+      return tokenResponse;
     } catch (error) {
-      console.error('Error exchanging code for tokens:', error);
-      return false;
+      console.error('Error exchanging code for token with Google Fit:', error);
+      throw error;
+    }
+  }
+  
+  /**
+   * Get fitness data from Google Fit
+   */
+  async getData(userId: number, dataType: string, startDate?: string, endDate?: string): Promise<any> {
+    const token = await getServiceToken(userId, this.id);
+    
+    if (!token) {
+      throw new Error('User is not authenticated with Google Fit');
+    }
+    
+    // In a real implementation, we would make API requests to Google Fit
+    // For this prototype, we'll return simulated data
+    
+    const now = new Date();
+    const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+    const lastWeek = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    
+    const actualStartDate = startDate ? new Date(startDate) : lastWeek;
+    const actualEndDate = endDate ? new Date(endDate) : now;
+    
+    switch (dataType) {
+      case 'steps':
+        return {
+          dataType: 'steps',
+          startDate: actualStartDate.toISOString(),
+          endDate: actualEndDate.toISOString(),
+          data: {
+            totalSteps: 58750,
+            dailyAverage: 8393,
+            dailyData: [
+              { date: yesterday.toISOString(), steps: 9432 },
+              { date: now.toISOString(), steps: 4128 }
+            ]
+          }
+        };
+        
+      case 'heart_rate':
+        return {
+          dataType: 'heart_rate',
+          startDate: actualStartDate.toISOString(),
+          endDate: actualEndDate.toISOString(),
+          data: {
+            averageRestingHeartRate: 62,
+            data: [
+              { date: yesterday.toISOString(), average: 64, min: 52, max: 142 },
+              { date: now.toISOString(), average: 68, min: 58, max: 132 }
+            ]
+          }
+        };
+        
+      case 'sleep':
+        return {
+          dataType: 'sleep',
+          startDate: actualStartDate.toISOString(),
+          endDate: actualEndDate.toISOString(),
+          data: {
+            averageHours: 7.3,
+            data: [
+              { date: yesterday.toISOString(), hoursSlept: 7.2, deepSleepMinutes: 90, lightSleepMinutes: 260, awakeMinutes: 20 },
+              { date: new Date(yesterday.getTime() - 24 * 60 * 60 * 1000).toISOString(), hoursSlept: 7.5, deepSleepMinutes: 105, lightSleepMinutes: 275, awakeMinutes: 15 }
+            ]
+          }
+        };
+        
+      case 'activities':
+        return {
+          dataType: 'activities',
+          startDate: actualStartDate.toISOString(),
+          endDate: actualEndDate.toISOString(),
+          data: [
+            { 
+              type: 'running', 
+              date: yesterday.toISOString(),
+              duration: 35, // minutes
+              distance: 5.2, // km
+              calories: 450,
+              averageHeartRate: 142
+            },
+            { 
+              type: 'cycling',
+              date: new Date(yesterday.getTime() - 48 * 60 * 60 * 1000).toISOString(),
+              duration: 45, // minutes
+              distance: 15, // km
+              calories: 380,
+              averageHeartRate: 128
+            }
+          ]
+        };
+        
+      default:
+        throw new Error(`Unsupported data type: ${dataType}`);
     }
   }
   
@@ -71,173 +189,37 @@ class GoogleFitService implements FitnessTrackerService {
    * Sync data from Google Fit
    */
   async syncData(userId: number): Promise<any> {
-    try {
-      // In a real implementation, you would:
-      // 1. Get user's token from database
-      // 2. Set token in oauth2Client
-      // 3. Create fitness client and fetch data
-      // 4. Process and store data
-      
-      // This is a simplified example:
-      const fitness = google.fitness({ version: 'v1', auth: oauth2Client });
-      const now = new Date();
-      const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-      
-      // Example of fetching steps data
-      const response = await fitness.users.dataset.aggregate({
-        userId: 'me',
-        requestBody: {
-          aggregateBy: [{
-            dataTypeName: 'com.google.step_count.delta'
-          }],
-          bucketByTime: { durationMillis: 86400000 },
-          startTimeMillis: yesterday.getTime(),
-          endTimeMillis: now.getTime()
-        }
-      });
-      
-      return response.data;
-    } catch (error) {
-      console.error('Error syncing Google Fit data:', error);
-      throw error;
+    const token = await getServiceToken(userId, this.id);
+    
+    if (!token) {
+      throw new Error('User is not authenticated with Google Fit');
     }
-  }
-  
-  /**
-   * Disconnect from Google Fit
-   */
-  async disconnect(userId: number): Promise<boolean> {
+    
     try {
-      // In a real implementation, you would:
-      // 1. Get user's token from database
-      // 2. Revoke the token
-      // 3. Remove token from database
+      // In a real implementation, this would fetch data from Google Fit
+      // For now, we'll simulate the sync by updating the last sync date
       
-      // This is a simplified example:
-      // await oauth2Client.revokeToken(token);
-      console.log(`Disconnected Google Fit for user ${userId}`);
+      // Update last sync date
+      await updateLastSyncDate(userId, this.id);
       
-      return true;
+      return {
+        status: 'success',
+        message: 'Google Fit data synced successfully',
+        syncDate: new Date().toISOString(),
+        dataPoints: {
+          steps: 9432,
+          calories: 2150,
+          activities: 2,
+          heartRate: 12,
+          sleep: 1
+        }
+      };
     } catch (error) {
-      console.error('Error disconnecting from Google Fit:', error);
-      return false;
+      console.error('Error syncing data with Google Fit:', error);
+      throw error;
     }
   }
 }
 
-// Create service instance
-const googleFitService = new GoogleFitService();
-
-// Configure routes
-router.get('/auth', async (req, res) => {
-  try {
-    // In a real app, get userId from session
-    const userId = req.query.userId ? parseInt(req.query.userId as string) : 1;
-    
-    if (!googleFitService.isConfigured) {
-      return res.status(503).json({
-        success: false,
-        message: 'Google Fit integration is not configured'
-      });
-    }
-    
-    const authUrl = await googleFitService.getAuthUrl(userId);
-    
-    res.json({
-      success: true,
-      authUrl
-    });
-  } catch (error) {
-    console.error('Error generating auth URL:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to generate authorization URL'
-    });
-  }
-});
-
-router.get('/callback', async (req, res) => {
-  try {
-    const { code, state } = req.query;
-    
-    if (!code || !state) {
-      return res.status(400).json({
-        success: false,
-        message: 'Invalid callback parameters'
-      });
-    }
-    
-    // Extract userId from state
-    const stateStr = state as string;
-    const userId = parseInt(stateStr.replace('user-', ''));
-    
-    if (isNaN(userId)) {
-      return res.status(400).json({
-        success: false,
-        message: 'Invalid state parameter'
-      });
-    }
-    
-    const success = await googleFitService.handleCallback(userId, code as string);
-    
-    if (success) {
-      // Redirect to the fitness trackers page with success message
-      res.redirect(`/?provider=google-fit&connected=true`);
-    } else {
-      res.redirect(`/?provider=google-fit&error=true`);
-    }
-  } catch (error) {
-    console.error('Error handling callback:', error);
-    res.redirect(`/?provider=google-fit&error=true`);
-  }
-});
-
-router.get('/sync', async (req, res) => {
-  try {
-    // In a real app, get userId from session
-    const userId = req.query.userId ? parseInt(req.query.userId as string) : 1;
-    
-    const data = await googleFitService.syncData(userId);
-    
-    res.json({
-      success: true,
-      data
-    });
-  } catch (error) {
-    console.error('Error syncing data:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to sync data from Google Fit'
-    });
-  }
-});
-
-router.post('/disconnect', async (req, res) => {
-  try {
-    // In a real app, get userId from session
-    const userId = req.body.userId ? parseInt(req.body.userId) : 1;
-    
-    const success = await googleFitService.disconnect(userId);
-    
-    res.json({
-      success
-    });
-  } catch (error) {
-    console.error('Error disconnecting:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Failed to disconnect from Google Fit'
-    });
-  }
-});
-
-// Health check endpoint
-router.get('/status', (req, res) => {
-  res.json({
-    service: googleFitService.name,
-    id: googleFitService.id,
-    configured: googleFitService.isConfigured
-  });
-});
-
-export { router as googleFitRouter, GoogleFitService };
+// Create an instance of the service
+export const googleFitService = new GoogleFitService();

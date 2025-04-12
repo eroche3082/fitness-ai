@@ -9,11 +9,14 @@ import { UserProvider } from "./contexts/UserContext";
 import { ChatProvider } from "./contexts/ChatContext";
 import FitnessSystemInitializer from "./components/FitnessSystemInitializer";
 
+import VoiceCoachingPage from "@/pages/voice-coaching";
+
 function Router() {
   return (
     <Switch>
       <Route path="/" component={Home}/>
       <Route path="/fitness-trackers" component={FitnessTrackersPage}/>
+      <Route path="/voice-coaching" component={VoiceCoachingPage}/>
       <Route component={NotFound} />
     </Switch>
   );

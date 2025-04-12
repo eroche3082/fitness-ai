@@ -14,6 +14,11 @@ import {
 import { handleFormCheckAnalysis } from "./services/vision-service";
 import { handleSpeechToText, handleTextToSpeech } from "./services/speech-service";
 import { registerFitnessTrackerRoutes } from "./services/fitness-trackers";
+import { 
+  handleRepCounting, 
+  handleVoiceCommand, 
+  handleVoiceResponse 
+} from "./services/voice-coaching";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Initialize Gemini configuration
@@ -247,6 +252,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Text-to-Speech API
   apiRouter.post("/text-to-speech", handleTextToSpeech);
+  
+  // Voice Coaching APIs
+  apiRouter.post("/voice-coaching/rep-counting", handleRepCounting);
+  apiRouter.post("/voice-coaching/command", handleVoiceCommand);
+  apiRouter.post("/voice-coaching/response", handleVoiceResponse);
   
   return httpServer;
 }
