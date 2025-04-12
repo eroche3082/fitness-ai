@@ -12,10 +12,11 @@ import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/ge
  */
 export async function generateGeminiResponse(messages: { role: string; content: string }[]): Promise<string> {
   try {
-    const apiKey = process.env.GOOGLE_API_KEY;
+    // Usar GEMINI_API_KEY si está disponible, sino usar GOOGLE_API_KEY como fallback
+    const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || process.env.GOOGLE_GROUP3_API_KEY;
     
     if (!apiKey) {
-      console.error('GOOGLE_API_KEY not found in environment variables');
+      console.error('No API key found for Gemini in environment variables');
       throw new Error('Gemini API key not configured');
     }
     
@@ -117,9 +118,9 @@ export async function generateGeminiResponse(messages: { role: string; content: 
  * Configure the Gemini API and verify that it's working
  */
 export function configureGemini(): void {
-  const apiKey = process.env.GOOGLE_API_KEY;
+  const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || process.env.GOOGLE_GROUP3_API_KEY;
   if (!apiKey) {
-    console.warn('WARNING: GOOGLE_API_KEY not found. Gemini integration will not work correctly.');
+    console.warn('WARNING: No Gemini API key found. Gemini integration will not work correctly.');
   } else {
     try {
       // Initialize the Google Generative AI SDK to verify configuration
