@@ -76,6 +76,21 @@ export default function RapidApiStatus() {
       name: 'Muscle Group Visualization',
       status: 'active',
       description: 'Visual representation of muscle groups for exercise targeting'
+    },
+    {
+      name: 'Gym Calculations',
+      status: status?.apis?.gymCalculations ? 'active' : 'inactive',
+      description: 'Calculator for one-rep max and other strength measurements'
+    },
+    {
+      name: 'Exercise API3',
+      status: status?.apis?.exerciseApi3 ? 'active' : 'inactive',
+      description: 'Different experience levels for exercises'
+    },
+    {
+      name: 'Mood API',
+      status: status?.apis?.moodApi ? 'active' : 'inactive',
+      description: 'Track mood and correlate with fitness routines'
     }
   ];
 

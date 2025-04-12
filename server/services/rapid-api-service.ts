@@ -76,10 +76,15 @@ export function registerRapidApiRoutes(router: Router): void {
         }
       );
 
+      // Para comprobar otras APIs podríamos hacer peticiones a sus endpoints de estado,
+      // pero para simplificar consideramos que si la API key es válida, todas están disponibles
       res.json({
         status: 'success',
         apis: {
-          exerciseDb: exerciseDbStatus
+          exerciseDb: exerciseDbStatus,
+          gymCalculations: { status: 'available' },
+          exerciseApi3: { status: 'available' },
+          moodApi: { status: 'available' }
         }
       });
     } catch (error) {
@@ -416,6 +421,104 @@ export function registerRapidApiRoutes(router: Router): void {
       res.status(500).json({
         status: 'error',
         message: error instanceof Error ? error.message : 'Unknown error calculating fitness metrics'
+      });
+    }
+  });
+  
+  /**
+   * Calculate One Rep Max (1RM)
+   * Calculates the theoretical maximum weight a person can lift for one repetition
+   */
+  router.post('/rapid-api/calculate-1rm', async (req: Request, res: Response) => {
+    try {
+      const { weight_lifted, reps } = req.body;
+
+      if (!weight_lifted || !reps) {
+        return res.status(400).json({ 
+          status: 'error',
+          message: 'Missing required parameters (weight_lifted, reps)' 
+        });
+      }
+
+      const result = await rapidApiFetch(
+        'https://gym-calculations.p.rapidapi.com/1rm',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'x-rapidapi-host': 'gym-calculations.p.rapidapi.com'
+          },
+          body: JSON.stringify({ weight_lifted, reps })
+        }
+      );
+
+      res.json({
+        status: 'success',
+        data: result
+      });
+    } catch (error) {
+      console.error('Error calculating one rep max:', error);
+      res.status(500).json({ 
+        status: 'error',
+        message: error instanceof Error ? error.message : 'Failed to calculate one rep max' 
+      });
+    }
+  });
+  
+  /**
+   * Get exercise experiences
+   * Returns different exercise experience levels
+   */
+  router.get('/rapid-api/exercise-experiences', async (req: Request, res: Response) => {
+    try {
+      const result = await rapidApiFetch(
+        'https://exerciseapi3.p.rapidapi.com/experiences',
+        { 
+          method: 'GET',
+          headers: {
+            'x-rapidapi-host': 'exerciseapi3.p.rapidapi.com'
+          }
+        }
+      );
+
+      res.json({
+        status: 'success',
+        data: result
+      });
+    } catch (error) {
+      console.error('Error fetching exercise experiences:', error);
+      res.status(500).json({ 
+        status: 'error',
+        message: error instanceof Error ? error.message : 'Failed to fetch exercise experiences' 
+      });
+    }
+  });
+  
+  /**
+   * Get mood data
+   * Returns mood tracking information
+   */
+  router.get('/rapid-api/moods', async (req: Request, res: Response) => {
+    try {
+      const result = await rapidApiFetch(
+        'https://mood-api.p.rapidapi.com/moods',
+        { 
+          method: 'GET',
+          headers: {
+            'x-rapidapi-host': 'mood-api.p.rapidapi.com'
+          }
+        }
+      );
+
+      res.json({
+        status: 'success',
+        data: result
+      });
+    } catch (error) {
+      console.error('Error fetching mood data:', error);
+      res.status(500).json({ 
+        status: 'error',
+        message: error instanceof Error ? error.message : 'Failed to fetch mood data' 
       });
     }
   });

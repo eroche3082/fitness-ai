@@ -16,6 +16,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
 import { apiRequest } from "@/lib/queryClient";
 import Header from "@/components/Header";
 import RapidApiStatus from "@/components/RapidApiStatus";
@@ -45,6 +46,11 @@ const fitnessMetricsFormSchema = z.object({
   neck: z.string().optional(),
   waist: z.string().optional(),
   hip: z.string().optional()
+});
+
+const oneRepMaxFormSchema = z.object({
+  weight_lifted: z.string().min(1, 'Weight lifted is required'),
+  reps: z.string().min(1, 'Repetitions is required')
 });
 
 export default function FitnessApiPage() {
