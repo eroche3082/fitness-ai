@@ -23,6 +23,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import PhaseTracker from './PhaseTracker';
 import TabStatusTracker from './TabStatusTracker';
 import VisualEnhancementsTracker from './VisualEnhancementsTracker';
+import ChatFlowsTracker from './ChatFlowsTracker';
 
 // Phase status type
 type PhaseStatus = 'pending' | 'in_progress' | 'complete';
@@ -295,11 +296,12 @@ export default function AdminPanel() {
           </SheetHeader>
 
           <Tabs defaultValue="checklist" className="w-full">
-            <TabsList className="grid w-full grid-cols-4">
+            <TabsList className="grid w-full grid-cols-5">
               <TabsTrigger value="checklist">Checklist</TabsTrigger>
               <TabsTrigger value="diagnostic">System Diagnostic</TabsTrigger>
               <TabsTrigger value="tabs">Tab Status</TabsTrigger>
               <TabsTrigger value="enhancements">Visual Enhancements</TabsTrigger>
+              <TabsTrigger value="chatflows">Chat Flows</TabsTrigger>
             </TabsList>
             
             <TabsContent value="checklist" className="mt-4">
@@ -373,6 +375,10 @@ export default function AdminPanel() {
             
             <TabsContent value="enhancements">
               <VisualEnhancementsTracker />
+            </TabsContent>
+            
+            <TabsContent value="chatflows">
+              <ChatFlowsTracker />
             </TabsContent>
           </Tabs>
 
