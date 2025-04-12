@@ -67,6 +67,12 @@ export default function Header() {
                 Fitness Devices
               </Link>
             </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link href="/voice-coaching">
+                <Volume2 className="h-4 w-4 mr-2" />
+                Voice Coaching
+              </Link>
+            </DropdownMenuItem>
             <DropdownMenuItem>Profile</DropdownMenuItem>
             <DropdownMenuItem>Settings</DropdownMenuItem>
             <DropdownMenuSeparator />
