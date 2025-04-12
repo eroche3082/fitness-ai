@@ -7,7 +7,7 @@ export default function FitnessTrackersPage() {
     <div className="min-h-screen bg-background">
       <Header />
       <div className="container mx-auto py-8">
-        <h1 className="text-3xl font-bold mb-8">Conecta tus dispositivos de fitness</h1>
+        <h1 className="text-3xl font-bold mb-8">Connect Your Fitness Devices</h1>
         <FitnessTrackers />
       </div>
     </div>

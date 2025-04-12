@@ -3,6 +3,7 @@ import { googleFitRouter } from './google-fit';
 import { appleHealthRouter } from './apple-health';
 import { fitbitRouter } from './fitbit';
 import { stravaRouter } from './strava';
+import { fitnessRouter } from './routes';
 
 /**
  * Base interface for all fitness tracker services
@@ -22,21 +23,8 @@ export interface FitnessTrackerService {
  * @param router Express router
  */
 export function registerFitnessTrackerRoutes(router: Router): void {
-  // Main health endpoint for all services
-  router.get('/fitness-trackers/health', (req, res) => {
-    // Check which services are available
-    const availableServices = {
-      'google-fit': process.env.GOOGLE_API_KEY !== undefined,
-      'apple-health': false, // Requires iOS app
-      'fitbit': process.env.FITBIT_CLIENT_ID !== undefined,
-      'strava': process.env.STRAVA_CLIENT_ID !== undefined
-    };
-    
-    res.json({
-      status: 'ok',
-      availableServices
-    });
-  });
+  // Register the main fitness API router 
+  router.use('/fitness', fitnessRouter);
   
   // Register each service router
   router.use('/fitness-trackers/google-fit', googleFitRouter);

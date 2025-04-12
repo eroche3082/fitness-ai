@@ -1,0 +1,77 @@
+Objetivo: Activar y probar el ecosistema completo de rastreadores de fitness en Fitness AI, asegurando que cada integración esté funcionando correctamente, autenticada, sincronizada, y con UI funcional.
+
+🧠 CONTEXTO ACTUAL:
+- Google Cloud API Key, Gemini 1.5 Flash y archivo JSON global están activos
+- Rutas actualizadas usando apiRouter
+- Servicios creados en: server/services/fitness-trackers/
+- Componentes y páginas frontend creadas: FitnessTrackers.tsx + fitness-trackers.tsx
+- Navegación habilitada en Header
+- Back y Front conectados
+- Menú actualizado y visible
+- Componentes funcionan sin errores
+
+🔄 INSTRUCCIONES DE ACTIVACIÓN PARA CADA RASTREADOR:
+
+1. **GOOGLE FIT**
+   - Verifica que la API está habilitada en Google Cloud Console
+   - Asegúrate de que `GOOGLE_CLIENT_ID` y `GOOGLE_CLIENT_SECRET` estén en `.env`
+   - Revisa scopes: `https://www.googleapis.com/auth/fitness.activity.read`
+   - Endpoint esperado: `/api/fitness/google-fit/sync`
+   - Verifica autenticación OAuth2 → muestra "Conectar con Google Fit" en UI
+   - Ejecuta `syncGoogleFitData()` en el backend y muestra métricas en dashboard
+
+2. **APPLE HEALTH (vía dispositivo iOS o Apple Watch)**
+   - Simula integración con datos mock si estás fuera de iOS
+   - Permite subir JSON o CSV exportados desde Apple Health
+   - Endpoint esperado: `/api/fitness/apple-health/upload`
+   - Ejecuta `parseAppleHealthData()` y muestra gráficos
+
+3. **FITBIT**
+   - Asegúrate de tener los secrets: `FITBIT_CLIENT_ID`, `FITBIT_CLIENT_SECRET`, `CALLBACK_URL`
+   - OAuth2 flow funcional → scopes: `activity`, `profile`, `sleep`, `weight`
+   - Endpoint esperado: `/api/fitness/fitbit/auth`
+   - UI: Botón "Connect to Fitbit" en FitnessTrackers.tsx
+   - Muestra información diaria al conectar
+
+4. **STRAVA**
+   - Usa client ID y secret de Strava Developer Dashboard
+   - Verifica que `STRAVA_CLIENT_ID`, `STRAVA_CLIENT_SECRET`, `STRAVA_CALLBACK_URL` estén en `.env`
+   - OAuth2 scopes: `read`, `activity:read_all`
+   - Endpoint esperado: `/api/fitness/strava/auth`
+   - Mostrar últimos entrenamientos en la UI (calorías, distancia, tiempo)
+
+📦 FRONTEND FLOW:
+- Mostrar en FitnessTrackers.tsx una tarjeta por cada servicio con:
+  - Botón de conexión
+  - Estado de sincronización ✅
+  - Últimos datos sincronizados
+- Permitir reconectar, ver historial y forzar sync manual
+
+🔐 SEGURIDAD:
+- Usa AuthMiddleware para asegurar que solo usuarios autenticados acceden a `/fitness-trackers`
+- Encripta tokens en Firebase o Firestore con TTL (tiempo de vida)
+- Verifica que las credenciales no se expongan en consola o UI
+
+🧪 VERIFICACIÓN:
+- Ejecuta pruebas para cada uno:
+  - ✅ Autenticación OAuth
+  - ✅ Fetch de datos
+  - ✅ Respuesta JSON esperada
+  - ✅ Renderización en UI
+  - ✅ Estado sincronizado en tiempo real
+- Simula escenarios de error (token expirado, API down) y muestra fallback amigable
+
+📈 DASHBOARD FINAL:
+- Integra métricas agregadas por día y semana
+- Muestra comparación entre plataformas
+- Detecta patrones de salud para sugerencias por IA (Gemini)
+
+🧬 COMANDO DE ACTIVACIÓN MAESTRO (simulado):
+```ts
+await activateFitnessIntegrations({
+  services: ["google-fit", "apple-health", "fitbit", "strava"],
+  secretsValidated: true,
+  syncNow: true,
+  logResults: true,
+  userId: "Alex",
+});

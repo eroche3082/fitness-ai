@@ -32,11 +32,11 @@ export default function Header() {
       
       <div className="flex items-center space-x-4">
         <Link href="/" className="text-sm font-medium hover:text-primary transition-colors">
-          Inicio
+          Home
         </Link>
         <Link href="/fitness-trackers" className="flex items-center text-sm font-medium hover:text-primary transition-colors">
           <Activity className="h-4 w-4 mr-1" />
-          Dispositivos
+          Devices
         </Link>
         
         <LanguageSwitcher />
@@ -55,19 +55,19 @@ export default function Header() {
             </div>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Mi Cuenta</DropdownMenuLabel>
+            <DropdownMenuLabel>My Account</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
               <Link href="/fitness-trackers">
                 <Activity className="h-4 w-4 mr-2" />
-                Dispositivos de Fitness
+                Fitness Devices
               </Link>
             </DropdownMenuItem>
-            <DropdownMenuItem>Perfil</DropdownMenuItem>
-            <DropdownMenuItem>Configuración</DropdownMenuItem>
+            <DropdownMenuItem>Profile</DropdownMenuItem>
+            <DropdownMenuItem>Settings</DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={handleLogout}>
-              Cerrar Sesión
+              Logout
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
