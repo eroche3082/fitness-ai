@@ -391,14 +391,49 @@ export default function EnhancedChatbot({ forceOpen = false }: EnhancedChatbotPr
             {isSidebarOpen && (
               <div className="w-72 border-r bg-muted/30">
                 {/* User Profile */}
-                <div className="p-4 border-b flex items-center gap-3">
-                  <div className="h-12 w-12 rounded-full bg-primary/20 flex items-center justify-center">
-                    <User className="h-6 w-6 text-primary" />
+                <div className="p-4 border-b flex flex-col">
+                  <div className="flex items-center gap-3 mb-2">
+                    <div className="h-12 w-12 rounded-full bg-primary/20 flex items-center justify-center">
+                      <User className="h-6 w-6 text-primary" />
+                    </div>
+                    <div>
+                      <p className="font-medium">{profile?.name || 'Fitness User'}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {profile?.fitnessLevel ? 
+                          profile.fitnessLevel.charAt(0).toUpperCase() + profile.fitnessLevel.slice(1) + ' Level' 
+                          : 'Active Member'}
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <p className="font-medium">Fitness User</p>
-                    <p className="text-sm text-muted-foreground">Active Member</p>
-                  </div>
+                  
+                  {profile?.onboardingCompleted && (
+                    <div className="text-xs text-muted-foreground mt-2 space-y-1">
+                      {profile.fitnessGoals && profile.fitnessGoals.length > 0 && (
+                        <div>
+                          <span className="font-medium">Goals:</span> {profile.fitnessGoals.map(g => 
+                            g.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')
+                          ).join(', ')}
+                        </div>
+                      )}
+                      {profile.preferredActivities && profile.preferredActivities.length > 0 && (
+                        <div>
+                          <span className="font-medium">Activities:</span> {profile.preferredActivities.map(a => 
+                            a.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')
+                          ).join(', ')}
+                        </div>
+                      )}
+                      <div className="flex justify-end">
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          onClick={resetOnboarding} 
+                          className="text-xs mt-1 h-7 px-2"
+                        >
+                          Reset Profile
+                        </Button>
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Navigation */}
@@ -520,42 +555,57 @@ export default function EnhancedChatbot({ forceOpen = false }: EnhancedChatbotPr
                 
                 {/* Chat Tab */}
                 <TabsContent value="chat" className="flex-1 flex flex-col p-0 m-0">
-                  <ScrollArea className="flex-1 p-4">
-                    {messages.map((message, index) => (
-                      <div 
-                        key={index} 
-                        className={`mb-4 flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
-                      >
+                  {isOnboarding ? (
+                    <div className="flex flex-1 items-center justify-center p-4">
+                      <OnboardingFlow 
+                        userId={1} 
+                        onComplete={(welcomeMessage) => {
+                          // Add welcome message to chat
+                          setMessages(prev => [...prev, {
+                            role: 'assistant',
+                            content: welcomeMessage
+                          }]);
+                        }} 
+                      />
+                    </div>
+                  ) : (
+                    <ScrollArea className="flex-1 p-4">
+                      {messages.map((message, index) => (
                         <div 
-                          className={`rounded-lg px-4 py-2 max-w-[80%] ${
-                            message.role === 'user' 
-                              ? 'bg-primary text-primary-foreground ml-auto' 
-                              : 'bg-secondary text-secondary-foreground'
-                          }`}
+                          key={index} 
+                          className={`mb-4 flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
                         >
-                          <div className="prose prose-sm dark:prose-invert max-w-none">
-                            <ReactMarkdown>
-                              {message.content}
-                            </ReactMarkdown>
+                          <div 
+                            className={`rounded-lg px-4 py-2 max-w-[80%] ${
+                              message.role === 'user' 
+                                ? 'bg-primary text-primary-foreground ml-auto' 
+                                : 'bg-secondary text-secondary-foreground'
+                            }`}
+                          >
+                            <div className="prose prose-sm dark:prose-invert max-w-none">
+                              <ReactMarkdown>
+                                {message.content}
+                              </ReactMarkdown>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    ))}
-                    
-                    {isProcessing && (
-                      <div className="mb-4 flex justify-start">
-                        <div className="rounded-lg px-4 py-2 bg-secondary text-secondary-foreground">
-                          <div className="flex space-x-2">
-                            <div className="w-2 h-2 rounded-full bg-primary/60 animate-bounce" style={{ animationDelay: '0s' }}></div>
-                            <div className="w-2 h-2 rounded-full bg-primary/60 animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-                            <div className="w-2 h-2 rounded-full bg-primary/60 animate-bounce" style={{ animationDelay: '0.4s' }}></div>
+                      ))}
+                      
+                      {isProcessing && (
+                        <div className="mb-4 flex justify-start">
+                          <div className="rounded-lg px-4 py-2 bg-secondary text-secondary-foreground">
+                            <div className="flex space-x-2">
+                              <div className="w-2 h-2 rounded-full bg-primary/60 animate-bounce" style={{ animationDelay: '0s' }}></div>
+                              <div className="w-2 h-2 rounded-full bg-primary/60 animate-bounce" style={{ animationDelay: '0.2s' }}></div>
+                              <div className="w-2 h-2 rounded-full bg-primary/60 animate-bounce" style={{ animationDelay: '0.4s' }}></div>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    )}
-                    
-                    <div ref={messageEndRef} />
-                  </ScrollArea>
+                      )}
+                      
+                      <div ref={messageEndRef} />
+                    </ScrollArea>
+                  )}
                   
                   {/* Action Bar */}
                   <div className="border-t p-2 flex flex-wrap gap-1 justify-center">

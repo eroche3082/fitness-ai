@@ -13,10 +13,10 @@ import {
 
 export interface IStorage {
   // User operations
-  getUser(id: number): Promise<User | undefined>;
-  getUserByUsername(username: string): Promise<User | undefined>;
+  getUser(id: number): Promise<User & { profile?: any } | undefined>;
+  getUserByUsername(username: string): Promise<User & { profile?: any } | undefined>;
   createUser(user: InsertUser): Promise<User>;
-  updateUser(id: number, data: Partial<InsertUser> & { profile?: any }): Promise<User | undefined>;
+  updateUser(id: number, data: Partial<InsertUser> & { profile?: any }): Promise<User & { profile?: any } | undefined>;
   
   // Conversation operations
   getConversation(id: number): Promise<Conversation | undefined>;
