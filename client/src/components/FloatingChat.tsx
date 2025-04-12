@@ -5,10 +5,17 @@ import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'; 
-import { useChat } from '@/contexts/ChatContext';
 import { Avatar } from '@/components/ui/avatar';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import ReactMarkdown from 'react-markdown';
+
+// Define a simple Message type
+type MessageRole = 'user' | 'assistant';
+
+interface Message {
+  role: MessageRole;
+  content: string;
+}
 
 export default function FloatingChat() {
   const [isOpen, setIsOpen] = useState(false);
@@ -16,8 +23,11 @@ export default function FloatingChat() {
   const [activeTab, setActiveTab] = useState('chat');
   const [inputValue, setInputValue] = useState('');
   const [isRecording, setIsRecording] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [messages, setMessages] = useState<Message[]>([
+    { role: 'assistant', content: "Hello! I'm your Fitness AI assistant. How can I help you with your fitness goals today?" }
+  ]);
   
-  const { messages, isProcessing, sendMessage } = useChat();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   
   // Scroll to bottom when messages change
@@ -35,6 +45,46 @@ export default function FloatingChat() {
   // Handle toggling fullscreen mode
   const toggleFullscreen = () => {
     setIsFullscreen(!isFullscreen);
+  };
+  
+  // Simulate sending a message and getting a response
+  const sendMessage = async (content: string) => {
+    if (!content.trim() || isProcessing) return;
+    
+    try {
+      // Add user message
+      setMessages(prev => [...prev, { role: 'user', content }]);
+      setIsProcessing(true);
+      
+      // Simulate API call delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Get predefined responses based on keywords
+      let response: string;
+      
+      if (content.toLowerCase().includes('workout')) {
+        response = "Based on your fitness profile, I recommend a mix of strength training and HIIT for optimal results. Would you like a customized workout plan?";
+      } else if (content.toLowerCase().includes('diet') || content.toLowerCase().includes('nutrition')) {
+        response = "Nutrition is key to fitness success! Aim for a balanced diet with plenty of protein, complex carbs, and healthy fats. Would you like specific meal recommendations based on your goals?";
+      } else if (content.toLowerCase().includes('track') || content.toLowerCase().includes('progress')) {
+        response = "Tracking your fitness progress is essential! You can connect your fitness trackers like Google Fit, Apple Health, or Fitbit to automatically sync your data.";
+      } else if (content.toLowerCase().includes('goal')) {
+        response = "Setting specific, measurable fitness goals is important. Let's break down your main goal into smaller milestones to track progress more effectively.";
+      } else {
+        response = "I'm here to help with all your fitness needs! You can ask me about workout plans, nutrition advice, progress tracking, or connecting fitness devices.";
+      }
+      
+      // Add assistant response
+      setMessages(prev => [...prev, { role: 'assistant', content: response }]);
+    } catch (error) {
+      console.error('Error:', error);
+      setMessages(prev => [...prev, { 
+        role: 'assistant', 
+        content: "I'm sorry, I encountered an error. Please try again." 
+      }]);
+    } finally {
+      setIsProcessing(false);
+    }
   };
   
   // Handle sending a message
@@ -56,7 +106,10 @@ export default function FloatingChat() {
   // Toggle voice recording
   const toggleRecording = () => {
     setIsRecording(!isRecording);
-    // Voice recording implementation would go here
+    if (isRecording) {
+      // Simulating voice transcription
+      setInputValue("This is a voice transcription example");
+    }
   };
   
   // Generate QR code (placeholder)
@@ -247,7 +300,7 @@ export default function FloatingChat() {
                 <QrCodeImage />
                 <h3 className="font-medium mt-4 mb-2">QR Code Generator</h3>
                 <p className="text-muted-foreground text-sm mb-4">
-                  Generate QR codes for your fitness plans or share with friends
+                  Generate QR codes for your workout plans or share with friends
                 </p>
                 <Button onClick={generateQRCode}>Generate QR Code</Button>
               </div>
