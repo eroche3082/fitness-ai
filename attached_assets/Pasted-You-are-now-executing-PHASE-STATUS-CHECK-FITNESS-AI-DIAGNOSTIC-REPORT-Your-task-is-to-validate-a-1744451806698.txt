@@ -1,0 +1,79 @@
+You are now executing PHASE STATUS CHECK – FITNESS AI DIAGNOSTIC REPORT.
+
+Your task is to validate and finalize the system-wide diagnostic for the Fitness AI application, following the official Phase Model [Phase 0–9].
+
+You must:
+
+1. Confirm and validate the implementation status of each task under every phase
+2. Provide ✔️ Completed / ❌ Not Started / ⚠️ In Progress for each item
+3. Include **suggestions** for missing or incomplete items
+4. Declare the **current overall phase** and the **next focus**
+5. Highlight the **top 3 priority actions**
+6. Provide a **system status badge** (OK / WARNING / ERROR) with a reason
+
+---
+
+### ✅ SYSTEM DIAGNOSTIC CHECKLIST
+
+Fill out the checklist using this format:
+
+```json
+{
+  "phase_0_initialization": {
+    "app_skeleton_created": "✅",
+    "env_and_secrets_loaded": "✅",
+    "firebase_connected": "✅",
+    "replit_initialized": "✅",
+    "github_repo_linked": "❌",
+    "suggestions": [
+      "Configure GitHub repository connection for version control and collaborative development",
+      "Implement CI/CD pipeline for automated testing and deployment"
+    ]
+  },
+  ...
+  "phase_9_deployment": {
+    "firebase_hosting": "❌",
+    "custom_domain": "❌",
+    "ssl_security": "❌",
+    "post_deployment_testing": "❌",
+    "final_checklist": "❌",
+    "suggestions": [
+      "Configure Firebase hosting settings",
+      "Acquire and set up custom domain",
+      "Create deployment pipeline with staging environment"
+    ]
+  }
+}
+📌 PROJECT STATUS SUMMARY
+At the end of your diagnostic, include the final summary:
+
+json
+Copiar
+Editar
+{
+  "current_phase": "PHASE 4 – User Personalization Implementation",
+  "next_focus": "PHASE 3 – Complete Tab Module Implementation",
+  "priority_actions": [
+    "Complete the Profile/Preferences tab implementation",
+    "Configure fitness tracker integrations by providing the required API keys",
+    "Begin implementation of Analytics tab with data visualization"
+  ],
+  "system_status": "WARNING",
+  "status_reason": "Core functionality is working, but several key modules are incomplete and fitness tracker integrations require API keys"
+}
+📎 FINAL INSTRUCTIONS
+Save the result in the Admin Panel > Phase Tracker
+
+Sync the data with Firebase if applicable
+
+This prompt will serve as the baseline for future status updates and deployment readiness
+
+Include any platform-specific suggestions or additions to phases based on your system architecture
+
+Once this report is submitted, the team will use it to define the next milestone.
+
+Begin full diagnostic validation now and confirm system phase alignment.
+
+yaml
+Copiar
+Editar

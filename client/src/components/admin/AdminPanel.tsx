@@ -11,6 +11,7 @@ import {
   SheetHeader,
   SheetTitle,
   SheetFooter,
+  SheetTrigger,
 } from '@/components/ui/sheet';
 import {
   Accordion,
@@ -18,6 +19,8 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '@/components/ui/accordion';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import PhaseTracker from './PhaseTracker';
 
 // Phase status type
 type PhaseStatus = 'pending' | 'in_progress' | 'complete';
@@ -276,7 +279,7 @@ export default function AdminPanel() {
 
       {/* Admin Panel Sheet */}
       <Sheet open={open} onOpenChange={setOpen}>
-        <SheetContent side="right" className="w-full sm:max-w-md md:max-w-lg overflow-y-auto">
+        <SheetContent side="right" className="w-full sm:max-w-md md:max-w-lg lg:max-w-xl overflow-y-auto">
           <SheetHeader className="mb-4">
             <SheetTitle className="flex items-center justify-between">
               <span>Fitness AI - Admin Panel</span>
@@ -289,64 +292,77 @@ export default function AdminPanel() {
             </SheetDescription>
           </SheetHeader>
 
-          {/* Phases Accordion */}
-          <div className="my-4">
-            <Accordion type="multiple" value={expandedSections} className="w-full">
-              {phases.map((phase) => (
-                <AccordionItem key={phase.id} value={phase.id} className="border-b">
-                  <AccordionTrigger 
-                    onClick={() => toggleSection(phase.id)} 
-                    className="py-2 hover:no-underline"
-                  >
-                    <div className="flex items-center justify-between w-full">
-                      <span className="text-sm font-medium text-left flex-1">{phase.title}</span>
-                      <Badge className={`${statusColors[phase.status]} ml-2`}>
-                        {phase.status.replace('_', ' ').toUpperCase()}
-                      </Badge>
-                    </div>
-                  </AccordionTrigger>
-                  <AccordionContent>
-                    <div className="space-y-3 py-2">
-                      {/* Phase Checklist */}
-                      <div className="space-y-2">
-                        {phase.items.map((item) => (
-                          <div key={item.id} className="flex items-start gap-2">
-                            <Checkbox
-                              id={item.id}
-                              checked={item.completed}
-                              onCheckedChange={() => toggleItemCompletion(phase.id, item.id)}
-                              className="mt-0.5"
-                            />
-                            <label
-                              htmlFor={item.id}
-                              className={`text-sm ${
-                                item.completed ? 'line-through text-muted-foreground' : ''
-                              }`}
-                            >
-                              {item.label}
-                            </label>
+          <Tabs defaultValue="checklist" className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="checklist">Checklist</TabsTrigger>
+              <TabsTrigger value="diagnostic">System Diagnostic</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="checklist" className="mt-4">
+              {/* Phases Accordion */}
+              <div className="my-4">
+                <Accordion type="multiple" value={expandedSections} className="w-full">
+                  {phases.map((phase) => (
+                    <AccordionItem key={phase.id} value={phase.id} className="border-b">
+                      <AccordionTrigger 
+                        onClick={() => toggleSection(phase.id)} 
+                        className="py-2 hover:no-underline"
+                      >
+                        <div className="flex items-center justify-between w-full">
+                          <span className="text-sm font-medium text-left flex-1">{phase.title}</span>
+                          <Badge className={`${statusColors[phase.status]} ml-2`}>
+                            {phase.status.replace('_', ' ').toUpperCase()}
+                          </Badge>
+                        </div>
+                      </AccordionTrigger>
+                      <AccordionContent>
+                        <div className="space-y-3 py-2">
+                          {/* Phase Checklist */}
+                          <div className="space-y-2">
+                            {phase.items.map((item) => (
+                              <div key={item.id} className="flex items-start gap-2">
+                                <Checkbox
+                                  id={item.id}
+                                  checked={item.completed}
+                                  onCheckedChange={() => toggleItemCompletion(phase.id, item.id)}
+                                  className="mt-0.5"
+                                />
+                                <label
+                                  htmlFor={item.id}
+                                  className={`text-sm ${
+                                    item.completed ? 'line-through text-muted-foreground' : ''
+                                  }`}
+                                >
+                                  {item.label}
+                                </label>
+                              </div>
+                            ))}
                           </div>
-                        ))}
-                      </div>
 
-                      {/* Notes Section */}
-                      <div>
-                        <label className="text-sm text-muted-foreground mb-1 block">
-                          Notes:
-                        </label>
-                        <Textarea
-                          placeholder="Add notes for this phase..."
-                          value={phase.notes}
-                          onChange={(e) => updateNotes(phase.id, e.target.value)}
-                          className="min-h-[80px] text-sm"
-                        />
-                      </div>
-                    </div>
-                  </AccordionContent>
-                </AccordionItem>
-              ))}
-            </Accordion>
-          </div>
+                          {/* Notes Section */}
+                          <div>
+                            <label className="text-sm text-muted-foreground mb-1 block">
+                              Notes:
+                            </label>
+                            <Textarea
+                              placeholder="Add notes for this phase..."
+                              value={phase.notes}
+                              onChange={(e) => updateNotes(phase.id, e.target.value)}
+                              className="min-h-[80px] text-sm"
+                            />
+                          </div>
+                        </div>
+                      </AccordionContent>
+                    </AccordionItem>
+                  ))}
+                </Accordion>
+              </div>
+            </TabsContent>
+            
+            <TabsContent value="diagnostic">
+              <PhaseTracker />
+            </TabsContent>
+          </Tabs>
 
           <SheetFooter className="flex justify-between items-center mt-4">
             <Button 
