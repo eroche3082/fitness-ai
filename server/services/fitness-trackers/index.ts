@@ -1,34 +1,44 @@
-import { Router } from 'express';
-import { googleFitRouter } from './google-fit';
-import { appleHealthRouter } from './apple-health';
-import { fitbitRouter } from './fitbit';
-import { stravaRouter } from './strava';
+/**
+ * Main entry point for Fitness Tracker Services
+ */
+
 import { fitnessRouter } from './routes';
+import { initializeFitnessAISystem, checkEnvSecrets, notifyUser } from './initialize';
+import { activateFitnessIntegrations } from './activate';
+import { 
+  getServiceToken, 
+  storeServiceToken, 
+  updateLastSyncDate,
+  deleteServiceToken,
+  testAllIntegrations
+} from './utils';
 
-/**
- * Base interface for all fitness tracker services
- */
+// Unified interface for all fitness tracker services
 export interface FitnessTrackerService {
-  name: string;
   id: string;
-  isConfigured: boolean;
-  getAuthUrl(userId: number): Promise<string>;
-  handleCallback(userId: number, code: string): Promise<boolean>;
+  name: string;
+  description: string;
+  apiDocumentation: string;
+  requiredSecrets: string[];
+  
+  // Service methods
+  isConfigured(): boolean;
+  getAuthUrl(userId: number, redirectUri: string): string;
+  exchangeCodeForToken(code: string, userId: number): Promise<any>;
+  getData(userId: number, dataType: string, startDate?: string, endDate?: string): Promise<any>;
   syncData(userId: number): Promise<any>;
-  disconnect(userId: number): Promise<boolean>;
 }
 
-/**
- * Register all fitness tracker routes
- * @param router Express router
- */
-export function registerFitnessTrackerRoutes(router: Router): void {
-  // Register the main fitness API router 
-  router.use('/fitness', fitnessRouter);
-  
-  // Register each service router
-  router.use('/fitness-trackers/google-fit', googleFitRouter);
-  router.use('/fitness-trackers/apple-health', appleHealthRouter);
-  router.use('/fitness-trackers/fitbit', fitbitRouter);
-  router.use('/fitness-trackers/strava', stravaRouter);
-}
+// Export all the necessary functions and components
+export {
+  fitnessRouter,
+  initializeFitnessAISystem,
+  checkEnvSecrets,
+  notifyUser,
+  activateFitnessIntegrations,
+  getServiceToken,
+  storeServiceToken,
+  updateLastSyncDate,
+  deleteServiceToken,
+  testAllIntegrations
+};

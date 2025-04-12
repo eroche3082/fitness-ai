@@ -5,6 +5,7 @@
 import { Router, Request, Response } from 'express';
 import { activateFitnessIntegrations } from './activate';
 import { testAllIntegrations } from './utils';
+import { initializeFitnessAISystem, checkEnvSecrets, notifyUser } from './initialize';
 
 const fitnessRouter = Router();
 
@@ -75,6 +76,53 @@ fitnessRouter.get('/test', async (req, res) => {
     });
   } catch (error) {
     console.error('Error testing fitness integrations:', error);
+    res.status(500).json({
+      status: 'error',
+      message: (error as Error).message
+    });
+  }
+});
+
+/**
+ * Initialize the Fitness AI System
+ */
+fitnessRouter.post('/initialize', async (req, res) => {
+  try {
+    const { 
+      userId = 1, 
+      language = 'en',
+      enableDiagnostics = true,
+      services = []
+    } = req.body;
+    
+    // Process the services to check their status
+    const processedServices = services.map((service: any) => {
+      if (service.requiredSecrets && Array.isArray(service.requiredSecrets)) {
+        return {
+          ...service,
+          status: checkEnvSecrets(service.requiredSecrets)
+        };
+      }
+      return service;
+    });
+    
+    const result = await initializeFitnessAISystem({
+      userId,
+      language,
+      enableDiagnostics,
+      services: processedServices,
+      onMissingSecrets: (service) => {
+        console.warn(`${service.name} is not fully configured. Please provide missing secrets.`);
+      },
+      onComplete: () => {
+        console.log("✅ All services initialized and dashboard components are synced.");
+        notifyUser("All systems go! You can now connect and sync your fitness data.");
+      }
+    });
+    
+    res.json(result);
+  } catch (error) {
+    console.error('Error initializing Fitness AI System:', error);
     res.status(500).json({
       status: 'error',
       message: (error as Error).message
