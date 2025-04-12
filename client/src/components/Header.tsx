@@ -11,7 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Activity, Volume2, CloudCog, Gauge } from "lucide-react";
+import { Activity, Volume2, CloudCog, Gauge, Dumbbell } from "lucide-react";
 
 export default function Header() {
   const { user, logout } = useUser();
@@ -51,6 +51,11 @@ export default function Header() {
         <Link href="/agent-status" className="flex items-center text-sm font-medium hover:text-primary transition-colors">
           <Gauge className="h-4 w-4 mr-1" />
           System
+        </Link>
+        
+        <Link href="/fitness-api" className="flex items-center text-sm font-medium hover:text-primary transition-colors">
+          <Dumbbell className="h-4 w-4 mr-1" />
+          Fitness API
         </Link>
         
         <LanguageSwitcher />
@@ -93,6 +98,12 @@ export default function Header() {
               <Link href="/agent-status">
                 <Gauge className="h-4 w-4 mr-2" />
                 System Audit
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link href="/fitness-api">
+                <Dumbbell className="h-4 w-4 mr-2" />
+                Fitness API
               </Link>
             </DropdownMenuItem>
             <DropdownMenuItem>Profile</DropdownMenuItem>

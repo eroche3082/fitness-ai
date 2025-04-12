@@ -7,20 +7,77 @@ async function throwIfResNotOk(res: Response) {
   }
 }
 
-export async function apiRequest(
-  method: string,
-  url: string,
-  data?: unknown | undefined,
-): Promise<Response> {
-  const res = await fetch(url, {
-    method,
-    headers: data ? { "Content-Type": "application/json" } : {},
-    body: data ? JSON.stringify(data) : undefined,
-    credentials: "include",
-  });
+export async function apiRequest<T = any>(
+  urlOrOptions: string | { 
+    url: string; 
+    method?: string; 
+    headers?: Record<string, string>; 
+    body?: any 
+  },
+  options?: {
+    method?: string;
+    headers?: Record<string, string>;
+    body?: any;
+  }
+): Promise<T> {
+  let url: string;
+  let fetchOptions: RequestInit = { 
+    credentials: "include" 
+  };
 
+  if (typeof urlOrOptions === 'string') {
+    url = urlOrOptions;
+    
+    if (options) {
+      fetchOptions.method = options.method || 'GET';
+      
+      if (options.headers) {
+        fetchOptions.headers = options.headers;
+      }
+      
+      if (options.body) {
+        if (options.body instanceof URLSearchParams) {
+          fetchOptions.body = options.body;
+        } else {
+          fetchOptions.headers = {
+            'Content-Type': 'application/json',
+            ...(fetchOptions.headers || {})
+          };
+          fetchOptions.body = JSON.stringify(options.body);
+        }
+      }
+    }
+  } else {
+    url = urlOrOptions.url;
+    fetchOptions.method = urlOrOptions.method || 'GET';
+    
+    if (urlOrOptions.headers) {
+      fetchOptions.headers = urlOrOptions.headers;
+    }
+    
+    if (urlOrOptions.body) {
+      if (urlOrOptions.body instanceof URLSearchParams) {
+        fetchOptions.body = urlOrOptions.body;
+      } else {
+        fetchOptions.headers = {
+          'Content-Type': 'application/json',
+          ...(fetchOptions.headers || {})
+        };
+        fetchOptions.body = JSON.stringify(urlOrOptions.body);
+      }
+    }
+  }
+
+  const res = await fetch(url, fetchOptions);
   await throwIfResNotOk(res);
-  return res;
+  
+  // Parse JSON response if available
+  const contentType = res.headers.get('content-type');
+  if (contentType && contentType.includes('application/json')) {
+    return await res.json() as T;
+  }
+  
+  return res as unknown as T;
 }
 
 type UnauthorizedBehavior = "returnNull" | "throw";

@@ -21,7 +21,7 @@ export default function RapidApiStatus() {
     setLoading(true);
     setError(null);
     try {
-      const response = await apiRequest<{ status: string; apis: Record<string, any> }>('/api/rapid-api/status');
+      const response = await apiRequest('/api/rapid-api/status');
       setStatus(response);
     } catch (err) {
       setError('Error al verificar el estado de las APIs');

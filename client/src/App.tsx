@@ -7,6 +7,7 @@ import Home from "@/pages/home";
 import FitnessTrackersPage from "@/pages/fitness-trackers";
 import ApiStatusPage from "@/pages/api-status";
 import SystemAuditPage from "@/pages/system-audit";
+import FitnessApiPage from "@/pages/fitness-api";
 import { UserProvider } from "./contexts/UserContext";
 import { ChatProvider } from "./contexts/ChatContext";
 import FitnessSystemInitializer from "./components/FitnessSystemInitializer";
@@ -21,6 +22,7 @@ function Router() {
       <Route path="/voice-coaching" component={VoiceCoachingPage}/>
       <Route path="/api-status" component={ApiStatusPage}/>
       <Route path="/agent-status" component={SystemAuditPage}/>
+      <Route path="/fitness-api" component={FitnessApiPage}/>
       <Route component={NotFound} />
     </Switch>
   );
