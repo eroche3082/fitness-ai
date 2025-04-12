@@ -11,6 +11,7 @@ import FitnessApiPage from "@/pages/fitness-api";
 import { UserProvider } from "./contexts/UserContext";
 import { ChatProvider } from "./contexts/ChatContext";
 import FitnessSystemInitializer from "./components/FitnessSystemInitializer";
+import FloatingChatbot from "./components/FloatingChatbot";
 
 import VoiceCoachingPage from "@/pages/voice-coaching";
 
@@ -35,6 +36,7 @@ function App() {
         <ChatProvider>
           <FitnessSystemInitializer />
           <Router />
+          <FloatingChatbot />
         </ChatProvider>
       </UserProvider>
       <Toaster />
