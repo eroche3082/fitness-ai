@@ -2,7 +2,9 @@ import { useState, useRef, useEffect } from 'react';
 import { Link } from 'wouter';
 import ReactMarkdown from 'react-markdown';
 import { useCustomChat } from '@/hooks/useCustomChat';
+import { useUserProfile } from '@/hooks/useUserProfile';
 import { Message as ChatMessage } from '@/contexts/ChatContext';
+import OnboardingFlow from './OnboardingFlow';
 
 import {
   Tabs,
@@ -108,6 +110,14 @@ export default function EnhancedChatbot({ forceOpen = false }: EnhancedChatbotPr
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [arModeActive, setArModeActive] = useState(false);
   const [vrModeActive, setVrModeActive] = useState(false);
+  
+  // User profile integration
+  const { 
+    profile, 
+    loading: profileLoading,
+    isOnboarding,
+    resetOnboarding
+  } = useUserProfile();
 
   // Get chat context
   const {
