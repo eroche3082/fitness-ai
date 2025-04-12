@@ -6,6 +6,12 @@ import { Router, Request, Response } from 'express';
 import { activateFitnessIntegrations } from './activate';
 import { testAllIntegrations } from './utils';
 import { initializeFitnessAISystem, checkEnvSecrets, notifyUser } from './initialize';
+import { 
+  GoogleFitMockAdapter, 
+  FitbitMockAdapter, 
+  StravaMockAdapter, 
+  AppleHealthAdapter 
+} from './mock-adapter';
 
 const fitnessRouter = Router();
 
@@ -95,8 +101,49 @@ fitnessRouter.post('/initialize', async (req, res) => {
       services = []
     } = req.body;
     
+    // Si no se proporcionan servicios, usar los adaptadores mock
+    let servicesToUse = services;
+    if (services.length === 0) {
+      // Usar los adaptadores mock para una demostración completa
+      const googleFit = new GoogleFitMockAdapter();
+      const fitbit = new FitbitMockAdapter();
+      const strava = new StravaMockAdapter();
+      const appleHealth = new AppleHealthAdapter();
+      
+      servicesToUse = [
+        {
+          name: googleFit.name,
+          serviceId: googleFit.id,
+          requiredSecrets: googleFit.requiredSecrets,
+          authUrl: googleFit.getAuthUrl(userId, '/fitness/callback'),
+          mode: 'oauth'
+        },
+        {
+          name: appleHealth.name,
+          serviceId: appleHealth.id,
+          requiredSecrets: appleHealth.requiredSecrets,
+          uploadUrl: appleHealth.getAuthUrl(userId, ''),
+          mode: 'file-upload'
+        },
+        {
+          name: fitbit.name,
+          serviceId: fitbit.id,
+          requiredSecrets: fitbit.requiredSecrets,
+          authUrl: fitbit.getAuthUrl(userId, '/fitness/callback'),
+          mode: 'oauth'
+        },
+        {
+          name: strava.name,
+          serviceId: strava.id,
+          requiredSecrets: strava.requiredSecrets,
+          authUrl: strava.getAuthUrl(userId, '/fitness/callback'),
+          mode: 'oauth'
+        }
+      ];
+    }
+    
     // Process the services to check their status
-    const processedServices = services.map((service: any) => {
+    const processedServices = servicesToUse.map((service: any) => {
       if (service.requiredSecrets && Array.isArray(service.requiredSecrets)) {
         return {
           ...service,
