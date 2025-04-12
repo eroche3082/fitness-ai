@@ -3,6 +3,7 @@ import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
 import { configureGemini } from "./gemini";
 import { initializeGoogleCloudServices } from "./google-cloud-config";
+import { initializeGoogleCloudApis } from "./services/google-cloud-integration";
 
 // Configure Google APIs
 configureGemini();
@@ -11,6 +12,18 @@ configureGemini();
 initializeGoogleCloudServices()
   .then(() => console.log("Google Cloud services initialized successfully"))
   .catch(err => console.warn("Google Cloud services initialization failed, some features may be limited:", err));
+
+// Initialize our extended Google Cloud APIs for Fitness AI
+initializeGoogleCloudApis()
+  .then(success => {
+    if (success) {
+      console.log("✅ Google Cloud APIs for Fitness AI initialized successfully");
+      console.log("🚀 The following APIs are active: Generative AI, Vision, Speech, Text-to-Speech, Translation, Language, Video Intelligence, Firestore, Vertex AI, Maps, Dialogflow, Storage, DLP, Monitoring, Secret Manager");
+    } else {
+      console.warn("⚠️ Some Google Cloud APIs for Fitness AI could not be initialized");
+    }
+  })
+  .catch(err => console.error("❌ Failed to initialize Google Cloud APIs for Fitness AI:", err));
 
 const app = express();
 app.use(express.json());
