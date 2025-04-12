@@ -1,12 +1,34 @@
 import React, { useState, useEffect } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { getQueryFn } from '@/lib/queryClient';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { getQueryFn, apiRequest } from '@/lib/queryClient';
 import { useUser } from '@/contexts/UserContext';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { AlertCircle, Activity, Timer, Flame, Heart, TrendingUp } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { useToast } from '@/hooks/use-toast';
+import { 
+  AlertCircle, Activity, Timer, Flame, Heart, TrendingUp, RefreshCw, 
+  CheckCircle, XCircle, Clock, Smartphone 
+} from 'lucide-react';
+
+interface SyncStatus {
+  lastSyncDate?: string;
+  status?: string;
+  dataTypes?: string[];
+  hasSyncedData?: boolean;
+}
+
+interface ConnectedDevice {
+  service: string;
+  connected: boolean;
+  lastSync: string | null;
+  error: string | null;
+  syncedData?: SyncStatus | null;
+}
 
 interface DashboardData {
   summary: {
@@ -17,12 +39,8 @@ interface DashboardData {
     sleepAvg: number;
   };
   devices: {
-    connected: Array<{
-      service: string;
-      connected: boolean;
-      lastSync: string | null;
-      error: string | null;
-    }>;
+    connected: Array<ConnectedDevice>;
+    syncStatus?: Record<string, any>;
   };
   recentActivities: Array<{
     type: string;
@@ -32,17 +50,127 @@ interface DashboardData {
     calories: number;
     source: string;
   }>;
+  dataLastUpdated?: string | null;
 }
 
 export default function FitnessDashboard() {
   const { user } = useUser();
   const userId = user?.id || 1;
   const [timeframe, setTimeframe] = useState<'day' | 'week' | 'month'>('week');
+  const [syncingService, setSyncingService] = useState<string | null>(null);
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
   
   const { data, isLoading, error } = useQuery({
     queryKey: [`/api/fitness/dashboard/${userId}`],
     queryFn: getQueryFn<DashboardData>({ on401: 'returnNull' }),
-    enabled: !!userId
+    enabled: !!userId,
+    refetchInterval: 60000 // Refetch every minute
+  });
+  
+  // Sync a specific fitness service
+  const syncMutation = useMutation({
+    mutationFn: async (serviceId: string) => {
+      return apiRequest(`/api/fitness/sync/${serviceId}`, {
+        method: 'POST',
+        body: JSON.stringify({ userId })
+      });
+    },
+    onMutate: (serviceId) => {
+      setSyncingService(serviceId);
+      toast({
+        title: 'Syncing data',
+        description: `Syncing your ${serviceId.replace(/-/g, ' ')} data...`,
+        duration: 2000
+      });
+    },
+    onSuccess: (data) => {
+      if (data.success) {
+        toast({
+          title: 'Sync successful',
+          description: 'Your fitness data has been updated',
+          variant: 'default',
+          duration: 3000
+        });
+        // Refetch dashboard data to get the latest stats
+        queryClient.invalidateQueries({ queryKey: [`/api/fitness/dashboard/${userId}`] });
+      } else {
+        toast({
+          title: 'Sync partially completed',
+          description: data.error || 'Some data types could not be synced',
+          variant: 'destructive',
+          duration: 5000
+        });
+      }
+    },
+    onError: (error) => {
+      toast({
+        title: 'Sync failed',
+        description: 'Could not synchronize your fitness data',
+        variant: 'destructive',
+        duration: 5000
+      });
+      console.error('Sync error:', error);
+    },
+    onSettled: () => {
+      setSyncingService(null);
+    }
+  });
+  
+  // Function to sync all connected services
+  const syncAllMutation = useMutation({
+    mutationFn: async () => {
+      return apiRequest('/api/fitness/sync-all', {
+        method: 'POST',
+        body: JSON.stringify({ userId })
+      });
+    },
+    onMutate: () => {
+      setSyncingService('all');
+      toast({
+        title: 'Syncing all data',
+        description: 'Fetching latest data from all connected trackers...',
+        duration: 2000
+      });
+    },
+    onSuccess: (data) => {
+      if (data.status === 'success') {
+        toast({
+          title: 'All devices synced',
+          description: 'Your fitness data has been fully updated',
+          variant: 'default',
+          duration: 3000
+        });
+      } else if (data.status === 'partial') {
+        toast({
+          title: 'Sync partially completed',
+          description: 'Some devices were synced successfully',
+          variant: 'default',
+          duration: 3000
+        });
+      } else {
+        toast({
+          title: 'Sync issues',
+          description: 'There were problems syncing your data',
+          variant: 'destructive',
+          duration: 5000
+        });
+      }
+      // Refetch dashboard data
+      queryClient.invalidateQueries({ queryKey: [`/api/fitness/dashboard/${userId}`] });
+    },
+    onError: (error) => {
+      toast({
+        title: 'Sync failed',
+        description: 'Could not synchronize your fitness data',
+        variant: 'destructive',
+        duration: 5000
+      });
+      console.error('Sync error:', error);
+    },
+    onSettled: () => {
+      setSyncingService(null);
+    }
   });
   
   if (isLoading) {
@@ -225,35 +353,101 @@ export default function FitnessDashboard() {
           
           <Card>
             <CardHeader>
-              <CardTitle>Connected Devices</CardTitle>
-              <CardDescription>
-                {connectedDevices} of {devices.connected.length} services connected
-              </CardDescription>
+              <div className="flex justify-between items-center">
+                <div>
+                  <CardTitle>Connected Devices</CardTitle>
+                  <CardDescription>
+                    {connectedDevices} of {devices.connected.length} services connected
+                  </CardDescription>
+                </div>
+                <Button 
+                  size="sm" 
+                  variant="outline" 
+                  className="flex items-center gap-1"
+                  onClick={() => syncAllMutation.mutate()}
+                  disabled={syncingService !== null || connectedDevices === 0}
+                >
+                  <RefreshCw className={`h-4 w-4 ${syncingService === 'all' ? 'animate-spin' : ''}`} />
+                  Sync All
+                </Button>
+              </div>
             </CardHeader>
             <CardContent>
-              <div className="space-y-3">
+              <div className="space-y-4">
                 {devices.connected.map((device, index) => (
-                  <div key={index} className="flex items-center justify-between border-b pb-2 last:border-0">
-                    <div className="flex items-center">
-                      <div className={`h-3 w-3 rounded-full mr-3 ${device.connected ? 'bg-green-500' : 'bg-gray-300'}`}></div>
-                      <div>
-                        <div className="font-medium capitalize">
-                          {device.service.replace(/-/g, ' ')}
-                        </div>
-                        {device.connected && device.lastSync && (
-                          <div className="text-xs text-muted-foreground">
-                            Last sync: {formatDate(device.lastSync)}
+                  <div key={index} className="flex flex-col border-b pb-3 last:border-0">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center">
+                        <div className={`h-3 w-3 rounded-full mr-3 ${device.connected ? 'bg-green-500' : 'bg-gray-300'}`}></div>
+                        <div>
+                          <div className="font-medium capitalize">
+                            {device.service.replace(/-/g, ' ')}
                           </div>
-                        )}
+                          {device.connected && device.lastSync && (
+                            <div className="text-xs text-muted-foreground flex items-center gap-1">
+                              <Clock className="h-3 w-3" />
+                              Last sync: {formatDate(device.lastSync)}
+                            </div>
+                          )}
+                        </div>
                       </div>
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button 
+                              size="sm" 
+                              variant={device.connected ? "outline" : "secondary"}
+                              disabled={!device.connected || syncingService !== null}
+                              onClick={() => device.connected && syncMutation.mutate(device.service)}
+                              className="flex items-center gap-1"
+                            >
+                              {syncingService === device.service ? (
+                                <>
+                                  <RefreshCw className="h-3 w-3 animate-spin" />
+                                  Syncing...
+                                </>
+                              ) : device.connected ? (
+                                <>
+                                  <RefreshCw className="h-3 w-3" />
+                                  Sync
+                                </>
+                              ) : (
+                                'Not Connected'
+                              )}
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            {device.connected 
+                              ? "Sync latest fitness data from this service" 
+                              : "Connect this service to sync fitness data"}
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
                     </div>
-                    <div className="text-sm">
-                      {device.connected ? 'Connected' : 'Not connected'}
-                    </div>
+                    
+                    {device.connected && device.syncedData && (
+                      <div className="mt-2 pl-6">
+                        <div className="flex flex-wrap gap-1 text-xs">
+                          {device.syncedData.dataTypes && device.syncedData.dataTypes.map((dataType: string) => (
+                            <Badge key={dataType} variant="outline" className="capitalize">
+                              {dataType}
+                            </Badge>
+                          ))}
+                          {(!device.syncedData.dataTypes || device.syncedData.dataTypes.length === 0) && (
+                            <span className="text-xs text-muted-foreground">No data synced yet</span>
+                          )}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
             </CardContent>
+            {data.dataLastUpdated && (
+              <CardFooter className="flex justify-between items-center pt-0 text-xs text-muted-foreground border-t">
+                <span>Data last updated: {formatDate(data.dataLastUpdated)} </span>
+              </CardFooter>
+            )}
           </Card>
         </div>
       </Tabs>

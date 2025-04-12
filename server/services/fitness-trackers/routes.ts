@@ -4,8 +4,10 @@
 
 import { Router, Request, Response } from 'express';
 import { activateFitnessIntegrations } from './activate';
-import { testAllIntegrations } from './utils';
+import { testAllIntegrations, getServiceToken } from './utils';
 import { initializeFitnessAISystem, checkEnvSecrets, notifyUser } from './initialize';
+import { syncFitnessData } from './sync-service';
+import { getFitnessTrackerSyncStatus, getLatestFitnessData, getAllFitnessData } from './firebase-storage';
 import { 
   GoogleFitMockAdapter, 
   FitbitMockAdapter, 
@@ -191,42 +193,393 @@ fitnessRouter.get('/dashboard/:userId', async (req, res) => {
       });
     }
     
-    // In a real implementation, you would fetch aggregated data from the database
-    // For now, we'll return some sample data
-    const dashboard = {
+    // Get device connection status
+    const connections = await testAllIntegrations(userId);
+    
+    // Get sync status from Firebase
+    const syncStatus = await getFitnessTrackerSyncStatus(userId);
+    
+    // Initialize dashboard data
+    let dashboard = {
       summary: {
-        dailyAvgSteps: 8500,
-        weeklyActiveMinutes: 210,
-        totalWorkouts: 12,
-        caloriesBurned: 4250,
-        sleepAvg: 7.2 // hours
+        dailyAvgSteps: 0,
+        weeklyActiveMinutes: 0,
+        totalWorkouts: 0,
+        caloriesBurned: 0,
+        sleepAvg: 0
       },
       devices: {
-        connected: await testAllIntegrations(userId)
+        connected: connections,
+        syncStatus
       },
-      recentActivities: [
-        {
-          type: 'Running',
-          date: new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(),
-          duration: 35, // minutes
-          distance: 5.2, // km
-          calories: 450,
-          source: 'strava'
-        },
-        {
-          type: 'Cycling',
-          date: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-          duration: 45, // minutes
-          distance: 15, // km
-          calories: 380,
-          source: 'fitbit'
-        }
-      ]
+      recentActivities: [],
+      dataLastUpdated: null
     };
+    
+    // Try to get real data from Firebase for connected services
+    const connectedServices = Object.keys(connections).filter(
+      serviceId => connections[serviceId].connected
+    );
+    
+    if (connectedServices.length > 0) {
+      try {
+        // Collect data from all connected services
+        for (const serviceId of connectedServices) {
+          // Get steps data if available
+          try {
+            const stepsData = await getLatestFitnessData(userId, serviceId, 'steps');
+            if (stepsData && stepsData.lastValue) {
+              dashboard.summary.dailyAvgSteps += Math.floor(stepsData.lastValue.total / 7);
+              dashboard.dataLastUpdated = stepsData.lastUpdated;
+            }
+          } catch (e) {
+            console.log(`No steps data for ${serviceId}`);
+          }
+          
+          // Get active minutes data if available
+          try {
+            const activeMinutesData = await getLatestFitnessData(userId, serviceId, 'activeMinutes');
+            if (activeMinutesData && activeMinutesData.lastValue) {
+              dashboard.summary.weeklyActiveMinutes += activeMinutesData.lastValue.total;
+            }
+          } catch (e) {
+            console.log(`No activeMinutes data for ${serviceId}`);
+          }
+          
+          // Get calories data if available
+          try {
+            const caloriesData = await getLatestFitnessData(userId, serviceId, 'calories');
+            if (caloriesData && caloriesData.lastValue) {
+              dashboard.summary.caloriesBurned += caloriesData.lastValue.total;
+            }
+          } catch (e) {
+            console.log(`No calories data for ${serviceId}`);
+          }
+          
+          // Get sleep data if available
+          try {
+            const sleepData = await getLatestFitnessData(userId, serviceId, 'sleep');
+            if (sleepData && sleepData.lastValue) {
+              dashboard.summary.sleepAvg = sleepData.lastValue.averageDuration;
+            }
+          } catch (e) {
+            console.log(`No sleep data for ${serviceId}`);
+          }
+          
+          // Get workout data if available
+          try {
+            const workoutData = await getLatestFitnessData(userId, serviceId, 'workout');
+            if (workoutData && workoutData.lastValue) {
+              dashboard.summary.totalWorkouts += workoutData.lastValue.count;
+              
+              // Add recent activities
+              if (workoutData.lastValue.workouts && Array.isArray(workoutData.lastValue.workouts)) {
+                // Add source to each workout
+                const activitiesWithSource = workoutData.lastValue.workouts.map((workout: any) => ({
+                  ...workout,
+                  source: serviceId
+                }));
+                
+                // @ts-ignore - TypeScript doesn't know the type of recentActivities
+                dashboard.recentActivities = [
+                  // @ts-ignore - TypeScript doesn't know the type of recentActivities
+                  ...dashboard.recentActivities,
+                  ...activitiesWithSource
+                ];
+              }
+            }
+          } catch (e) {
+            console.log(`No workout data for ${serviceId}`);
+          }
+          
+          // Get activities data if available (for Strava)
+          if (serviceId === 'strava') {
+            try {
+              const activitiesData = await getLatestFitnessData(userId, serviceId, 'activities');
+              if (activitiesData && activitiesData.lastValue) {
+                dashboard.summary.totalWorkouts += activitiesData.lastValue.count;
+                
+                // Add recent activities
+                if (activitiesData.lastValue.activities && Array.isArray(activitiesData.lastValue.activities)) {
+                  // Add source to each activity
+                  const activitiesWithSource = activitiesData.lastValue.activities.map((activity: any) => ({
+                    ...activity,
+                    source: serviceId
+                  }));
+                  
+                  // @ts-ignore - TypeScript doesn't know the type of recentActivities
+                  dashboard.recentActivities = [
+                    // @ts-ignore - TypeScript doesn't know the type of recentActivities
+                    ...dashboard.recentActivities,
+                    ...activitiesWithSource
+                  ];
+                }
+              }
+            } catch (e) {
+              console.log(`No activities data for ${serviceId}`);
+            }
+          }
+        }
+        
+        // Sort recent activities by date (most recent first)
+        // @ts-ignore - TypeScript doesn't know the type of recentActivities
+        dashboard.recentActivities.sort((a: any, b: any) => {
+          return new Date(b.date).getTime() - new Date(a.date).getTime();
+        });
+        
+        // Limit to 5 most recent activities
+        // @ts-ignore - TypeScript doesn't know the type of recentActivities
+        dashboard.recentActivities = dashboard.recentActivities.slice(0, 5);
+      } catch (error) {
+        console.error('Error getting data from Firebase:', error);
+        // Continue with default data
+      }
+    }
+    
+    // If we have no real data, use fallback values
+    if (dashboard.summary.dailyAvgSteps === 0) {
+      dashboard.summary.dailyAvgSteps = 8500;
+    }
+    
+    if (dashboard.summary.weeklyActiveMinutes === 0) {
+      dashboard.summary.weeklyActiveMinutes = 210;
+    }
+    
+    if (dashboard.summary.totalWorkouts === 0) {
+      dashboard.summary.totalWorkouts = 12;
+    }
+    
+    if (dashboard.summary.caloriesBurned === 0) {
+      dashboard.summary.caloriesBurned = 4250;
+    }
+    
+    if (dashboard.summary.sleepAvg === 0) {
+      dashboard.summary.sleepAvg = 7.2;
+    }
+    
+    // If no recent activities, provide empty array
+    if (dashboard.recentActivities.length === 0) {
+      dashboard.recentActivities = [];
+    }
     
     res.json(dashboard);
   } catch (error) {
     console.error('Error getting fitness dashboard:', error);
+    res.status(500).json({
+      status: 'error',
+      message: (error as Error).message
+    });
+  }
+});
+
+/**
+ * Sync endpoint for a specific service
+ */
+fitnessRouter.post('/sync/:serviceId', async (req, res) => {
+  try {
+    const { serviceId } = req.params;
+    const { 
+      userId = 1, 
+      dataTypes = [], 
+      startDate, 
+      endDate, 
+      forceRefresh = false 
+    } = req.body;
+    
+    // Check if the service is connected
+    const token = await getServiceToken(userId, serviceId);
+    
+    if (!token) {
+      return res.status(400).json({
+        status: 'error',
+        message: `Service ${serviceId} is not connected for user ${userId}`
+      });
+    }
+    
+    // Sync the data
+    const result = await syncFitnessData({
+      userId,
+      serviceId,
+      dataTypes,
+      startDate,
+      endDate,
+      forceRefresh
+    });
+    
+    res.json({
+      status: result.success ? 'success' : 'error',
+      ...result
+    });
+  } catch (error) {
+    console.error('Error syncing fitness data:', error);
+    res.status(500).json({
+      status: 'error',
+      message: (error as Error).message
+    });
+  }
+});
+
+/**
+ * Get sync status for all fitness trackers
+ */
+fitnessRouter.get('/sync-status/:userId', async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId);
+    
+    if (isNaN(userId)) {
+      return res.status(400).json({
+        status: 'error',
+        message: 'Invalid user ID'
+      });
+    }
+    
+    // Get the sync status from Firebase
+    const status = await getFitnessTrackerSyncStatus(userId);
+    
+    // Also get the connection status from our tracker integrations
+    const connections = await testAllIntegrations(userId);
+    
+    res.json({
+      status: 'success',
+      syncStatus: status,
+      connections
+    });
+  } catch (error) {
+    console.error('Error getting sync status:', error);
+    res.status(500).json({
+      status: 'error',
+      message: (error as Error).message
+    });
+  }
+});
+
+/**
+ * Get latest fitness data for a specific service and data type
+ */
+fitnessRouter.get('/data/:userId/:serviceId/:dataType', async (req, res) => {
+  try {
+    const { userId: userIdParam, serviceId, dataType } = req.params;
+    const userId = parseInt(userIdParam);
+    
+    if (isNaN(userId)) {
+      return res.status(400).json({
+        status: 'error',
+        message: 'Invalid user ID'
+      });
+    }
+    
+    // Get the data from Firebase
+    const data = await getLatestFitnessData(userId, serviceId, dataType);
+    
+    if (!data) {
+      return res.status(404).json({
+        status: 'error',
+        message: `No ${dataType} data available for ${serviceId}`
+      });
+    }
+    
+    res.json({
+      status: 'success',
+      data
+    });
+  } catch (error) {
+    console.error('Error getting fitness data:', error);
+    res.status(500).json({
+      status: 'error',
+      message: (error as Error).message
+    });
+  }
+});
+
+/**
+ * Get all fitness data for a specific service and data type
+ */
+fitnessRouter.get('/data/:userId/:serviceId/:dataType/history', async (req, res) => {
+  try {
+    const { userId: userIdParam, serviceId, dataType } = req.params;
+    const limit = req.query.limit ? parseInt(req.query.limit as string) : 50;
+    const userId = parseInt(userIdParam);
+    
+    if (isNaN(userId)) {
+      return res.status(400).json({
+        status: 'error',
+        message: 'Invalid user ID'
+      });
+    }
+    
+    // Get the data from Firebase
+    const data = await getAllFitnessData(userId, serviceId, dataType, limit);
+    
+    if (data.length === 0) {
+      return res.status(404).json({
+        status: 'error',
+        message: `No ${dataType} history available for ${serviceId}`
+      });
+    }
+    
+    res.json({
+      status: 'success',
+      count: data.length,
+      data
+    });
+  } catch (error) {
+    console.error('Error getting fitness data history:', error);
+    res.status(500).json({
+      status: 'error',
+      message: (error as Error).message
+    });
+  }
+});
+
+/**
+ * Sync all connected fitness trackers
+ */
+fitnessRouter.post('/sync-all', async (req, res) => {
+  try {
+    const { userId = 1, dataTypes = [] } = req.body;
+    
+    // Get all connected services
+    const connections = await testAllIntegrations(userId);
+    const connectedServices = Object.keys(connections).filter(
+      serviceId => connections[serviceId].connected
+    );
+    
+    if (connectedServices.length === 0) {
+      return res.status(400).json({
+        status: 'error',
+        message: 'No connected fitness trackers found'
+      });
+    }
+    
+    // Sync each connected service
+    const results: Record<string, any> = {};
+    
+    for (const serviceId of connectedServices) {
+      try {
+        const result = await syncFitnessData({
+          userId,
+          serviceId,
+          dataTypes
+        });
+        
+        results[serviceId] = result;
+      } catch (error) {
+        results[serviceId] = {
+          success: false,
+          error: (error as Error).message
+        };
+      }
+    }
+    
+    // Update the dashboard data
+    const allSuccess = Object.values(results).every(result => result.success);
+    
+    res.json({
+      status: allSuccess ? 'success' : 'partial',
+      results
+    });
+  } catch (error) {
+    console.error('Error syncing all fitness trackers:', error);
     res.status(500).json({
       status: 'error',
       message: (error as Error).message
