@@ -1,19 +1,19 @@
 /**
- * Mock Adapters para servicios de fitness tracker
- * Permite activar todas las funcionalidades mientras se completan los permisos de OAuth
+ * Mock Adapters for fitness tracker services
+ * Enables full functionality while OAuth permissions are being completed
  */
 
 import { FitnessTrackerService } from './index';
 import { getServiceToken, storeServiceToken } from './utils';
 
 /**
- * Adapter Mock para Google Fit
- * Proporciona datos simulados basados en patrones reales para desarrollo y demostración
+ * Mock Adapter for Google Fit
+ * Provides simulated data based on real patterns for development and demonstration
  */
 export class GoogleFitMockAdapter implements FitnessTrackerService {
   id = 'google-fit';
   name = 'Google Fit';
-  description = 'El servicio de seguimiento de actividad física de Google';
+  description = 'Google\'s activity tracking service';
   apiDocumentation = 'https://developers.google.com/fit';
   requiredSecrets = ['GOOGLE_FIT_CLIENT_ID', 'GOOGLE_FIT_CLIENT_SECRET'];
   
@@ -27,10 +27,9 @@ export class GoogleFitMockAdapter implements FitnessTrackerService {
   
   async exchangeCodeForToken(code: string, userId: number): Promise<any> {
     const mockToken = {
-      access_token: 'mock_google_fit_access_token',
-      refresh_token: 'mock_google_fit_refresh_token',
-      expires_in: 3600,
-      token_type: 'Bearer',
+      accessToken: 'mock_google_fit_access_token',
+      refreshToken: 'mock_google_fit_refresh_token',
+      expiresAt: new Date(Date.now() + 3600 * 1000).toISOString(),
     };
     
     await storeServiceToken(userId, this.id, mockToken);
@@ -104,12 +103,12 @@ export class GoogleFitMockAdapter implements FitnessTrackerService {
 }
 
 /**
- * Adapter Mock para Fitbit
+ * Mock Adapter for Fitbit
  */
 export class FitbitMockAdapter implements FitnessTrackerService {
   id = 'fitbit';
   name = 'Fitbit';
-  description = 'Plataforma de seguimiento de actividad física, sueño y más';
+  description = 'Platform for tracking physical activity, sleep, and more';
   apiDocumentation = 'https://dev.fitbit.com/build/reference/web-api/';
   requiredSecrets = ['FITBIT_CLIENT_ID', 'FITBIT_CLIENT_SECRET'];
   
@@ -123,10 +122,9 @@ export class FitbitMockAdapter implements FitnessTrackerService {
   
   async exchangeCodeForToken(code: string, userId: number): Promise<any> {
     const mockToken = {
-      access_token: 'mock_fitbit_access_token',
-      refresh_token: 'mock_fitbit_refresh_token',
-      expires_in: 3600,
-      token_type: 'Bearer',
+      accessToken: 'mock_fitbit_access_token',
+      refreshToken: 'mock_fitbit_refresh_token',
+      expiresAt: new Date(Date.now() + 3600 * 1000).toISOString(),
     };
     
     await storeServiceToken(userId, this.id, mockToken);
