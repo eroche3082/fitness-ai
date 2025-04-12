@@ -21,7 +21,11 @@ import {
   Award,
   Mic,
   Download,
-  Heart as HeartIcon
+  Heart as HeartIcon,
+  Play,
+  CalendarDays,
+  Clock,
+  CheckCircle
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -29,8 +33,11 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '../App';
 
-// Import SVG pattern
+// Import SVG assets
 import patternSvg from '../assets/fitness-pattern.svg';
+import workoutThumbnail from '../assets/workout-thumbnail.svg';
+import nutritionThumbnail from '../assets/nutrition-thumbnail.svg';
+import trackingThumbnail from '../assets/tracking-thumbnail.svg';
 
 // App features based on the 20 core features identified
 const features = [
@@ -330,7 +337,7 @@ export default function LandingPage() {
             <Button 
               size="lg" 
               onClick={() => setShowLoginModal(true)}
-              className="bg-primary hover:bg-primary/90 text-white font-semibold shadow-lg px-8 py-6 text-lg"
+              className="glow-button bg-primary hover:bg-primary/90 text-white font-semibold shadow-lg px-8 py-6 text-lg hover-purple"
             >
               Get Started Now
             </Button>
@@ -338,7 +345,7 @@ export default function LandingPage() {
               size="lg" 
               variant="outline" 
               onClick={() => window.location.href = "#features"}
-              className="border-primary text-primary hover:bg-primary/10 px-8 py-6 text-lg"
+              className="border-primary text-primary hover-purple-text px-8 py-6 text-lg"
             >
               Explore Features
             </Button>

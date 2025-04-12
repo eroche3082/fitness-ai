@@ -1,0 +1,128 @@
+/* Custom Styles for Fitness AI */
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap');
+
+/* Global Font Styles */
+body {
+  font-family: 'Poppins', sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Montserrat', sans-serif;
+}
+
+/* Custom Hover Effects */
+.hover-purple:hover {
+  background-color: #6b21a8 !important;
+  color: white !important;
+  transition: all 0.3s ease;
+}
+
+.hover-purple-text:hover {
+  color: #6b21a8 !important;
+  transition: all 0.3s ease;
+}
+
+.hover-scale:hover {
+  transform: scale(1.05);
+  transition: transform 0.3s ease;
+}
+
+/* Animation Classes */
+.float-animation {
+  animation: float 5s ease-in-out infinite;
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+.pulse-animation {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Custom Background Overlays */
+.gradient-mesh {
+  background-image: 
+    radial-gradient(circle at 10% 20%, rgba(107, 33, 168, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 90% 80%, rgba(79, 134, 247, 0.1) 0%, transparent 50%);
+}
+
+/* Video Preview Section */
+.video-preview {
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease;
+}
+
+.video-preview:hover {
+  transform: translateY(-5px);
+}
+
+.video-preview .play-button {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 60px;
+  height: 60px;
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.video-preview .play-button:hover {
+  background-color: #6b21a8;
+  color: white;
+}
+
+/* Custom Buttons */
+.glow-button {
+  position: relative;
+  background: linear-gradient(45deg, #4f86f7, #6b21a8);
+  color: white;
+  border: none;
+  box-shadow: 0 5px 15px rgba(107, 33, 168, 0.3);
+  overflow: hidden;
+  z-index: 1;
+}
+
+.glow-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(45deg, #6b21a8, #4f86f7);
+  transition: left 0.5s ease;
+  z-index: -1;
+}
+
+.glow-button:hover::before {
+  left: 0;
+}
