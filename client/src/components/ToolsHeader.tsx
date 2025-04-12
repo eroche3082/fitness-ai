@@ -2,6 +2,7 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import FormCheckAnalyzer from "./FormCheckAnalyzer";
 import QRCodeScanner from "./QRCodeScanner";
+import { Link } from "wouter";
 import { 
   BarChartBig, 
   FileUp, 
@@ -9,7 +10,8 @@ import {
   Dumbbell, 
   Utensils,
   Bed, 
-  Heart
+  Heart,
+  Mic
 } from "lucide-react";
 
 // This component renders a toolbar with all the Fitness AI tools
