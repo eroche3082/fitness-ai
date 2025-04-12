@@ -30,409 +30,356 @@ interface UserProfile {
   onboardingStep?: number;
 }
 
-// These are the onboarding questions that will be asked to the user
-const onboardingQuestions: OnboardingQuestion[] = [
-  {
-    step: 0,
-    question: "What's your name?",
-    totalSteps: 8,
-    completed: false
-  },
-  {
-    step: 1,
-    question: "What's your email address?",
-    totalSteps: 8,
-    completed: false
-  },
-  {
-    step: 2,
-    question: "What's your fitness level?",
-    options: ['beginner', 'intermediate', 'advanced'],
-    optionLabels: ['Beginner - New to fitness', 'Intermediate - Workout regularly', 'Advanced - Experienced athlete'],
-    totalSteps: 8,
-    completed: false
-  },
-  {
-    step: 3,
-    question: "What are your fitness goals?",
-    options: ['weight_loss', 'muscle_gain', 'endurance', 'flexibility', 'overall_health', 'sports_performance'],
-    optionLabels: [
-      'Weight Loss', 
-      'Muscle Gain', 
-      'Improve Endurance', 
-      'Increase Flexibility', 
-      'Overall Health', 
-      'Sports Performance'
-    ],
-    totalSteps: 8,
-    completed: false
-  },
-  {
-    step: 4,
-    question: "What activities do you prefer?",
-    options: ['running', 'weightlifting', 'yoga', 'swimming', 'cycling', 'hiit', 'team_sports', 'other'],
-    optionLabels: [
-      'Running', 
-      'Weightlifting', 
-      'Yoga', 
-      'Swimming', 
-      'Cycling', 
-      'HIIT Workouts', 
-      'Team Sports', 
-      'Other'
-    ],
-    totalSteps: 8,
-    completed: false
-  },
-  {
-    step: 5,
-    question: "Would you like to track your sleep patterns?",
-    totalSteps: 8,
-    completed: false
-  },
-  {
-    step: 6,
-    question: "How many active hours do you typically spend per week exercising?",
-    totalSteps: 8,
-    completed: false
-  },
-  {
-    step: 7,
-    question: "Which fitness trackers or devices do you use?",
-    options: ['none', 'fitbit', 'apple_watch', 'garmin', 'google_fit', 'samsung', 'strava', 'other'],
-    optionLabels: [
-      'None', 
-      'Fitbit', 
-      'Apple Watch', 
-      'Garmin', 
-      'Google Fit', 
-      'Samsung Health', 
-      'Strava', 
-      'Other'
-    ],
-    totalSteps: 8,
-    completed: false
-  }
-];
+const initialProfileState: UserProfile = {
+  language: 'en',
+  onboardingCompleted: false,
+  onboardingStep: 1
+};
 
-// Generate a personalized welcome message based on the user's profile
+// Get a personalized welcome message based on the user's profile
 const generateWelcomeMessage = (profile: UserProfile): string => {
-  const name = profile.name || 'there';
-  const fitnessLevel = profile.fitnessLevel || 'beginner';
-  const mainGoal = profile.fitnessGoals?.[0] || 'overall_health';
-  const mainActivity = profile.preferredActivities?.[0] || 'running';
-  
-  let goalText = '';
-  switch(mainGoal) {
-    case 'weight_loss':
-      goalText = 'lose weight';
-      break;
-    case 'muscle_gain':
-      goalText = 'build muscle';
-      break;
-    case 'endurance':
-      goalText = 'increase your endurance';
-      break;
-    case 'flexibility':
-      goalText = 'improve your flexibility';
-      break;
-    case 'sports_performance':
-      goalText = 'enhance your sports performance';
-      break;
-    default:
-      goalText = 'improve your overall health';
+  const { name, fitnessLevel, fitnessGoals, preferredActivities, activeHoursPerWeek, language } = profile;
+
+  // Multilingual welcome messages
+  const welcomeIntros = {
+    en: `Welcome${name ? ', ' + name : ''}! I'm your personal Fitness AI assistant.`,
+    es: `¡Bienvenido${name ? ', ' + name : ''}! Soy tu asistente personal de Fitness AI.`,
+    fr: `Bienvenue${name ? ', ' + name : ''}! Je suis votre assistant personnel Fitness AI.`,
+    pt: `Bem-vindo${name ? ', ' + name : ''}! Sou seu assistente pessoal de Fitness AI.`
+  };
+
+  const fitnessLevelTexts = {
+    en: {
+      beginner: "I see you're just starting your fitness journey.",
+      intermediate: "I see you're already experienced with fitness.",
+      advanced: "I see you're at an advanced fitness level."
+    },
+    es: {
+      beginner: "Veo que estás comenzando tu viaje de fitness.",
+      intermediate: "Veo que ya tienes experiencia con el fitness.",
+      advanced: "Veo que estás en un nivel avanzado de fitness."
+    },
+    fr: {
+      beginner: "Je vois que vous commencez tout juste votre parcours de remise en forme.",
+      intermediate: "Je vois que vous avez déjà de l'expérience en fitness.",
+      advanced: "Je vois que vous êtes à un niveau avancé de fitness."
+    },
+    pt: {
+      beginner: "Vejo que você está apenas começando sua jornada de fitness.",
+      intermediate: "Vejo que você já tem experiência com fitness.",
+      advanced: "Vejo que você está em um nível avançado de fitness."
+    }
+  };
+
+  const activityHoursTexts = {
+    en: `You've indicated that you can dedicate about ${activeHoursPerWeek} hours per week to exercise.`,
+    es: `Has indicado que puedes dedicar aproximadamente ${activeHoursPerWeek} horas por semana al ejercicio.`,
+    fr: `Vous avez indiqué que vous pouvez consacrer environ ${activeHoursPerWeek} heures par semaine à l'exercice.`,
+    pt: `Você indicou que pode dedicar cerca de ${activeHoursPerWeek} horas por semana ao exercício.`
+  };
+
+  const goalTexts = {
+    en: "Based on your goals",
+    es: "Basado en tus objetivos",
+    fr: "En fonction de vos objectifs",
+    pt: "Com base em seus objetivos"
+  };
+
+  const activitiesTexts = {
+    en: "and preferred activities",
+    es: "y actividades preferidas",
+    fr: "et activités préférées",
+    pt: "e atividades preferidas"
+  };
+
+  const planTexts = {
+    en: "I'll help you create personalized workout plans and track your progress effectively.",
+    es: "Te ayudaré a crear planes de entrenamiento personalizados y a seguir tu progreso de manera efectiva.",
+    fr: "Je vous aiderai à créer des plans d'entraînement personnalisés et à suivre vos progrès efficacement.",
+    pt: "Vou ajudá-lo a criar planos de treino personalizados e acompanhar seu progresso de forma eficaz."
+  };
+
+  const askTexts = {
+    en: "What would you like to do today?",
+    es: "¿Qué te gustaría hacer hoy?",
+    fr: "Que souhaitez-vous faire aujourd'hui?",
+    pt: "O que você gostaria de fazer hoje?"
+  };
+
+  // Current language or fallback to English
+  const currentLang = (language && language in welcomeIntros) ? language : 'en';
+
+  // Build personalized welcome message
+  let welcomeMessage = welcomeIntros[currentLang as keyof typeof welcomeIntros];
+
+  // Add fitness level if available
+  if (fitnessLevel && fitnessLevelTexts[currentLang as keyof typeof fitnessLevelTexts]) {
+    welcomeMessage += ' ' + fitnessLevelTexts[currentLang as keyof typeof fitnessLevelTexts][fitnessLevel as keyof typeof fitnessLevelTexts['en']];
   }
-  
-  let activityText = '';
-  switch(mainActivity) {
-    case 'weightlifting':
-      activityText = 'strength training';
-      break;
-    case 'yoga':
-      activityText = 'yoga and flexibility exercises';
-      break;
-    case 'swimming':
-      activityText = 'swimming and water workouts';
-      break;
-    case 'cycling':
-      activityText = 'cycling workouts';
-      break;
-    case 'hiit':
-      activityText = 'high-intensity interval training';
-      break;
-    case 'team_sports':
-      activityText = 'team sports and group activities';
-      break;
-    default:
-      activityText = 'running and cardio exercises';
+
+  // Add activity hours if available
+  if (activeHoursPerWeek && activeHoursPerWeek > 0) {
+    welcomeMessage += ' ' + activityHoursTexts[currentLang as keyof typeof activityHoursTexts];
   }
-  
-  let levelText = '';
-  switch(fitnessLevel) {
-    case 'beginner':
-      levelText = 'beginner-friendly';
-      break;
-    case 'intermediate':
-      levelText = 'intermediate-level';
-      break;
-    case 'advanced':
-      levelText = 'advanced';
-      break;
+
+  // Add goals and activities if available
+  if (fitnessGoals && fitnessGoals.length > 0 && preferredActivities && preferredActivities.length > 0) {
+    welcomeMessage += ' ' + goalTexts[currentLang as keyof typeof goalTexts] + ' ' + 
+                      activitiesTexts[currentLang as keyof typeof activitiesTexts] + ', ';
+  } else if (fitnessGoals && fitnessGoals.length > 0) {
+    welcomeMessage += ' ' + goalTexts[currentLang as keyof typeof goalTexts] + ', ';
+  } else if (preferredActivities && preferredActivities.length > 0) {
+    welcomeMessage += ' ' + activitiesTexts[currentLang as keyof typeof activitiesTexts] + ', ';
   }
-  
-  return `Welcome, ${name}! 👋 Based on your profile, I've personalized Fitness AI to help you ${goalText} through ${levelText} ${activityText}. I'll provide customized workout plans, nutrition advice, and progress tracking tailored to your goals and preferences. You can ask me anything about fitness, health, or wellness at any time!`;
+
+  // Add plan text
+  welcomeMessage += ' ' + planTexts[currentLang as keyof typeof planTexts];
+
+  // Add final question
+  welcomeMessage += '\n\n' + askTexts[currentLang as keyof typeof askTexts];
+
+  return welcomeMessage;
 };
 
 export function useUserProfile(userId: number = 1) {
   const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [isOnboarding, setIsOnboarding] = useState<boolean>(false);
-  const [currentQuestion, setCurrentQuestion] = useState<OnboardingQuestion | null>(null);
 
-  // Fetch the user profile from the server
+  // Onboarding questions sequence
+  const onboardingQuestions: OnboardingQuestion[] = [
+    {
+      step: 1,
+      question: "What's your name?",
+      totalSteps: 8,
+      completed: false
+    },
+    {
+      step: 2,
+      question: "What's your fitness level?",
+      totalSteps: 8,
+      completed: false
+    },
+    {
+      step: 3,
+      question: "What are your fitness goals?",
+      options: [
+        'lose_weight', 
+        'build_muscle', 
+        'improve_endurance', 
+        'increase_flexibility', 
+        'reduce_stress', 
+        'better_sleep', 
+        'improve_overall_health'
+      ],
+      optionLabels: [
+        'Lose Weight', 
+        'Build Muscle', 
+        'Improve Endurance', 
+        'Increase Flexibility', 
+        'Reduce Stress',
+        'Better Sleep',
+        'Improve Overall Health'
+      ],
+      totalSteps: 8,
+      completed: false
+    },
+    {
+      step: 4,
+      question: "What activities do you prefer?",
+      options: [
+        'running', 
+        'weightlifting', 
+        'cycling', 
+        'swimming', 
+        'yoga', 
+        'hiit', 
+        'pilates', 
+        'team_sports', 
+        'walking'
+      ],
+      optionLabels: [
+        'Running',
+        'Weightlifting',
+        'Cycling',
+        'Swimming',
+        'Yoga',
+        'HIIT',
+        'Pilates',
+        'Team Sports',
+        'Walking'
+      ],
+      totalSteps: 8,
+      completed: false
+    },
+    {
+      step: 5,
+      question: "How many hours per week can you dedicate to exercise?",
+      totalSteps: 8,
+      completed: false
+    },
+    {
+      step: 6,
+      question: "What language do you prefer?",
+      totalSteps: 8,
+      completed: false
+    },
+    {
+      step: 7,
+      question: "Which fitness trackers or devices do you use?",
+      options: [
+        'google_fit', 
+        'apple_health', 
+        'fitbit', 
+        'strava', 
+        'garmin', 
+        'samsung_health', 
+        'none'
+      ],
+      optionLabels: [
+        'Google Fit',
+        'Apple Health',
+        'Fitbit',
+        'Strava',
+        'Garmin',
+        'Samsung Health',
+        'None'
+      ],
+      totalSteps: 8,
+      completed: false
+    },
+    {
+      step: 8,
+      question: "Ready to start your personalized fitness journey?",
+      totalSteps: 8,
+      completed: false
+    }
+  ];
+
+  // Get current question based on onboarding step
+  const currentQuestion = profile?.onboardingStep 
+    ? onboardingQuestions.find(q => q.step === profile.onboardingStep) || onboardingQuestions[0]
+    : onboardingQuestions[0];
+
+  // Fetch profile
   const fetchProfile = useCallback(async () => {
     try {
       setLoading(true);
       const response = await fetch(`/api/users/${userId}/profile`);
       
       if (!response.ok) {
-        if (response.status === 404) {
-          // If the user doesn't exist or has no profile, create one
-          const createUserResponse = await fetch('/api/users', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              username: `user${userId}`,
-              password: 'password123',
-              name: null,
-              email: null,
-              language: 'en'
-            })
-          });
-          
-          if (!createUserResponse.ok) {
-            throw new Error('Failed to create user');
-          }
-          
-          // Start onboarding
-          setIsOnboarding(true);
-          setCurrentQuestion(onboardingQuestions[0]);
-          setProfile({
-            language: 'en',
-            onboardingCompleted: false,
-            onboardingStep: 0
-          });
-        } else {
-          throw new Error('Failed to fetch user profile');
-        }
-      } else {
-        const data = await response.json();
-        setProfile(data);
-        
-        // Check if onboarding is completed or in progress
-        if (data.onboardingCompleted === false) {
-          setIsOnboarding(true);
-          const currentStep = data.onboardingStep || 0;
-          if (currentStep < onboardingQuestions.length) {
-            setCurrentQuestion({
-              ...onboardingQuestions[currentStep],
-              completed: false
-            });
-          } else {
-            completeOnboarding();
-          }
-        } else {
-          setIsOnboarding(false);
-          setCurrentQuestion(null);
-        }
+        throw new Error('Failed to fetch user profile');
       }
-    } catch (error) {
-      console.error('Error fetching user profile:', error);
-      setError('Failed to load profile data');
       
-      // Create a default profile and start onboarding
-      setIsOnboarding(true);
-      setCurrentQuestion(onboardingQuestions[0]);
-      setProfile({
-        language: 'en',
-        onboardingCompleted: false,
-        onboardingStep: 0
-      });
+      const data = await response.json();
+      setProfile(data);
+      setError(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An unknown error occurred');
+      console.error('Error fetching user profile:', err);
     } finally {
       setLoading(false);
     }
   }, [userId]);
 
-  // Submit an answer to the current onboarding question
-  const submitAnswer = useCallback(async (answer: any) => {
-    if (!currentQuestion || !profile) return;
-    
+  // Update profile
+  const updateProfile = useCallback(async (updates: Partial<UserProfile>) => {
     try {
       setLoading(true);
-      
-      // Update the profile based on the current question and answer
-      const updatedProfile = { ...profile };
-      
-      // Process the answer based on the current step
-      switch (currentQuestion.step) {
-        case 0: // Name
-          updatedProfile.name = answer;
-          break;
-        case 1: // Email
-          updatedProfile.email = answer;
-          break;
-        case 2: // Fitness level
-          updatedProfile.fitnessLevel = answer as 'beginner' | 'intermediate' | 'advanced';
-          break;
-        case 3: // Fitness goals
-          updatedProfile.fitnessGoals = Array.isArray(answer) ? answer : [answer];
-          break;
-        case 4: // Preferred activities
-          updatedProfile.preferredActivities = Array.isArray(answer) ? answer : [answer];
-          break;
-        case 5: // Sleep tracking
-          updatedProfile.sleepTracking = Boolean(answer);
-          break;
-        case 6: // Active hours per week
-          updatedProfile.activeHoursPerWeek = Number(answer);
-          break;
-        case 7: // Used devices
-          updatedProfile.usedDevices = Array.isArray(answer) ? answer : [answer];
-          break;
-      }
-      
-      // Update the onboarding step
-      const nextStep = currentQuestion.step + 1;
-      updatedProfile.onboardingStep = nextStep;
-      
-      // Check if this was the last question
-      if (nextStep >= onboardingQuestions.length) {
-        updatedProfile.onboardingCompleted = true;
-      }
-      
-      // Save the updated profile
       const response = await fetch(`/api/users/${userId}/profile`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updatedProfile)
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(updates)
       });
       
       if (!response.ok) {
-        throw new Error('Failed to update profile');
+        throw new Error('Failed to update user profile');
       }
       
+      const updatedProfile = await response.json();
       setProfile(updatedProfile);
-      
-      // Move to the next question or complete onboarding
-      if (nextStep < onboardingQuestions.length) {
-        setCurrentQuestion({
-          ...onboardingQuestions[nextStep],
-          completed: false
-        });
-      } else {
-        // Complete onboarding
-        const welcomeMessage = generateWelcomeMessage(updatedProfile);
-        setCurrentQuestion({
-          ...onboardingQuestions[onboardingQuestions.length - 1],
-          completed: true,
-          welcomeMessage
-        });
-        setIsOnboarding(false);
-      }
-    } catch (error) {
-      console.error('Error submitting answer:', error);
-      setError('Failed to save your answer');
+      setError(null);
+      return updatedProfile;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An unknown error occurred');
+      console.error('Error updating user profile:', err);
+      return null;
     } finally {
       setLoading(false);
     }
-  }, [currentQuestion, profile, userId]);
+  }, [userId]);
 
-  // Complete the onboarding process
-  const completeOnboarding = useCallback(async () => {
-    if (!profile) return;
-    
-    try {
-      setLoading(true);
-      
-      const updatedProfile = {
-        ...profile,
-        onboardingCompleted: true,
-        onboardingStep: onboardingQuestions.length
-      };
-      
-      const response = await fetch(`/api/users/${userId}/profile`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updatedProfile)
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to complete onboarding');
-      }
-      
-      setProfile(updatedProfile);
-      setIsOnboarding(false);
-      setCurrentQuestion({
-        ...onboardingQuestions[onboardingQuestions.length - 1],
-        completed: true,
-        welcomeMessage: generateWelcomeMessage(updatedProfile)
-      });
-    } catch (error) {
-      console.error('Error completing onboarding:', error);
-      setError('Failed to complete onboarding');
-    } finally {
-      setLoading(false);
-    }
-  }, [profile, userId]);
-
-  // Reset the onboarding process
+  // Reset onboarding
   const resetOnboarding = useCallback(async () => {
-    if (!profile) return;
-    
     try {
       setLoading(true);
-      
-      const updatedProfile = {
-        ...profile,
-        onboardingCompleted: false,
-        onboardingStep: 0
-      };
-      
-      const response = await fetch(`/api/users/${userId}/profile`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updatedProfile)
+      const response = await fetch(`/api/users/${userId}/profile/reset`, {
+        method: 'POST'
       });
       
       if (!response.ok) {
         throw new Error('Failed to reset onboarding');
       }
       
-      setProfile(updatedProfile);
-      setIsOnboarding(true);
-      setCurrentQuestion(onboardingQuestions[0]);
-    } catch (error) {
-      console.error('Error resetting onboarding:', error);
-      setError('Failed to reset onboarding');
+      const resetProfile = await response.json();
+      setProfile(resetProfile);
+      setError(null);
+      return resetProfile;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An unknown error occurred');
+      console.error('Error resetting onboarding:', err);
+      return null;
     } finally {
       setLoading(false);
     }
-  }, [profile, userId]);
+  }, [userId]);
 
-  // Load the profile on component mount
+  // Complete onboarding
+  const completeOnboarding = useCallback(async () => {
+    try {
+      const updatedProfile = await updateProfile({ 
+        onboardingCompleted: true,
+        onboardingStep: onboardingQuestions.length
+      });
+      
+      if (updatedProfile) {
+        const welcomeMessage = generateWelcomeMessage(updatedProfile);
+        return welcomeMessage;
+      }
+      
+      return "Welcome to Fitness AI! How can I help you today?";
+    } catch (err) {
+      console.error('Error completing onboarding:', err);
+      return "Welcome to Fitness AI! How can I help you today?";
+    }
+  }, [updateProfile, onboardingQuestions.length]);
+
+  // Helper function to generate welcome message
+  const welcomeMessageGenerator = useCallback(() => {
+    if (!profile) return "Welcome to Fitness AI! How can I help you today?";
+    return generateWelcomeMessage(profile);
+  }, [profile]);
+
+  // Initial profile fetch
   useEffect(() => {
     fetchProfile();
   }, [fetchProfile]);
+
+  // Calculate if user is in onboarding process
+  const isOnboarding = !profile?.onboardingCompleted && profile?.onboardingStep !== undefined;
 
   return {
     profile,
     loading,
     error,
     isOnboarding,
-    currentQuestion,
-    submitAnswer,
+    updateProfile,
     resetOnboarding,
-    refreshProfile: fetchProfile
+    completeOnboarding,
+    onboardingQuestions,
+    currentQuestion,
+    generateWelcomeMessage: welcomeMessageGenerator
   };
 }

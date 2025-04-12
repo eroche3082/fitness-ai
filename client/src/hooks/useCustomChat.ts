@@ -1,93 +1,107 @@
-import { useState, useEffect, useRef } from 'react';
-import { useChat, Message } from '@/contexts/ChatContext';
+import { useState } from 'react';
 
-interface UseCustomChatReturn {
-  messages: Message[];
-  sending: boolean;
-  loadingMessages: boolean;
-  inputValue: string;
-  setInputValue: React.Dispatch<React.SetStateAction<string>>;
-  isRecording: boolean;
-  startRecording: () => void;
-  stopRecording: () => void;
-  handleSendMessage: () => void;
-  isConversationActive: boolean;
+// Message type definition
+export interface Message {
+  role: 'user' | 'assistant';
+  content: string;
 }
 
-export function useCustomChat(): UseCustomChatReturn {
-  const chatContext = useChat();
-  const [inputValue, setInputValue] = useState('');
-  const [isRecording, setIsRecording] = useState(false);
+export function useCustomChat() {
+  const [messages, setMessages] = useState<Message[]>([
+    { 
+      role: 'assistant', 
+      content: "Hello! I'm your Fitness AI assistant. How can I help you with your fitness goals today?" 
+    }
+  ]);
+  const [isProcessing, setIsProcessing] = useState(false);
 
-  // For recording
-  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
-  const audioChunksRef = useRef<Blob[]>([]);
+  // Send message to the fitness AI and get response
+  const sendMessage = async (content: string) => {
+    if (!content.trim() || isProcessing) return;
 
-  const startRecording = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mediaRecorder = new MediaRecorder(stream);
-      mediaRecorderRef.current = mediaRecorder;
-      audioChunksRef.current = [];
-
-      mediaRecorder.ondataavailable = (event) => {
-        if (event.data.size > 0) {
-          audioChunksRef.current.push(event.data);
+      // Update UI with user message
+      setIsProcessing(true);
+      
+      // Create conversation if needed
+      let conversationId: number;
+      
+      // Check if we have existing conversation in localStorage
+      const storedConversationId = localStorage.getItem('currentConversationId');
+      
+      if (storedConversationId) {
+        conversationId = parseInt(storedConversationId);
+      } else {
+        // Create new conversation
+        const conversationResponse = await fetch('/api/conversations', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            userId: 1,
+            title: 'New Conversation'
+          })
+        });
+        
+        if (!conversationResponse.ok) {
+          throw new Error('Failed to create conversation');
         }
-      };
-
-      mediaRecorder.onstop = async () => {
-        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/wav' });
         
-        // Here you would normally send the audio to a speech-to-text service
-        // For now we'll just add a placeholder message
-        setInputValue('Voice command transcription would appear here');
-        
-        // Cleanup
-        stream.getTracks().forEach(track => track.stop());
-      };
-
-      mediaRecorder.start();
-      setIsRecording(true);
-    } catch (error) {
-      console.error('Error starting recording:', error);
-      setIsRecording(false);
-    }
-  };
-
-  const stopRecording = () => {
-    if (mediaRecorderRef.current && isRecording) {
-      mediaRecorderRef.current.stop();
-      setIsRecording(false);
-    }
-  };
-
-  const handleSendMessage = () => {
-    if (inputValue.trim()) {
-      chatContext.sendMessage(inputValue.trim());
-      setInputValue('');
-    }
-  };
-
-  // Cancel recording if component unmounts while recording
-  useEffect(() => {
-    return () => {
-      if (isRecording && mediaRecorderRef.current) {
-        mediaRecorderRef.current.stop();
+        const conversation = await conversationResponse.json();
+        conversationId = conversation.id;
+        localStorage.setItem('currentConversationId', conversationId.toString());
       }
-    };
-  }, [isRecording]);
+      
+      // Add user message to the UI
+      const userMessage: Message = { role: 'user', content };
+      setMessages((prevMessages) => [...prevMessages, userMessage]);
+      
+      // Send message to the API
+      const messageResponse = await fetch(`/api/conversations/${conversationId}/messages`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: 1,
+          content
+        })
+      });
+      
+      if (!messageResponse.ok) {
+        throw new Error('Failed to send message');
+      }
+      
+      const responseData = await messageResponse.json();
+      
+      // Add assistant response to the UI
+      const assistantMessage: Message = { 
+        role: 'assistant', 
+        content: responseData.assistantMessage.content 
+      };
+      
+      setMessages((prevMessages) => [...prevMessages, assistantMessage]);
+    } catch (error) {
+      console.error('Error sending message:', error);
+      
+      // Show error message to the user
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        { 
+          role: 'assistant', 
+          content: "I'm sorry, I encountered an error processing your request. Please try again." 
+        }
+      ]);
+    } finally {
+      setIsProcessing(false);
+    }
+  };
 
   return {
-    messages: chatContext.messages,
-    sending: chatContext.sending,
-    loadingMessages: chatContext.loadingMessages,
-    inputValue,
-    setInputValue,
-    isRecording,
-    startRecording,
-    stopRecording,
-    handleSendMessage,
-    isConversationActive: !!chatContext.currentConversation,
+    messages,
+    sendMessage,
+    isProcessing,
+    setMessages
   };
 }

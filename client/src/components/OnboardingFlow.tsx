@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
-import { useUserProfile } from '@/hooks/useUserProfile';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Checkbox } from '@/components/ui/checkbox';
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
-import { Separator } from '@/components/ui/separator';
-import { Progress } from '@/components/ui/progress';
-import { Check, ChevronRight } from 'lucide-react';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Slider } from '@/components/ui/slider';
+import { Input } from '@/components/ui/input';
+import { useUserProfile } from '@/hooks/useUserProfile';
+import { ArrowRight, ArrowLeft, CheckCircle2 } from 'lucide-react';
 
 interface OnboardingFlowProps {
   userId?: number;
@@ -15,234 +15,273 @@ interface OnboardingFlowProps {
 }
 
 export default function OnboardingFlow({ userId = 1, onComplete }: OnboardingFlowProps) {
-  const {
-    isOnboarding,
-    currentQuestion,
-    submitAnswer,
-    loading
+  const [currentStep, setCurrentStep] = useState(0);
+  const { 
+    profile, 
+    updateProfile, 
+    onboardingQuestions, 
+    currentQuestion, 
+    completeOnboarding, 
+    generateWelcomeMessage 
   } = useUserProfile(userId);
-  
-  const [textValue, setTextValue] = useState<string>('');
-  const [numberValue, setNumberValue] = useState<number | ''>('');
-  const [booleanValue, setBooleanValue] = useState<boolean>(false);
-  const [singleSelectValue, setSingleSelectValue] = useState<string>('');
-  const [multiSelectValue, setMultiSelectValue] = useState<string[]>([]);
 
-  // Reset form values when the question changes
+  // If profile has already completed onboarding, skip to the end
   useEffect(() => {
-    setTextValue('');
-    setNumberValue('');
-    setBooleanValue(false);
-    setSingleSelectValue('');
-    setMultiSelectValue([]);
-  }, [currentQuestion?.step]);
-
-  // If onboarding is complete, trigger the onComplete callback
-  useEffect(() => {
-    if (!isOnboarding && currentQuestion?.welcomeMessage) {
-      onComplete(currentQuestion.welcomeMessage);
+    if (profile?.onboardingCompleted) {
+      const welcomeMessage = generateWelcomeMessage();
+      onComplete(welcomeMessage);
     }
-  }, [isOnboarding, currentQuestion, onComplete]);
+  }, [profile, generateWelcomeMessage, onComplete]);
 
-  if (!isOnboarding || !currentQuestion) {
-    return null;
+  // Update current step when currentQuestion changes
+  useEffect(() => {
+    if (currentQuestion) {
+      setCurrentStep(currentQuestion.step);
+    }
+  }, [currentQuestion]);
+
+  const handleNext = () => {
+    if (currentQuestion.step < onboardingQuestions.length) {
+      updateProfile({ onboardingStep: currentQuestion.step + 1 });
+    }
+  };
+
+  const handlePrevious = () => {
+    if (currentQuestion.step > 1) {
+      updateProfile({ onboardingStep: currentQuestion.step - 1 });
+    }
+  };
+
+  const handleComplete = () => {
+    completeOnboarding().then((welcomeMessage) => {
+      onComplete(welcomeMessage);
+    });
+  };
+
+  const handleSingleChoice = (value: string) => {
+    if (currentQuestion.step === 1) {
+      updateProfile({ name: value });
+    } else if (currentQuestion.step === 2) {
+      updateProfile({ fitnessLevel: value as 'beginner' | 'intermediate' | 'advanced' });
+    } else if (currentQuestion.step === 6) {
+      updateProfile({ language: value });
+    }
+  };
+
+  const handleMultipleChoice = (checked: boolean, value: string) => {
+    if (currentQuestion.step === 3) {
+      const currentGoals = [...(profile?.fitnessGoals || [])];
+      if (checked) {
+        if (!currentGoals.includes(value)) {
+          updateProfile({ fitnessGoals: [...currentGoals, value] });
+        }
+      } else {
+        updateProfile({ fitnessGoals: currentGoals.filter(goal => goal !== value) });
+      }
+    } else if (currentQuestion.step === 4) {
+      const currentActivities = [...(profile?.preferredActivities || [])];
+      if (checked) {
+        if (!currentActivities.includes(value)) {
+          updateProfile({ preferredActivities: [...currentActivities, value] });
+        }
+      } else {
+        updateProfile({ preferredActivities: currentActivities.filter(activity => activity !== value) });
+      }
+    } else if (currentQuestion.step === 7) {
+      const currentDevices = [...(profile?.usedDevices || [])];
+      if (checked) {
+        if (!currentDevices.includes(value)) {
+          updateProfile({ usedDevices: [...currentDevices, value] });
+        }
+      } else {
+        updateProfile({ usedDevices: currentDevices.filter(device => device !== value) });
+      }
+    }
+  };
+
+  const handleNumberInput = (value: number) => {
+    if (currentQuestion.step === 5) {
+      updateProfile({ activeHoursPerWeek: value });
+    }
+  };
+
+  if (!currentQuestion) {
+    return <div>Loading...</div>;
   }
 
-  const handleSubmit = async () => {
-    if (loading) return;
-
-    let answerValue: any;
-    
-    // Determine the type of answer based on the current question
-    if (currentQuestion.options && currentQuestion.options.length > 0) {
-      if (multiSelectValue.length > 0) {
-        answerValue = multiSelectValue;
-      } else {
-        answerValue = singleSelectValue;
-      }
-    } else if (typeof booleanValue === 'boolean' && currentQuestion.question.toLowerCase().includes('would you like')) {
-      answerValue = booleanValue;
-    } else if (numberValue !== '') {
-      answerValue = numberValue;
-    } else {
-      answerValue = textValue;
-    }
-    
-    await submitAnswer(answerValue);
-  };
-
-  // Determine input type based on question content
-  const getInputType = () => {
-    const question = currentQuestion.question.toLowerCase();
-    
-    // Email input
-    if (question.includes('email')) {
-      return 'email';
-    }
-    
-    // Number input
-    if (
-      question.includes('age') || 
-      question.includes('height') || 
-      question.includes('weight') ||
-      question.includes('hours')
-    ) {
-      return 'number';
-    }
-    
-    // Boolean input
-    if (question.includes('would you like')) {
-      return 'boolean';
-    }
-    
-    // Multi-select
-    if (
-      currentQuestion.options && 
-      currentQuestion.options.length > 0 && 
-      (question.includes('goals') || question.includes('preferences') || question.includes('activities'))
-    ) {
-      return 'multi-select';
-    }
-    
-    // Single-select
-    if (currentQuestion.options && currentQuestion.options.length > 0) {
-      return 'single-select';
-    }
-    
-    // Default to text
-    return 'text';
-  };
-
-  const inputType = getInputType();
-  const progress = ((currentQuestion.step) / currentQuestion.totalSteps) * 100;
-
   return (
-    <div className="flex flex-col gap-4 p-4 bg-card border rounded-lg shadow-sm">
-      <div className="space-y-2">
-        <div className="flex justify-between items-center">
-          <h3 className="text-lg font-medium">Welcome to Fitness AI</h3>
-          <span className="text-sm text-muted-foreground">
-            Step {currentQuestion.step + 1} of {currentQuestion.totalSteps}
-          </span>
-        </div>
-        <Progress value={progress} className="h-2" />
-      </div>
-      
-      <Separator />
-      
-      <div className="space-y-4">
-        <p className="text-base">{currentQuestion.question}</p>
-        
-        {inputType === 'text' && (
-          <Input
-            placeholder="Type your answer here..."
-            value={textValue}
-            onChange={(e) => setTextValue(e.target.value)}
-            className="w-full"
-          />
-        )}
-        
-        {inputType === 'email' && (
-          <Input
-            type="email"
-            placeholder="Enter your email address..."
-            value={textValue}
-            onChange={(e) => setTextValue(e.target.value)}
-            className="w-full"
-          />
-        )}
-        
-        {inputType === 'number' && (
-          <Input
-            type="number"
-            placeholder="Enter a number..."
-            value={numberValue === '' ? '' : numberValue}
-            onChange={(e) => setNumberValue(e.target.value === '' ? '' : Number(e.target.value))}
-            className="w-full"
-          />
-        )}
-        
-        {inputType === 'boolean' && (
-          <div className="flex items-center space-x-2">
-            <Checkbox 
-              id="boolean-input" 
-              checked={booleanValue}
-              onCheckedChange={(checked) => setBooleanValue(checked as boolean)} 
-            />
-            <label
-              htmlFor="boolean-input"
-              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-            >
-              Yes, I would like this
-            </label>
+    <Card className="w-full max-w-md">
+      <CardHeader>
+        <CardTitle>Welcome to Fitness AI</CardTitle>
+        <CardDescription>
+          Step {currentQuestion.step} of {currentQuestion.totalSteps}: {currentQuestion.question}
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        {currentQuestion.step === 1 && (
+          <div className="space-y-3">
+            <div className="grid gap-2">
+              <Label htmlFor="name">Your Name</Label>
+              <Input 
+                id="name" 
+                placeholder="Enter your name" 
+                value={profile?.name || ''} 
+                onChange={(e) => handleSingleChoice(e.target.value)}
+              />
+            </div>
           </div>
         )}
-        
-        {inputType === 'single-select' && currentQuestion.options && (
-          <RadioGroup value={singleSelectValue} onValueChange={setSingleSelectValue}>
-            <div className="space-y-2">
-              {currentQuestion.options.map((option, index) => (
-                <div key={option} className="flex items-center space-x-2">
-                  <RadioGroupItem value={option} id={`option-${option}`} />
-                  <Label htmlFor={`option-${option}`}>
-                    {currentQuestion.optionLabels?.[index] || option}
-                  </Label>
-                </div>
-              ))}
+
+        {currentQuestion.step === 2 && (
+          <RadioGroup 
+            value={profile?.fitnessLevel || ''}
+            onValueChange={(value) => handleSingleChoice(value)}
+            className="space-y-3"
+          >
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="beginner" id="beginner" />
+              <Label htmlFor="beginner">Beginner</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="intermediate" id="intermediate" />
+              <Label htmlFor="intermediate">Intermediate</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="advanced" id="advanced" />
+              <Label htmlFor="advanced">Advanced</Label>
             </div>
           </RadioGroup>
         )}
-        
-        {inputType === 'multi-select' && currentQuestion.options && (
-          <div className="space-y-2">
+
+        {currentQuestion.step === 3 && currentQuestion.options && (
+          <div className="space-y-3">
             {currentQuestion.options.map((option, index) => (
               <div key={option} className="flex items-center space-x-2">
-                <Checkbox
-                  id={`option-${option}`}
-                  checked={multiSelectValue.includes(option)}
-                  onCheckedChange={(checked) => {
-                    if (checked) {
-                      setMultiSelectValue([...multiSelectValue, option]);
-                    } else {
-                      setMultiSelectValue(multiSelectValue.filter(item => item !== option));
-                    }
-                  }}
+                <Checkbox 
+                  id={`goal-${option}`} 
+                  checked={(profile?.fitnessGoals || []).includes(option)}
+                  onCheckedChange={(checked) => handleMultipleChoice(checked === true, option)}
                 />
-                <label
-                  htmlFor={`option-${option}`}
-                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                >
-                  {currentQuestion.optionLabels?.[index] || option}
-                </label>
+                <Label htmlFor={`goal-${option}`}>
+                  {currentQuestion.optionLabels?.[index] || option.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
+                </Label>
               </div>
             ))}
           </div>
         )}
-      </div>
-      
-      <div className="flex justify-end">
+
+        {currentQuestion.step === 4 && currentQuestion.options && (
+          <div className="space-y-3">
+            {currentQuestion.options.map((option, index) => (
+              <div key={option} className="flex items-center space-x-2">
+                <Checkbox 
+                  id={`activity-${option}`} 
+                  checked={(profile?.preferredActivities || []).includes(option)}
+                  onCheckedChange={(checked) => handleMultipleChoice(checked === true, option)}
+                />
+                <Label htmlFor={`activity-${option}`}>
+                  {currentQuestion.optionLabels?.[index] || option.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
+                </Label>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {currentQuestion.step === 5 && (
+          <div className="space-y-6">
+            <div className="space-y-2">
+              <Label>Hours per week: {profile?.activeHoursPerWeek || 0}</Label>
+              <Slider 
+                value={[profile?.activeHoursPerWeek || 0]} 
+                onValueChange={(value) => handleNumberInput(value[0])}
+                max={20}
+                step={1}
+              />
+              <div className="flex justify-between text-xs text-muted-foreground">
+                <span>0</span>
+                <span>5</span>
+                <span>10</span>
+                <span>15</span>
+                <span>20+</span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {currentQuestion.step === 6 && (
+          <RadioGroup 
+            value={profile?.language || 'en'}
+            onValueChange={(value) => handleSingleChoice(value)}
+            className="space-y-3"
+          >
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="en" id="en" />
+              <Label htmlFor="en">English</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="es" id="es" />
+              <Label htmlFor="es">Spanish</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="fr" id="fr" />
+              <Label htmlFor="fr">French</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="pt" id="pt" />
+              <Label htmlFor="pt">Portuguese</Label>
+            </div>
+          </RadioGroup>
+        )}
+
+        {currentQuestion.step === 7 && currentQuestion.options && (
+          <div className="space-y-3">
+            {currentQuestion.options.map((option, index) => (
+              <div key={option} className="flex items-center space-x-2">
+                <Checkbox 
+                  id={`device-${option}`} 
+                  checked={(profile?.usedDevices || []).includes(option)}
+                  onCheckedChange={(checked) => handleMultipleChoice(checked === true, option)}
+                />
+                <Label htmlFor={`device-${option}`}>
+                  {currentQuestion.optionLabels?.[index] || option.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
+                </Label>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {currentQuestion.step === 8 && (
+          <div className="text-center py-4">
+            <CheckCircle2 className="h-16 w-16 mx-auto text-primary mb-4" />
+            <h3 className="text-lg font-medium mb-2">All Set!</h3>
+            <p className="text-muted-foreground">
+              Thanks for completing your profile. Your customized fitness experience is ready.
+            </p>
+          </div>
+        )}
+      </CardContent>
+      <CardFooter className="flex justify-between">
         <Button 
-          onClick={handleSubmit}
-          disabled={
-            loading || 
-            (inputType === 'text' && !textValue) ||
-            (inputType === 'email' && !textValue) || 
-            (inputType === 'number' && numberValue === '') ||
-            (inputType === 'single-select' && !singleSelectValue) ||
-            (inputType === 'multi-select' && multiSelectValue.length === 0)
-          }
+          variant="outline" 
+          onClick={handlePrevious}
+          disabled={currentQuestion.step === 1}
         >
-          {currentQuestion.step === currentQuestion.totalSteps - 1 ? (
-            <>
-              Complete <Check className="ml-2 h-4 w-4" />
-            </>
-          ) : (
-            <>
-              Next <ChevronRight className="ml-2 h-4 w-4" />
-            </>
-          )}
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Back
         </Button>
-      </div>
-    </div>
+
+        {currentQuestion.step < currentQuestion.totalSteps ? (
+          <Button onClick={handleNext}>
+            Next
+            <ArrowRight className="ml-2 h-4 w-4" />
+          </Button>
+        ) : (
+          <Button onClick={handleComplete}>
+            Get Started
+            <CheckCircle2 className="ml-2 h-4 w-4" />
+          </Button>
+        )}
+      </CardFooter>
+    </Card>
   );
 }

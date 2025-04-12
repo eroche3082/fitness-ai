@@ -58,6 +58,29 @@ export class MemStorage implements IStorage {
     this.messages = new Map();
     this.workouts = new Map();
     this.progresses = new Map();
+    
+    // Create a default user for testing
+    const defaultUser: User = {
+      id: 1,
+      name: 'Test User',
+      email: 'test@example.com',
+      password: 'password',
+      username: 'testuser',
+      language: 'en',
+      workoutPreference: null,
+      fitnessGoal: null,
+      lastActive: new Date()
+    };
+    
+    // Add profile property separately to avoid TypeScript errors
+    const userWithProfile = defaultUser as any;
+    userWithProfile.profile = {
+      language: 'en',
+      onboardingCompleted: false,
+      onboardingStep: 1
+    };
+    
+    this.users.set(1, userWithProfile);
   }
   
   // User operations
