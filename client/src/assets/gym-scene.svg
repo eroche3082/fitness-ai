@@ -1,0 +1,148 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="1200" height="600" viewBox="0 0 1200 600" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="gym-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#272727;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#5b5b5b;stop-opacity:1"/>
+    </linearGradient>
+    <linearGradient id="energy-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#ff5e3a;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#ff2a68;stop-opacity:1"/>
+    </linearGradient>
+    <linearGradient id="accent-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#5433ff;stop-opacity:1"/>
+      <stop offset="50%" style="stop-color:#20bdff;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#a5fecb;stop-opacity:1"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Gym Background -->
+  <rect width="1200" height="600" fill="url(#gym-gradient)"/>
+  
+  <!-- Floor Grid Pattern -->
+  <g opacity="0.3">
+    <path d="M0,400 L1200,400" stroke="white" stroke-width="1"/>
+    <path d="M0,450 L1200,450" stroke="white" stroke-width="1"/>
+    <path d="M0,500 L1200,500" stroke="white" stroke-width="1"/>
+    <path d="M0,550 L1200,550" stroke="white" stroke-width="1"/>
+    
+    <path d="M100,400 L100,600" stroke="white" stroke-width="1"/>
+    <path d="M200,400 L200,600" stroke="white" stroke-width="1"/>
+    <path d="M300,400 L300,600" stroke="white" stroke-width="1"/>
+    <path d="M400,400 L400,600" stroke="white" stroke-width="1"/>
+    <path d="M500,400 L500,600" stroke="white" stroke-width="1"/>
+    <path d="M600,400 L600,600" stroke="white" stroke-width="1"/>
+    <path d="M700,400 L700,600" stroke="white" stroke-width="1"/>
+    <path d="M800,400 L800,600" stroke="white" stroke-width="1"/>
+    <path d="M900,400 L900,600" stroke="white" stroke-width="1"/>
+    <path d="M1000,400 L1000,600" stroke="white" stroke-width="1"/>
+    <path d="M1100,400 L1100,600" stroke="white" stroke-width="1"/>
+  </g>
+  
+  <!-- Gym Equipment -->
+  <!-- Weights Rack -->
+  <g transform="translate(200, 350)">
+    <rect x="-80" y="0" width="160" height="10" fill="#888"/>
+    <rect x="-80" y="50" width="160" height="10" fill="#888"/>
+    <rect x="-75" y="10" width="5" height="40" fill="#888"/>
+    <rect x="70" y="10" width="5" height="40" fill="#888"/>
+    
+    <!-- Weights -->
+    <g transform="translate(-60, 30)">
+      <rect x="-10" y="-20" width="20" height="40" rx="2" fill="#444"/>
+      <circle cx="0" cy="0" r="8" fill="#666"/>
+    </g>
+    <g transform="translate(-30, 30)">
+      <rect x="-10" y="-15" width="20" height="30" rx="2" fill="#444"/>
+      <circle cx="0" cy="0" r="7" fill="#666"/>
+    </g>
+    <g transform="translate(0, 30)">
+      <rect x="-8" y="-12" width="16" height="24" rx="2" fill="#444"/>
+      <circle cx="0" cy="0" r="6" fill="#666"/>
+    </g>
+    <g transform="translate(30, 30)">
+      <rect x="-12" y="-18" width="24" height="36" rx="2" fill="#444"/>
+      <circle cx="0" cy="0" r="9" fill="#666"/>
+    </g>
+    <g transform="translate(60, 30)">
+      <rect x="-15" y="-25" width="30" height="50" rx="2" fill="#444"/>
+      <circle cx="0" cy="0" r="10" fill="#666"/>
+    </g>
+  </g>
+  
+  <!-- Bench Press -->
+  <g transform="translate(500, 450)">
+    <rect x="-60" y="-10" width="120" height="20" rx="5" fill="#333"/>
+    <rect x="-55" y="10" width="110" height="30" rx="3" fill="#222"/>
+    <rect x="-50" y="-30" width="10" height="20" fill="#444"/>
+    <rect x="40" y="-30" width="10" height="20" fill="#444"/>
+    <rect x="-100" y="-50" width="200" height="10" fill="#555"/>
+    
+    <!-- Bar -->
+    <rect x="-90" y="-45" width="180" height="5" rx="2" fill="#777"/>
+    <circle cx="-70" cy="-42.5" r="15" fill="#444"/>
+    <circle cx="70" cy="-42.5" r="15" fill="#444"/>
+  </g>
+  
+  <!-- Treadmill -->
+  <g transform="translate(900, 450)">
+    <rect x="-60" y="-50" width="120" height="80" rx="10" fill="#333"/>
+    <rect x="-55" y="-40" width="110" height="60" fill="#222"/>
+    <rect x="-40" y="-70" width="80" height="20" rx="5" fill="#444"/>
+    <rect x="-50" y="30" width="100" height="10" rx="5" fill="#555"/>
+  </g>
+  
+  <!-- Gym Goers Silhouettes -->
+  <!-- Person Lifting Weights -->
+  <g transform="translate(500, 350)" fill="url(#energy-gradient)">
+    <circle cx="0" cy="-50" r="15"/> <!-- Head -->
+    <rect x="-20" y="-35" width="40" height="50" rx="5"/> <!-- Torso -->
+    <rect x="-60" y="-25" width="40" height="10" rx="5"/> <!-- Left Arm -->
+    <rect x="20" y="-25" width="40" height="10" rx="5"/> <!-- Right Arm -->
+    <rect x="-15" y="15" width="10" height="50" rx="3"/> <!-- Left Leg -->
+    <rect x="5" y="15" width="10" height="50" rx="3"/> <!-- Right Leg -->
+    
+    <!-- Barbell -->
+    <rect x="-80" y="-30" width="160" height="5" rx="2" fill="#777"/>
+    <circle cx="-70" cy="-27.5" r="12" fill="#444"/>
+    <circle cx="70" cy="-27.5" r="12" fill="#444"/>
+  </g>
+  
+  <!-- Person on Treadmill -->
+  <g transform="translate(900, 390)" fill="url(#accent-gradient)">
+    <circle cx="0" cy="-30" r="12"/> <!-- Head -->
+    <rect x="-10" y="-18" width="20" height="30" rx="5"/> <!-- Torso -->
+    <path d="M-10,-8 L-25,5 M10,-8 L25,5" stroke="url(#accent-gradient)" stroke-width="6" stroke-linecap="round" fill="none"/> <!-- Arms -->
+    <path d="M-5,12 L-15,40 M5,12 L15,40" stroke="url(#accent-gradient)" stroke-width="6" stroke-linecap="round" fill="none"/> <!-- Legs -->
+  </g>
+  
+  <!-- Kettlebell Exercise -->
+  <g transform="translate(200, 450)" fill="#ffdd59">
+    <circle cx="0" cy="-50" r="15"/> <!-- Head -->
+    <path d="M0,-35 L0,0" stroke="#ffdd59" stroke-width="10" stroke-linecap="round" fill="none"/> <!-- Torso -->
+    <path d="M0,-25 L-30,0 L-20,25 M0,-25 L30,0 L20,25" stroke="#ffdd59" stroke-width="6" stroke-linecap="round" fill="none"/> <!-- Arms -->
+    <path d="M0,0 L-15,45 M0,0 L15,45" stroke="#ffdd59" stroke-width="8" stroke-linecap="round" fill="none"/> <!-- Legs -->
+    
+    <!-- Kettlebell -->
+    <circle cx="0" cy="30" r="15" fill="#333"/>
+    <rect x="-5" cy="10" width="10" height="10" fill="#333"/>
+  </g>
+  
+  <!-- Motivational Text -->
+  <g>
+    <text x="600" y="100" font-family="Arial" font-size="60" font-weight="bold" fill="url(#energy-gradient)" text-anchor="middle">
+      PUSH YOUR LIMITS
+    </text>
+    <text x="600" y="150" font-family="Arial" font-size="30" fill="white" text-anchor="middle" opacity="0.8">
+      EVERY REP COUNTS
+    </text>
+  </g>
+  
+  <!-- Energy Accent Lines -->
+  <g stroke="url(#energy-gradient)" stroke-width="3" opacity="0.5">
+    <path d="M50,50 L250,50" />
+    <path d="M950,50 L1150,50" />
+    <path d="M50,550 L250,550" />
+    <path d="M950,550 L1150,550" />
+  </g>
+</svg>
