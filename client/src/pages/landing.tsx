@@ -26,19 +26,36 @@ import {
   CalendarDays,
   Clock,
   CheckCircle,
-  ChevronRight
+  ChevronRight,
+  UserPlus,
+  LogIn,
+  Menu,
+  Zap,
+  ArrowRight,
+  Share2,
+  Flame,
+  Sparkles
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '../App';
+import { SidePanel } from '../components/SidePanel';
+import { FitnessSlider } from '../components/FitnessSlider';
 
-// Import SVG assets
+// Import SVG assets 
 import patternSvg from '../assets/fitness-pattern.svg';
 import workoutThumbnail from '../assets/workout-thumbnail.svg';
 import nutritionThumbnail from '../assets/nutrition-thumbnail.svg';
 import trackingThumbnail from '../assets/tracking-thumbnail.svg';
+import runnerSilhouette from '../assets/runner-silhouette.svg';
+import weightLifter from '../assets/weight-lifter.svg';
+import yogaPose from '../assets/yoga-pose.svg';
+import natureBackground from '../assets/nature-background.svg';
+import mountainsFitness from '../assets/mountains-fitness.svg';
+import beachWorkout from '../assets/beach-workout.svg';
+import gymScene from '../assets/gym-scene.svg';
 
 // App features based on the 20 core features identified
 const features = [
@@ -144,12 +161,33 @@ const features = [
   }
 ];
 
+// Slider images
+const sliderImages = [
+  {
+    image: gymScene,
+    title: "TRANSFORM YOUR WORKOUT ROUTINE",
+    description: "Experience AI-powered workout plans designed specifically for your body type and goals."
+  },
+  {
+    image: beachWorkout, 
+    title: "TRAIN ANYWHERE, ANYTIME",
+    description: "Take your fitness journey with you wherever you go with our adaptive training system."
+  },
+  {
+    image: mountainsFitness,
+    title: "PUSH YOUR BOUNDARIES",
+    description: "Reach new heights with personalized challenges that evolve as you progress."
+  }
+];
+
 export default function LandingPage() {
   const [, setLocation] = useLocation();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showLoginModal, setShowLoginModal] = useState(false);
+  const [showSignupModal, setShowSignupModal] = useState(false);
   const [loginError, setLoginError] = useState('');
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const { login } = useAuth();
 
   const handleLogin = (e: React.FormEvent) => {
@@ -166,60 +204,126 @@ export default function LandingPage() {
 
   return (
     <div className="flex flex-col min-h-screen">
+      {/* Side Panel */}
+      <SidePanel isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      
       {/* Top Navigation */}
-      <nav className="flex items-center justify-between p-4 bg-primary text-primary-foreground sticky top-0 z-50">
+      <nav className="fitness-nav flex items-center justify-between p-4 bg-gradient-to-r from-primary/90 to-primary/80 text-primary-foreground sticky top-0 z-50 backdrop-blur">
         <div className="flex items-center gap-2">
-          <Activity className="h-6 w-6 text-white animate-pulse" />
-          <h1 className="text-xl font-bold text-white">Fitness AI</h1>
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={() => setSidebarOpen(true)}
+            className="text-white hover:bg-white/10 mr-1"
+          >
+            <Menu className="h-5 w-5" />
+          </Button>
+        
+          <div className="flex items-center gap-2">
+            <Activity className="h-6 w-6 text-white animate-pulse" />
+            <h1 className="text-xl font-bold text-white">Fitness AI</h1>
+          </div>
         </div>
-        <Button 
-          onClick={() => setShowLoginModal(true)} 
-          variant="secondary"
-          className="font-semibold shadow-md hover:shadow-lg"
-        >
-          Login
-        </Button>
+        
+        <div className="hidden md:flex items-center gap-6 text-sm">
+          <a href="#features" className="text-white hover:text-white/80 transition-colors">Features</a>
+          <a href="#about" className="text-white hover:text-white/80 transition-colors">About</a>
+          <a href="#pricing" className="text-white hover:text-white/80 transition-colors">Pricing</a>
+          <a href="#contact" className="text-white hover:text-white/80 transition-colors">Contact</a>
+        </div>
+        
+        <div className="flex items-center gap-2">
+          <Button 
+            onClick={() => setShowLoginModal(true)} 
+            variant="ghost"
+            className="text-white hover:bg-white/20"
+          >
+            <LogIn className="h-4 w-4 mr-2" />
+            Login
+          </Button>
+          
+          <Button 
+            onClick={() => setShowSignupModal(true)} 
+            variant="secondary"
+            className="energy-button font-semibold shadow-md hover:shadow-lg"
+          >
+            <UserPlus className="h-4 w-4 mr-2" />
+            Sign Up Free
+          </Button>
+        </div>
       </nav>
 
       {/* Hero Section */}
-      <div 
-        className="relative flex flex-col items-center justify-center px-6 py-24"
-        style={{
-          backgroundImage: `url(${patternSvg})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center'
-        }}
-      >
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent"></div>
+      <div className="relative overflow-hidden">
+        <div className="absolute inset-0 z-0">
+          <div className="h-full">
+            <FitnessSlider slides={sliderImages} autoPlayInterval={6000} />
+          </div>
+        </div>
         
-        <Badge variant="outline" className="relative mb-6 text-sm py-1 px-4 bg-white/10 backdrop-blur-sm border-primary/20">
-          <span className="animate-pulse mr-2 text-primary">●</span> Fitness Intelligence Platform
-        </Badge>
-        
-        <h1 className="relative text-4xl md:text-6xl font-bold text-center mb-6 bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary-foreground">
-          Transform Your Fitness Journey with AI
-        </h1>
-        
-        <p className="relative text-xl text-center max-w-3xl mb-8">
-          Use the power of artificial intelligence to optimize your workouts, track your progress, and achieve your health goals faster.
-        </p>
-        
-        <div className="relative flex flex-wrap gap-4 justify-center">
-          <Button 
-            size="lg" 
-            onClick={() => setShowLoginModal(true)}
-            className="bg-primary hover:bg-primary/90 text-white font-semibold shadow-lg"
-          >
-            Get Started
-          </Button>
-          <Button 
-            size="lg" 
-            variant="outline" 
-            onClick={() => setLocation('/chat')}
-            className="border-primary text-primary hover:bg-primary/10"
-          >
-            Chat with Assistant
-          </Button>
+        <div className="relative flex flex-col items-center justify-center px-6 py-32 md:py-40 lg:py-48 z-10 bg-gradient-to-b from-black/60 via-black/40 to-black/60">
+          <Badge variant="outline" className="mb-6 text-sm py-1 px-4 bg-white/10 backdrop-blur-sm border-white/20 text-white">
+            <span className="animate-pulse mr-2 text-primary">●</span> Fitness Intelligence Platform
+          </Badge>
+          
+          <h1 className="text-4xl md:text-6xl font-bold text-center mb-6 text-white shadow-text slide-in-left">
+            Transform Your Fitness <span className="bg-clip-text text-transparent bg-gradient-to-r from-orange-400 to-pink-500">Journey with AI</span>
+          </h1>
+          
+          <p className="text-xl text-center max-w-3xl mb-10 text-white/90 fade-in-up">
+            Use the power of artificial intelligence to optimize your workouts, track your progress, and achieve your health goals faster than ever before.
+          </p>
+          
+          <div className="flex flex-wrap gap-4 justify-center slide-in-right">
+            <Button 
+              size="lg" 
+              onClick={() => setShowSignupModal(true)}
+              className="energy-button text-white font-semibold shadow-lg px-8 py-6 text-lg"
+            >
+              <Zap className="mr-2 h-5 w-5" />
+              Start Your Journey
+            </Button>
+            
+            <Button 
+              size="lg" 
+              variant="outline" 
+              onClick={() => setLocation('/chat')}
+              className="border-white text-white hover:bg-white/20 px-8 py-6 text-lg"
+            >
+              <Activity className="mr-2 h-5 w-5" />
+              Try AI Coach
+            </Button>
+          </div>
+          
+          <div className="mt-16 grid grid-cols-3 gap-6 max-w-3xl w-full">
+            <div className="stat-card orange group hover-scale">
+              <div className="flex flex-col items-center text-center">
+                <Flame className="h-8 w-8 mb-2 text-orange-500" />
+                <h3 className="text-lg font-bold">800+</h3>
+                <p className="text-sm text-gray-500">Workouts</p>
+              </div>
+            </div>
+            
+            <div className="stat-card purple group hover-scale">
+              <div className="flex flex-col items-center text-center">
+                <Users className="h-8 w-8 mb-2 text-purple-500" />
+                <h3 className="text-lg font-bold">15K+</h3>
+                <p className="text-sm text-gray-500">Active Users</p>
+              </div>
+            </div>
+            
+            <div className="stat-card blue group hover-scale">
+              <div className="flex flex-col items-center text-center">
+                <Sparkles className="h-8 w-8 mb-2 text-blue-500" />
+                <h3 className="text-lg font-bold">99%</h3>
+                <p className="text-sm text-gray-500">Success Rate</p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="absolute bottom-5 animate-bounce">
+            <ArrowRight className="h-6 w-6 text-white/70 rotate-90" />
+          </div>
         </div>
       </div>
 
