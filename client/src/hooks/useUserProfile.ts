@@ -1,5 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
+import { AgentType, getOnboardingQuestions, OnboardingQuestion as OnboardingQuestionType } from '@/lib/onboardingFlow';
+import profileService from '@/services/profileService';
+import promptService from '@/services/promptService';
+import { SubscriberProfile } from '@/lib/subscriberSchema';
 
+// Simplified OnboardingQuestion for backward compatibility
 interface OnboardingQuestion {
   step: number;
   question: string;
@@ -10,269 +15,42 @@ interface OnboardingQuestion {
   welcomeMessage?: string;
 }
 
-interface UserProfile {
-  name?: string;
-  email?: string;
-  fitnessLevel?: 'beginner' | 'intermediate' | 'advanced';
-  fitnessGoals?: string[];
-  preferredActivities?: string[];
-  healthMetrics?: {
-    height?: number;
-    weight?: number;
-    age?: number;
+// Convert from OnboardingQuestionType to OnboardingQuestion
+function convertQuestion(q: OnboardingQuestionType, totalSteps: number): OnboardingQuestion {
+  return {
+    step: q.order,
+    question: q.label,
+    options: q.options,
+    optionLabels: q.optionLabels,
+    totalSteps,
+    completed: false
   };
-  dietPreferences?: string[];
-  sleepTracking?: boolean;
-  activeHoursPerWeek?: number;
-  usedDevices?: string[];
-  language?: string;
-  onboardingCompleted?: boolean;
-  onboardingStep?: number;
 }
 
-const initialProfileState: UserProfile = {
-  language: 'en',
-  onboardingCompleted: false,
-  onboardingStep: 1
-};
-
-// Get a personalized welcome message based on the user's profile
-const generateWelcomeMessage = (profile: UserProfile): string => {
-  const { name, fitnessLevel, fitnessGoals, preferredActivities, activeHoursPerWeek, language } = profile;
-
-  // Multilingual welcome messages
-  const welcomeIntros = {
-    en: `Welcome${name ? ', ' + name : ''}! I'm your personal Fitness AI assistant.`,
-    es: `¡Bienvenido${name ? ', ' + name : ''}! Soy tu asistente personal de Fitness AI.`,
-    fr: `Bienvenue${name ? ', ' + name : ''}! Je suis votre assistant personnel Fitness AI.`,
-    pt: `Bem-vindo${name ? ', ' + name : ''}! Sou seu assistente pessoal de Fitness AI.`
-  };
-
-  const fitnessLevelTexts = {
-    en: {
-      beginner: "I see you're just starting your fitness journey.",
-      intermediate: "I see you're already experienced with fitness.",
-      advanced: "I see you're at an advanced fitness level."
-    },
-    es: {
-      beginner: "Veo que estás comenzando tu viaje de fitness.",
-      intermediate: "Veo que ya tienes experiencia con el fitness.",
-      advanced: "Veo que estás en un nivel avanzado de fitness."
-    },
-    fr: {
-      beginner: "Je vois que vous commencez tout juste votre parcours de remise en forme.",
-      intermediate: "Je vois que vous avez déjà de l'expérience en fitness.",
-      advanced: "Je vois que vous êtes à un niveau avancé de fitness."
-    },
-    pt: {
-      beginner: "Vejo que você está apenas começando sua jornada de fitness.",
-      intermediate: "Vejo que você já tem experiência com fitness.",
-      advanced: "Vejo que você está em um nível avançado de fitness."
-    }
-  };
-
-  const activityHoursTexts = {
-    en: `You've indicated that you can dedicate about ${activeHoursPerWeek} hours per week to exercise.`,
-    es: `Has indicado que puedes dedicar aproximadamente ${activeHoursPerWeek} horas por semana al ejercicio.`,
-    fr: `Vous avez indiqué que vous pouvez consacrer environ ${activeHoursPerWeek} heures par semaine à l'exercice.`,
-    pt: `Você indicou que pode dedicar cerca de ${activeHoursPerWeek} horas por semana ao exercício.`
-  };
-
-  const goalTexts = {
-    en: "Based on your goals",
-    es: "Basado en tus objetivos",
-    fr: "En fonction de vos objectifs",
-    pt: "Com base em seus objetivos"
-  };
-
-  const activitiesTexts = {
-    en: "and preferred activities",
-    es: "y actividades preferidas",
-    fr: "et activités préférées",
-    pt: "e atividades preferidas"
-  };
-
-  const planTexts = {
-    en: "I'll help you create personalized workout plans and track your progress effectively.",
-    es: "Te ayudaré a crear planes de entrenamiento personalizados y a seguir tu progreso de manera efectiva.",
-    fr: "Je vous aiderai à créer des plans d'entraînement personnalisés et à suivre vos progrès efficacement.",
-    pt: "Vou ajudá-lo a criar planos de treino personalizados e acompanhar seu progresso de forma eficaz."
-  };
-
-  const askTexts = {
-    en: "What would you like to do today?",
-    es: "¿Qué te gustaría hacer hoy?",
-    fr: "Que souhaitez-vous faire aujourd'hui?",
-    pt: "O que você gostaria de fazer hoje?"
-  };
-
-  // Current language or fallback to English
-  const currentLang = (language && language in welcomeIntros) ? language : 'en';
-
-  // Build personalized welcome message
-  let welcomeMessage = welcomeIntros[currentLang as keyof typeof welcomeIntros];
-
-  // Add fitness level if available
-  if (fitnessLevel && fitnessLevelTexts[currentLang as keyof typeof fitnessLevelTexts]) {
-    welcomeMessage += ' ' + fitnessLevelTexts[currentLang as keyof typeof fitnessLevelTexts][fitnessLevel as keyof typeof fitnessLevelTexts['en']];
-  }
-
-  // Add activity hours if available
-  if (activeHoursPerWeek && activeHoursPerWeek > 0) {
-    welcomeMessage += ' ' + activityHoursTexts[currentLang as keyof typeof activityHoursTexts];
-  }
-
-  // Add goals and activities if available
-  if (fitnessGoals && fitnessGoals.length > 0 && preferredActivities && preferredActivities.length > 0) {
-    welcomeMessage += ' ' + goalTexts[currentLang as keyof typeof goalTexts] + ' ' + 
-                      activitiesTexts[currentLang as keyof typeof activitiesTexts] + ', ';
-  } else if (fitnessGoals && fitnessGoals.length > 0) {
-    welcomeMessage += ' ' + goalTexts[currentLang as keyof typeof goalTexts] + ', ';
-  } else if (preferredActivities && preferredActivities.length > 0) {
-    welcomeMessage += ' ' + activitiesTexts[currentLang as keyof typeof activitiesTexts] + ', ';
-  }
-
-  // Add plan text
-  welcomeMessage += ' ' + planTexts[currentLang as keyof typeof planTexts];
-
-  // Add final question
-  welcomeMessage += '\n\n' + askTexts[currentLang as keyof typeof askTexts];
-
-  return welcomeMessage;
-};
-
-export function useUserProfile(userId: number = 1) {
-  const [profile, setProfile] = useState<UserProfile | null>(null);
+export function useUserProfile(userId: number = 1, agentType: AgentType = 'fitness') {
+  const [profile, setProfile] = useState<SubscriberProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-
-  // Onboarding questions sequence
-  const onboardingQuestions: OnboardingQuestion[] = [
-    {
-      step: 1,
-      question: "What's your name?",
-      totalSteps: 8,
-      completed: false
-    },
-    {
-      step: 2,
-      question: "What's your fitness level?",
-      totalSteps: 8,
-      completed: false
-    },
-    {
-      step: 3,
-      question: "What are your fitness goals?",
-      options: [
-        'lose_weight', 
-        'build_muscle', 
-        'improve_endurance', 
-        'increase_flexibility', 
-        'reduce_stress', 
-        'better_sleep', 
-        'improve_overall_health'
-      ],
-      optionLabels: [
-        'Lose Weight', 
-        'Build Muscle', 
-        'Improve Endurance', 
-        'Increase Flexibility', 
-        'Reduce Stress',
-        'Better Sleep',
-        'Improve Overall Health'
-      ],
-      totalSteps: 8,
-      completed: false
-    },
-    {
-      step: 4,
-      question: "What activities do you prefer?",
-      options: [
-        'running', 
-        'weightlifting', 
-        'cycling', 
-        'swimming', 
-        'yoga', 
-        'hiit', 
-        'pilates', 
-        'team_sports', 
-        'walking'
-      ],
-      optionLabels: [
-        'Running',
-        'Weightlifting',
-        'Cycling',
-        'Swimming',
-        'Yoga',
-        'HIIT',
-        'Pilates',
-        'Team Sports',
-        'Walking'
-      ],
-      totalSteps: 8,
-      completed: false
-    },
-    {
-      step: 5,
-      question: "How many hours per week can you dedicate to exercise?",
-      totalSteps: 8,
-      completed: false
-    },
-    {
-      step: 6,
-      question: "What language do you prefer?",
-      totalSteps: 8,
-      completed: false
-    },
-    {
-      step: 7,
-      question: "Which fitness trackers or devices do you use?",
-      options: [
-        'google_fit', 
-        'apple_health', 
-        'fitbit', 
-        'strava', 
-        'garmin', 
-        'samsung_health', 
-        'none'
-      ],
-      optionLabels: [
-        'Google Fit',
-        'Apple Health',
-        'Fitbit',
-        'Strava',
-        'Garmin',
-        'Samsung Health',
-        'None'
-      ],
-      totalSteps: 8,
-      completed: false
-    },
-    {
-      step: 8,
-      question: "Ready to start your personalized fitness journey?",
-      totalSteps: 8,
-      completed: false
-    }
-  ];
+  
+  // Get the full set of onboarding questions based on agent type
+  const fullOnboardingQuestions = getOnboardingQuestions(agentType);
+  
+  // Convert to simplified format for backward compatibility
+  const onboardingQuestions: OnboardingQuestion[] = fullOnboardingQuestions.map(q => 
+    convertQuestion(q, fullOnboardingQuestions.length)
+  );
 
   // Get current question based on onboarding step
-  const currentQuestion = profile?.onboardingStep 
-    ? onboardingQuestions.find(q => q.step === profile.onboardingStep) || onboardingQuestions[0]
+  const currentQuestion = profile?.system?.onboardingStep 
+    ? onboardingQuestions.find(q => q.step === profile.system.onboardingStep) || onboardingQuestions[0]
     : onboardingQuestions[0];
 
   // Fetch profile
   const fetchProfile = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await fetch(`/api/users/${userId}/profile`);
-      
-      if (!response.ok) {
-        throw new Error('Failed to fetch user profile');
-      }
-      
-      const data = await response.json();
-      setProfile(data);
+      const userProfile = await profileService.fetchUserProfile(userId);
+      setProfile(userProfile);
       setError(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An unknown error occurred');
@@ -283,24 +61,14 @@ export function useUserProfile(userId: number = 1) {
   }, [userId]);
 
   // Update profile
-  const updateProfile = useCallback(async (updates: Partial<UserProfile>) => {
+  const updateProfile = useCallback(async (updates: Partial<SubscriberProfile>) => {
     try {
       setLoading(true);
-      const response = await fetch(`/api/users/${userId}/profile`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(updates)
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to update user profile');
+      const updatedProfile = await profileService.updateUserProfile(userId, updates);
+      if (updatedProfile) {
+        setProfile(updatedProfile);
+        setError(null);
       }
-      
-      const updatedProfile = await response.json();
-      setProfile(updatedProfile);
-      setError(null);
       return updatedProfile;
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An unknown error occurred');
@@ -315,17 +83,11 @@ export function useUserProfile(userId: number = 1) {
   const resetOnboarding = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await fetch(`/api/users/${userId}/profile/reset`, {
-        method: 'POST'
-      });
-      
-      if (!response.ok) {
-        throw new Error('Failed to reset onboarding');
+      const resetProfile = await profileService.resetOnboarding(userId);
+      if (resetProfile) {
+        setProfile(resetProfile);
+        setError(null);
       }
-      
-      const resetProfile = await response.json();
-      setProfile(resetProfile);
-      setError(null);
       return resetProfile;
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An unknown error occurred');
@@ -336,16 +98,19 @@ export function useUserProfile(userId: number = 1) {
     }
   }, [userId]);
 
+  // Update onboarding step
+  const updateOnboardingStep = useCallback(async (step: number) => {
+    return profileService.updateOnboardingStep(userId, step);
+  }, [userId]);
+
   // Complete onboarding
   const completeOnboarding = useCallback(async () => {
     try {
-      const updatedProfile = await updateProfile({ 
-        onboardingCompleted: true,
-        onboardingStep: onboardingQuestions.length
-      });
+      const completedProfile = await profileService.completeOnboarding(userId);
       
-      if (updatedProfile) {
-        const welcomeMessage = generateWelcomeMessage(updatedProfile);
+      if (completedProfile) {
+        setProfile(completedProfile);
+        const welcomeMessage = promptService.generateWelcomeMessage(completedProfile);
         return welcomeMessage;
       }
       
@@ -354,13 +119,24 @@ export function useUserProfile(userId: number = 1) {
       console.error('Error completing onboarding:', err);
       return "Welcome to Fitness AI! How can I help you today?";
     }
-  }, [updateProfile, onboardingQuestions.length]);
+  }, [userId]);
 
   // Helper function to generate welcome message
-  const welcomeMessageGenerator = useCallback(() => {
+  const generateWelcomeMessage = useCallback(() => {
     if (!profile) return "Welcome to Fitness AI! How can I help you today?";
-    return generateWelcomeMessage(profile);
+    return promptService.generateWelcomeMessage(profile);
   }, [profile]);
+
+  // Helper function to generate system prompt for AI
+  const generateSystemPrompt = useCallback(() => {
+    if (!profile) return "You are Fitness AI, a real-time interactive health and fitness assistant.";
+    return promptService.generateSystemPrompt(profile);
+  }, [profile]);
+
+  // Check if user has completed onboarding
+  const hasCompletedOnboarding = useCallback(async () => {
+    return profileService.hasCompletedOnboarding(userId);
+  }, [userId]);
 
   // Initial profile fetch
   useEffect(() => {
@@ -368,7 +144,7 @@ export function useUserProfile(userId: number = 1) {
   }, [fetchProfile]);
 
   // Calculate if user is in onboarding process
-  const isOnboarding = !profile?.onboardingCompleted && profile?.onboardingStep !== undefined;
+  const isOnboarding = !profile?.system?.onboardingCompleted && profile?.system?.onboardingStep !== undefined;
 
   return {
     profile,
@@ -377,9 +153,13 @@ export function useUserProfile(userId: number = 1) {
     isOnboarding,
     updateProfile,
     resetOnboarding,
+    updateOnboardingStep,
     completeOnboarding,
+    hasCompletedOnboarding,
     onboardingQuestions,
     currentQuestion,
-    generateWelcomeMessage: welcomeMessageGenerator
+    generateWelcomeMessage,
+    generateSystemPrompt,
+    refreshProfile: fetchProfile
   };
 }
