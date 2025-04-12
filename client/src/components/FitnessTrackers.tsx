@@ -4,10 +4,11 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
-import { Check, AlertCircle, Activity, Watch, Map, RefreshCcw } from 'lucide-react';
+import { Check, AlertCircle, Activity, Watch, Map, RefreshCcw, Key } from 'lucide-react';
 import { useUser } from '@/contexts/UserContext';
 import { getQueryFn, apiRequest } from '@/lib/queryClient';
 import { useQuery, useMutation } from '@tanstack/react-query';
+import { toast } from '@/hooks/use-toast';
 
 type TrackerStatus = 'connected' | 'disconnected' | 'connecting' | 'error';
 
@@ -97,12 +98,50 @@ export default function FitnessTrackers() {
   const selectedTracker = trackersData.find(t => t.id === activeTracker);
   
   const handleConnect = (trackerId: string) => {
+    // Check if the service is available first
+    if (trackers?.availableServices && !trackers.availableServices[trackerId]) {
+      // Service requires API keys, show a message to the user
+      toast({
+        title: `${trackerConfig[trackerId].name} API Keys Required`,
+        description: `To connect with ${trackerConfig[trackerId].name}, we need API keys. Please contact the administrator to set up this integration.`,
+        variant: "destructive"
+      });
+      
+      const requiredSecrets = getRequiredSecrets(trackerId);
+      if (requiredSecrets.length > 0) {
+        console.log(`Service ${trackerId} requires the following API keys:`, requiredSecrets);
+      }
+      
+      return;
+    }
+    
     getAuthUrl(trackerId);
   };
   
   const handleDisconnect = (trackerId: string) => {
     // Implement disconnect logic
     console.log(`Disconnecting ${trackerId}`);
+    
+    toast({
+      title: `${trackerConfig[trackerId].name} Disconnected`,
+      description: `Your ${trackerConfig[trackerId].name} account has been disconnected successfully.`,
+    });
+  };
+  
+  // Helper to determine required secrets for each service
+  const getRequiredSecrets = (trackerId: string): string[] => {
+    switch (trackerId) {
+      case 'google-fit':
+        return ['GOOGLE_FIT_CLIENT_ID', 'GOOGLE_FIT_CLIENT_SECRET'];
+      case 'fitbit':
+        return ['FITBIT_CLIENT_ID', 'FITBIT_CLIENT_SECRET'];
+      case 'strava':
+        return ['STRAVA_CLIENT_ID', 'STRAVA_CLIENT_SECRET'];
+      case 'apple-health':
+        return []; // Apple Health uses file upload, no API keys needed
+      default:
+        return [];
+    }
   };
   
   // Check if we're returning from an OAuth flow
@@ -231,6 +270,29 @@ export default function FitnessTrackers() {
                         Disconnect
                       </Button>
                     </>
+                  ) : tracker.status === 'error' ? (
+                    <div className="flex flex-col gap-2 items-end">
+                      <span className="text-xs text-muted-foreground">
+                        This service requires API keys to function
+                      </span>
+                      <Button 
+                        variant="outline"
+                        size="sm"
+                        className="flex items-center"
+                        onClick={() => {
+                          const requiredSecrets = getRequiredSecrets(tracker.id);
+                          toast({
+                            title: `${tracker.name} API Keys Required`,
+                            description: `Required secrets for ${tracker.name}: ${requiredSecrets.join(', ')}`,
+                            variant: "default"
+                          });
+                          console.log(`To enable ${tracker.name}, add these API keys:`, requiredSecrets);
+                        }}
+                      >
+                        <Key className="h-4 w-4 mr-2" />
+                        Add API Keys
+                      </Button>
+                    </div>
                   ) : null}
                 </CardFooter>
               </Card>

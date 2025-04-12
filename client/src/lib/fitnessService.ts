@@ -9,8 +9,11 @@ export async function initializeFitnessAI(config: {
   services: any[];
 }) {
   try {
-    const response = await apiRequest('/api/fitness/initialize', {
+    const response = await fetch('/api/fitness/initialize', {
       method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
       body: JSON.stringify({
         userId: config.userId,
         language: config.language,
@@ -19,7 +22,11 @@ export async function initializeFitnessAI(config: {
       })
     });
     
-    return response;
+    if (!response.ok) {
+      throw new Error(`Failed to initialize: ${response.status} ${response.statusText}`);
+    }
+    
+    return await response.json();
   } catch (error) {
     console.error('Failed to initialize Fitness AI:', error);
     throw error;

@@ -7,6 +7,7 @@ import Home from "@/pages/home";
 import FitnessTrackersPage from "@/pages/fitness-trackers";
 import { UserProvider } from "./contexts/UserContext";
 import { ChatProvider } from "./contexts/ChatContext";
+import FitnessSystemInitializer from "./components/FitnessSystemInitializer";
 
 function Router() {
   return (
@@ -23,6 +24,7 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <UserProvider>
         <ChatProvider>
+          <FitnessSystemInitializer />
           <Router />
         </ChatProvider>
       </UserProvider>
