@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { MessageSquare, X, ArrowUpRight, ArrowDownLeft, Send, Image, Mic, MicOff } from 'lucide-react';
+import { MessageSquare, X, ArrowUpRight, ArrowDownLeft, Send, Image, Mic, MicOff, QrCode, Scan, Activity } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -17,6 +17,13 @@ interface Message {
   content: string;
 }
 
+// List of AI models
+const AI_MODELS = [
+  { id: 'gemini', name: 'Gemini', active: true },
+  { id: 'gpt', name: 'GPT', active: false },
+  { id: 'claude', name: 'Claude', active: false },
+];
+
 export default function FloatingChat() {
   const [isOpen, setIsOpen] = useState(false);
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -24,11 +31,13 @@ export default function FloatingChat() {
   const [inputValue, setInputValue] = useState('');
   const [isRecording, setIsRecording] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [activeModel, setActiveModel] = useState('gemini');
   const [messages, setMessages] = useState<Message[]>([
     { role: 'assistant', content: "Hello! I'm your Fitness AI assistant. How can I help you with your fitness goals today?" }
   ]);
   
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
   
   // Scroll to bottom when messages change
   useEffect(() => {
@@ -36,6 +45,15 @@ export default function FloatingChat() {
       messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
   }, [messages]);
+  
+  // Focus input when chat is opened
+  useEffect(() => {
+    if (isOpen && inputRef.current) {
+      setTimeout(() => {
+        inputRef.current?.focus();
+      }, 100);
+    }
+  }, [isOpen]);
   
   // Handle opening/closing the chat
   const toggleChat = () => {
@@ -117,6 +135,11 @@ export default function FloatingChat() {
     alert('QR Code generation feature - coming soon');
   };
   
+  // Scan QR code (placeholder)
+  const scanQRCode = () => {
+    alert('QR Code scanning feature - coming soon');
+  };
+  
   return (
     <div className={`fixed z-50 transition-all duration-300 ${
       isOpen 
@@ -140,8 +163,8 @@ export default function FloatingChat() {
           {/* Header */}
           <div className="flex items-center justify-between p-3 bg-primary text-primary-foreground">
             <div className="flex items-center gap-2">
-              <MessageSquare className="h-5 w-5" />
-              <h3 className="font-medium">Fitness AI Assistant</h3>
+              <Activity className="h-5 w-5" />
+              <h3 className="font-medium">Fitness AI Universal Assistant</h3>
             </div>
             <div className="flex items-center gap-1">
               <Button 
@@ -164,163 +187,215 @@ export default function FloatingChat() {
             </div>
           </div>
           
-          {/* Tabs */}
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col overflow-hidden">
-            <div className="px-2 pt-2 border-b">
-              <TabsList className="w-full">
-                <TabsTrigger value="chat" className="flex-1">Chat</TabsTrigger>
-                <TabsTrigger value="qr" className="flex-1">QR Code</TabsTrigger>
-                <TabsTrigger value="ar" className="flex-1">AR/VR</TabsTrigger>
-              </TabsList>
-            </div>
+          {/* Tab navigation - CryptoBot style */}
+          <div className="flex border-b">
+            <Button 
+              variant={activeTab === "chat" ? "ghost" : "ghost"} 
+              onClick={() => setActiveTab('chat')}
+              className={`flex-1 rounded-none border-b-2 ${activeTab === 'chat' ? 'border-primary' : 'border-transparent'} py-2 px-4`}
+            >
+              <MessageSquare className="h-5 w-5 mr-2" />
+              <span>Chat</span>
+            </Button>
             
+            <Button 
+              variant={activeTab === "qr" ? "ghost" : "ghost"} 
+              onClick={() => setActiveTab('qr')}
+              className={`flex-1 rounded-none border-b-2 ${activeTab === 'qr' ? 'border-primary' : 'border-transparent'} py-2 px-4`}
+            >
+              <QrCode className="h-5 w-5 mr-2" />
+              <span>Create QR</span>
+            </Button>
+            
+            <Button 
+              variant={activeTab === "scan" ? "ghost" : "ghost"} 
+              onClick={() => setActiveTab('scan')}
+              className={`flex-1 rounded-none border-b-2 ${activeTab === 'scan' ? 'border-primary' : 'border-transparent'} py-2 px-4`}
+            >
+              <Scan className="h-5 w-5 mr-2" />
+              <span>AR View</span>
+            </Button>
+          </div>
+          
+          {/* Content container */}
+          <div className="flex-1 flex flex-col overflow-hidden">
             {/* Chat Content */}
-            <TabsContent value="chat" className="flex-1 flex flex-col overflow-hidden p-0 m-0">
-              <ScrollArea className="flex-1 p-4">
-                {messages.length === 0 ? (
-                  <div className="h-full flex items-center justify-center text-center p-4">
-                    <div>
-                      <MessageSquare className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                      <h3 className="font-medium text-lg mb-2">Welcome to Fitness AI</h3>
-                      <p className="text-muted-foreground">
-                        Your personal AI fitness coach. Ask me anything about workouts, nutrition, or health goals!
-                      </p>
+            {activeTab === 'chat' && (
+              <div className="flex-1 flex flex-col overflow-hidden">
+                <ScrollArea className="flex-1 p-4">
+                  {messages.length === 0 ? (
+                    <div className="h-full flex items-center justify-center text-center p-4">
+                      <div>
+                        <MessageSquare className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                        <h3 className="font-medium text-lg mb-2">Welcome to Fitness AI</h3>
+                        <p className="text-muted-foreground">
+                          Your personal AI fitness coach. Ask me anything about workouts, nutrition, or health goals!
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    {messages.map((message, index) => (
-                      <div 
-                        key={index} 
-                        className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
-                      >
+                  ) : (
+                    <div className="space-y-4">
+                      {messages.map((message, index) => (
                         <div 
-                          className={`flex max-w-[80%] ${
-                            message.role === 'user' 
-                              ? 'flex-row-reverse' 
-                              : 'flex-row'
-                          }`}
+                          key={index} 
+                          className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
                         >
                           <div 
-                            className={`rounded-full h-8 w-8 flex items-center justify-center ${
+                            className={`flex max-w-[80%] ${
                               message.role === 'user' 
-                                ? 'bg-primary text-primary-foreground ml-2' 
-                                : 'bg-muted mr-2'
+                                ? 'flex-row-reverse' 
+                                : 'flex-row'
                             }`}
                           >
-                            {message.role === 'user' ? 'U' : 'AI'}
-                          </div>
-                          <div 
-                            className={`p-3 rounded-lg ${
-                              message.role === 'user' 
-                                ? 'bg-primary text-primary-foreground' 
-                                : 'bg-muted'
-                            }`}
-                          >
-                            <div className="prose prose-sm dark:prose-invert">
-                              <ReactMarkdown>
-                                {message.content}
-                              </ReactMarkdown>
+                            <div 
+                              className={`rounded-full h-8 w-8 flex items-center justify-center ${
+                                message.role === 'user' 
+                                  ? 'bg-primary text-primary-foreground ml-2' 
+                                  : 'bg-muted mr-2'
+                              }`}
+                            >
+                              {message.role === 'user' ? 'U' : 'AI'}
+                            </div>
+                            <div 
+                              className={`p-3 rounded-lg ${
+                                message.role === 'user' 
+                                  ? 'bg-primary text-primary-foreground' 
+                                  : 'bg-muted'
+                              }`}
+                            >
+                              <div className="prose prose-sm dark:prose-invert">
+                                <ReactMarkdown>
+                                  {message.content}
+                                </ReactMarkdown>
+                              </div>
                             </div>
                           </div>
                         </div>
-                      </div>
-                    ))}
-                    <div ref={messagesEndRef} />
+                      ))}
+                      <div ref={messagesEndRef} />
+                    </div>
+                  )}
+                </ScrollArea>
+                
+                {/* AI model selector */}
+                <div className="flex justify-end p-2 border-t border-b">
+                  {AI_MODELS.map(model => (
+                    <Button
+                      key={model.id}
+                      variant={activeModel === model.id ? "default" : "ghost"}
+                      size="sm"
+                      className="text-xs px-2 py-1 h-auto mx-1"
+                      onClick={() => setActiveModel(model.id)}
+                      disabled={!model.active && model.id !== 'gemini'}
+                    >
+                      {model.name}
+                    </Button>
+                  ))}
+                </div>
+                
+                {/* Input Area */}
+                <div className="p-3">
+                  <div className="flex gap-2">
+                    <Input
+                      ref={inputRef}
+                      value={inputValue}
+                      onChange={(e) => setInputValue(e.target.value)}
+                      onKeyDown={handleKeyPress}
+                      placeholder="Type your message here..."
+                      className="flex-1"
+                      disabled={isProcessing}
+                    />
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button 
+                            size="icon" 
+                            variant="ghost"
+                            onClick={toggleRecording}
+                            disabled={isProcessing}
+                          >
+                            {isRecording ? <MicOff className="h-5 w-5" /> : <Mic className="h-5 w-5" />}
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>{isRecording ? 'Stop recording' : 'Start voice input'}</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                    
+                    <TooltipProvider>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button 
+                            size="icon" 
+                            variant="ghost"
+                            onClick={() => {
+                              const input = document.createElement("input");
+                              input.type = "file";
+                              input.accept = "image/*";
+                              input.click();
+                            }}
+                            disabled={isProcessing}
+                          >
+                            <Image className="h-5 w-5" />
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p>Upload image</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                    
+                    <Button 
+                      size="icon" 
+                      onClick={handleSendMessage}
+                      disabled={!inputValue.trim() || isProcessing}
+                      className="bg-primary"
+                    >
+                      <Send className="h-5 w-5" />
+                    </Button>
                   </div>
-                )}
-              </ScrollArea>
-              
-              {/* Input Area */}
-              <div className="border-t p-3">
-                <div className="flex gap-2">
-                  <Input
-                    value={inputValue}
-                    onChange={(e) => setInputValue(e.target.value)}
-                    onKeyDown={handleKeyPress}
-                    placeholder="Type your message..."
-                    className="flex-1"
-                    disabled={isProcessing}
-                  />
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button 
-                          size="icon" 
-                          variant="ghost"
-                          onClick={toggleRecording}
-                          disabled={isProcessing}
-                        >
-                          {isRecording ? <MicOff className="h-5 w-5" /> : <Mic className="h-5 w-5" />}
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>{isRecording ? 'Stop recording' : 'Start voice input'}</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                  
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button 
-                          size="icon" 
-                          variant="ghost"
-                          onClick={() => {
-                            const input = document.createElement("input");
-                            input.type = "file";
-                            input.accept = "image/*";
-                            input.click();
-                          }}
-                          disabled={isProcessing}
-                        >
-                          <Image className="h-5 w-5" />
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Upload image</p>
-                      </TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-                  
-                  <Button 
-                    size="icon" 
-                    onClick={handleSendMessage}
-                    disabled={!inputValue.trim() || isProcessing}
-                  >
-                    <Send className="h-5 w-5" />
-                  </Button>
                 </div>
               </div>
-            </TabsContent>
+            )}
             
             {/* QR Code Tab */}
-            <TabsContent value="qr" className="flex-1 flex items-center justify-center p-4 m-0">
-              <div className="text-center">
-                <QrCodeImage />
-                <h3 className="font-medium mt-4 mb-2">QR Code Generator</h3>
-                <p className="text-muted-foreground text-sm mb-4">
-                  Generate QR codes for your workout plans or share with friends
-                </p>
-                <Button onClick={generateQRCode}>Generate QR Code</Button>
-              </div>
-            </TabsContent>
-            
-            {/* AR/VR Tab */}
-            <TabsContent value="ar" className="flex-1 flex items-center justify-center p-4 m-0">
-              <div className="text-center">
-                <ArVrImage />
-                <h3 className="font-medium mt-4 mb-2">AR/VR Experiences</h3>
-                <p className="text-muted-foreground text-sm mb-4">
-                  Experience virtual workouts and fitness guidance in augmented reality
-                </p>
-                <div className="flex gap-2 justify-center">
-                  <Button onClick={() => alert('AR Mode - Coming soon!')}>AR Mode</Button>
-                  <Button variant="outline" onClick={() => alert('VR Mode - Coming soon!')}>VR Mode</Button>
+            {activeTab === 'qr' && (
+              <div className="flex-1 flex items-center justify-center p-4">
+                <div className="text-center">
+                  <QrCodeImage />
+                  <h3 className="font-medium mt-4 mb-2">QR Code Generator</h3>
+                  <p className="text-muted-foreground text-sm mb-4">
+                    Generate QR codes for your workout plans or share with friends
+                  </p>
+                  <div className="flex flex-col gap-3 max-w-xs mx-auto">
+                    <Input 
+                      placeholder="Enter content for QR code" 
+                      className="mb-2"
+                    />
+                    <Button onClick={generateQRCode}>Generate QR Code</Button>
+                  </div>
                 </div>
               </div>
-            </TabsContent>
-          </Tabs>
+            )}
+            
+            {/* AR/VR Tab */}
+            {activeTab === 'scan' && (
+              <div className="flex-1 flex items-center justify-center p-4">
+                <div className="text-center">
+                  <ArVrImage />
+                  <h3 className="font-medium mt-4 mb-2">AR Workout Viewer</h3>
+                  <p className="text-muted-foreground text-sm mb-4">
+                    Experience virtual workouts and fitness guidance in augmented reality
+                  </p>
+                  <div className="grid grid-cols-2 gap-3 max-w-xs mx-auto">
+                    <Button onClick={() => alert('AR Mode - Coming soon!')}>Start AR</Button>
+                    <Button variant="outline" onClick={() => alert('VR Mode - Coming soon!')}>View Library</Button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
         </Card>
       )}
     </div>
