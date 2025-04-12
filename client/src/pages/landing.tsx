@@ -25,7 +25,8 @@ import {
   Play,
   CalendarDays,
   Clock,
-  CheckCircle
+  CheckCircle,
+  ChevronRight
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -307,6 +308,112 @@ export default function LandingPage() {
                 Fitness AI is committed to continuously evolving with the latest research in exercise science, nutrition, and AI technology to provide you with the most effective tools for your fitness journey.
               </p>
             </div>
+          </div>
+        </div>
+        
+        {/* Fitness Preview Section with Videos/Live Content */}
+        <div className="mt-20 max-w-6xl mx-auto">
+          <div className="text-center mb-12">
+            <Badge variant="outline" className="mb-4 text-sm py-1 px-4 bg-white/10 backdrop-blur-sm border-primary/20">
+              <span className="animate-pulse mr-2 text-primary">●</span>Live Fitness Content
+            </Badge>
+            <h2 className="text-3xl font-bold mb-4">Experience Our Premium Fitness Content</h2>
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              Explore professionally designed workout sessions, nutrition plans, and real-time tracking features to maximize your fitness results.
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 px-6">
+            {/* Workout Preview */}
+            <div className="video-preview group hover-scale">
+              <div className="relative rounded-xl overflow-hidden">
+                <img src={workoutThumbnail} alt="Workout Preview" className="w-full h-auto" />
+                <div className="play-button group-hover:bg-primary group-hover:scale-110 transition-all">
+                  <Play className="h-6 w-6" />
+                </div>
+                <div className="absolute bottom-0 left-0 right-0 bg-black/60 text-white p-4">
+                  <div className="flex items-center gap-2 mb-1">
+                    <CheckCircle className="h-4 w-4 text-primary" />
+                    <span className="text-sm">Premium Content</span>
+                  </div>
+                  <h3 className="text-lg font-bold">HIIT Workout Session</h3>
+                  <div className="flex items-center justify-between mt-2">
+                    <div className="flex items-center gap-1">
+                      <CalendarDays className="h-4 w-4 text-gray-300" />
+                      <span className="text-xs text-gray-300">New</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Clock className="h-4 w-4 text-gray-300" />
+                      <span className="text-xs text-gray-300">30 min</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            {/* Nutrition Preview */}
+            <div className="video-preview group hover-scale">
+              <div className="relative rounded-xl overflow-hidden">
+                <img src={nutritionThumbnail} alt="Nutrition Preview" className="w-full h-auto" />
+                <div className="play-button group-hover:bg-primary group-hover:scale-110 transition-all">
+                  <Play className="h-6 w-6" />
+                </div>
+                <div className="absolute bottom-0 left-0 right-0 bg-black/60 text-white p-4">
+                  <div className="flex items-center gap-2 mb-1">
+                    <CheckCircle className="h-4 w-4 text-primary" />
+                    <span className="text-sm">Live Session</span>
+                  </div>
+                  <h3 className="text-lg font-bold">Personalized Meal Planning</h3>
+                  <div className="flex items-center justify-between mt-2">
+                    <div className="flex items-center gap-1">
+                      <CalendarDays className="h-4 w-4 text-gray-300" />
+                      <span className="text-xs text-gray-300">Today</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Clock className="h-4 w-4 text-gray-300" />
+                      <span className="text-xs text-gray-300">45 min</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            {/* Progress Tracking Preview */}
+            <div className="video-preview group hover-scale">
+              <div className="relative rounded-xl overflow-hidden">
+                <img src={trackingThumbnail} alt="Tracking Preview" className="w-full h-auto" />
+                <div className="play-button group-hover:bg-primary group-hover:scale-110 transition-all">
+                  <Play className="h-6 w-6" />
+                </div>
+                <div className="absolute bottom-0 left-0 right-0 bg-black/60 text-white p-4">
+                  <div className="flex items-center gap-2 mb-1">
+                    <CheckCircle className="h-4 w-4 text-primary" />
+                    <span className="text-sm">Analytics</span>
+                  </div>
+                  <h3 className="text-lg font-bold">Advanced Progress Tracking</h3>
+                  <div className="flex items-center justify-between mt-2">
+                    <div className="flex items-center gap-1">
+                      <CalendarDays className="h-4 w-4 text-gray-300" />
+                      <span className="text-xs text-gray-300">Weekly</span>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Clock className="h-4 w-4 text-gray-300" />
+                      <span className="text-xs text-gray-300">Real-time</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div className="mt-10 text-center">
+            <Button 
+              variant="outline" 
+              className="hover-purple-text px-8 py-3 text-lg font-medium"
+              onClick={() => setShowLoginModal(true)}
+            >
+              Explore All Content <ChevronRight className="h-5 w-5 ml-2" />
+            </Button>
           </div>
         </div>
       </div>
