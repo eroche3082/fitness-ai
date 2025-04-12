@@ -3,7 +3,7 @@ import Header from "./Header";
 import Sidebar from "./Sidebar";
 import ChatArea from "./ChatArea";
 import MobileSidebar from "./MobileSidebar";
-import FloatingVoiceButton from "./FloatingVoiceButton";
+import FloatingChat from "./FloatingChat";
 import { useUser } from "@/contexts/UserContext";
 import AdminPanel from "./admin/AdminPanel";
 import { Card, CardContent } from "@/components/ui/card";
@@ -203,11 +203,57 @@ export default function FitnessAI() {
       <Header />
       <div className="flex flex-1 overflow-hidden">
         <Sidebar />
-        <ChatArea />
+        <div className="flex-1 overflow-hidden">
+          {/* Main content area */}
+          <div className="bg-background h-full flex flex-col">
+            <div className="flex-1 p-6">
+              {/* Page content goes here */}
+              <h1 className="text-2xl font-bold mb-4">Welcome to Fitness AI</h1>
+              <p className="text-muted-foreground mb-6">
+                Your personal AI fitness coach, powered by advanced AI. Track your progress, get personalized workouts, and achieve your fitness goals.
+              </p>
+              
+              {/* Quick action cards */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                <Card className="bg-primary/5 border-primary/20">
+                  <CardContent className="p-6">
+                    <h3 className="font-semibold mb-2">Get Started</h3>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      Connect your fitness trackers and set your goals to get personalized recommendations.
+                    </p>
+                    <Button size="sm" variant="default">Connect Devices</Button>
+                  </CardContent>
+                </Card>
+                
+                <Card className="bg-primary/5 border-primary/20">
+                  <CardContent className="p-6">
+                    <h3 className="font-semibold mb-2">Today's Workout</h3>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      View your personalized workout plan for today based on your goals and schedule.
+                    </p>
+                    <Button size="sm" variant="default">View Workout</Button>
+                  </CardContent>
+                </Card>
+                
+                <Card className="bg-primary/5 border-primary/20">
+                  <CardContent className="p-6">
+                    <h3 className="font-semibold mb-2">Progress Report</h3>
+                    <p className="text-sm text-muted-foreground mb-4">
+                      Track your fitness journey with detailed progress reports and analytics.
+                    </p>
+                    <Button size="sm" variant="default">View Progress</Button>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
       <MobileSidebar />
-      <FloatingVoiceButton />
       <AdminPanel />
+      
+      {/* Float chat button in bottom right corner */}
+      <FloatingChat />
     </div>
   );
 }

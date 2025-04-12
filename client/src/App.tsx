@@ -12,7 +12,6 @@ import ChatPage from "@/pages/chat";
 import { UserProvider } from "./contexts/UserContext";
 import { ChatProvider } from "./contexts/ChatContext";
 import FitnessSystemInitializer from "./components/FitnessSystemInitializer";
-import EnhancedChatbot from "./components/EnhancedChatbot";
 
 import VoiceCoachingPage from "@/pages/voice-coaching";
 import { 
@@ -88,8 +87,7 @@ function App() {
           <Router />
           <MainNavigation />
           
-          {/* Universal AI Assistant accessible from all pages */}
-          <EnhancedChatbot />
+          {/* Floating chat button is now integrated in each page layout instead */}
         </ChatProvider>
       </UserProvider>
       <Toaster />
