@@ -1,410 +1,410 @@
 import { useState, useRef, useEffect } from 'react';
+import { MessageSquare, X, Send, Image, Mic, MicOff, QrCode, Scan, Activity } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import ReactMarkdown from 'react-markdown';
-import { useCustomChat } from '@/hooks/useCustomChat';
-import { Message as ChatMessage } from '@/contexts/ChatContext';
 
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-
-import {
-  Mic,
-  MicOff,
-  Send,
-  Image,
-  Camera,
-  QrCode,
-  Copy,
-  Share2,
-  Settings,
-  VolumeX,
-  Volume2,
-  Minimize2,
-  Maximize2,
-  X,
-} from 'lucide-react';
+// Define a simple Message type
+type MessageRole = 'user' | 'assistant';
 
 interface Message {
-  role: 'user' | 'assistant';
+  role: MessageRole;
   content: string;
 }
 
-export default function FullpageChatbot() {
-  // Refs
-  const messageEndRef = useRef<HTMLDivElement>(null);
-  
-  // Local state
-  const [messages, setMessages] = useState<Message[]>([
-    { 
-      role: 'assistant', 
-      content: "Hello! I'm your Fitness AI assistant. How can I help you with your fitness goals today?" 
-    }
-  ]);
-  const [inputValue, setInputValue] = useState('');
-  const [isProcessing, setIsProcessing] = useState(false);
+// List of AI models
+const AI_MODELS = [
+  { id: 'gemini', name: 'Gemini', active: true },
+  { id: 'gpt', name: 'GPT', active: false },
+  { id: 'claude', name: 'Claude', active: false },
+];
+
+interface FullpageChatbotProps {
+  onClose: () => void;
+}
+
+// SVG Components
+function QrCodeImage() {
+  return (
+    <svg
+      width="160"
+      height="160"
+      viewBox="0 0 160 160"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className="mx-auto"
+    >
+      <rect x="10" y="10" width="140" height="140" rx="8" fill="white" stroke="currentColor" strokeWidth="2" />
+      <rect x="30" y="30" width="40" height="40" rx="4" fill="currentColor" />
+      <rect x="90" y="30" width="40" height="40" rx="4" fill="currentColor" />
+      <rect x="30" y="90" width="40" height="40" rx="4" fill="currentColor" />
+      <rect x="90" y="90" width="10" height="10" rx="2" fill="currentColor" />
+      <rect x="110" y="90" width="20" height="10" rx="2" fill="currentColor" />
+      <rect x="90" y="110" width="10" height="20" rx="2" fill="currentColor" />
+      <rect x="110" y="110" width="20" height="20" rx="2" fill="currentColor" />
+    </svg>
+  );
+}
+
+function ArVrImage() {
+  return (
+    <svg
+      width="160"
+      height="160"
+      viewBox="0 0 160 160"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      className="mx-auto"
+    >
+      <rect x="10" y="10" width="140" height="140" rx="8" fill="white" stroke="currentColor" strokeWidth="2" />
+      <path d="M30 60 L80 30 L130 60 L80 90 Z" fill="currentColor" fillOpacity="0.2" stroke="currentColor" strokeWidth="2" />
+      <path d="M30 100 L80 70 L130 100 L80 130 Z" fill="currentColor" fillOpacity="0.2" stroke="currentColor" strokeWidth="2" />
+      <circle cx="80" cy="80" r="15" fill="currentColor" fillOpacity="0.4" stroke="currentColor" strokeWidth="2" />
+    </svg>
+  );
+}
+
+export default function FullpageChatbot({ onClose }: FullpageChatbotProps) {
   const [activeTab, setActiveTab] = useState('chat');
-  const [voiceEnabled, setVoiceEnabled] = useState(true);
-  const [isFullScreen, setIsFullScreen] = useState(false);
-
-  // Get chat context
-  const {
-    messages: contextMessages,
-    sending,
-    handleSendMessage: contextSendMessage,
-    setInputValue: setContextInputValue,
-    isRecording,
-    startRecording,
-    stopRecording
-  } = useCustomChat();
+  const [inputValue, setInputValue] = useState('');
+  const [isRecording, setIsRecording] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [activeModel, setActiveModel] = useState('gemini');
+  const [messages, setMessages] = useState<Message[]>([
+    { role: 'assistant', content: "Hello! I'm your Fitness AI assistant. How can I help you with your fitness goals today?" }
+  ]);
   
-  // Voice input handler
-  const handleVoiceInput = () => {
-    if (isRecording) {
-      stopRecording();
-    } else {
-      startRecording();
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  
+  // Scroll to bottom when messages change
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
-  };
-
-  // Handle sending messages
-  const handleSendMessage = async () => {
-    if (!inputValue.trim() || isProcessing) return;
-    
-    // Add user message to the conversation
-    const userMessage = { role: 'user', content: inputValue.trim() };
-    setMessages(prev => [...prev, userMessage]);
-    const messageToBeSent = inputValue.trim();
-    setInputValue('');
-    setIsProcessing(true);
+  }, [messages]);
+  
+  // Focus input when component mounts
+  useEffect(() => {
+    if (inputRef.current) {
+      setTimeout(() => {
+        inputRef.current?.focus();
+      }, 100);
+    }
+  }, []);
+  
+  // Simulate sending a message and getting a response
+  const sendMessage = async (content: string) => {
+    if (!content.trim() || isProcessing) return;
     
     try {
-      // Set the input value in the context and send the message to the main chat interface
-      if (contextSendMessage && setContextInputValue) {
-        setContextInputValue(messageToBeSent);
-        setTimeout(() => {
-          contextSendMessage();
-        }, 100);
+      // Add user message
+      setMessages(prev => [...prev, { role: 'user', content }]);
+      setIsProcessing(true);
+      
+      // Simulate API call delay
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Get predefined responses based on keywords
+      let response: string;
+      
+      if (content.toLowerCase().includes('workout')) {
+        response = "Based on your fitness profile, I recommend a mix of strength training and HIIT for optimal results. Would you like a customized workout plan?";
+      } else if (content.toLowerCase().includes('diet') || content.toLowerCase().includes('nutrition')) {
+        response = "Nutrition is key to fitness success! Aim for a balanced diet with plenty of protein, complex carbs, and healthy fats. Would you like specific meal recommendations based on your goals?";
+      } else if (content.toLowerCase().includes('track') || content.toLowerCase().includes('progress')) {
+        response = "Tracking your fitness progress is essential! You can connect your fitness trackers like Google Fit, Apple Health, or Fitbit to automatically sync your data.";
+      } else if (content.toLowerCase().includes('goal')) {
+        response = "Setting specific, measurable fitness goals is important. Let's break down your main goal into smaller milestones to track progress more effectively.";
+      } else {
+        response = "I'm here to help with all your fitness needs! You can ask me about workout plans, nutrition advice, progress tracking, or connecting fitness devices.";
       }
       
-      // Add AI response to the conversation after a short delay
-      setTimeout(() => {
-        setMessages(prev => [...prev, { 
-          role: 'assistant', 
-          content: 'I\'m analyzing your fitness data now. Please check the main chat area for a detailed response!' 
-        }]);
-        setIsProcessing(false);
-      }, 1500);
+      // Add assistant response
+      setMessages(prev => [...prev, { role: 'assistant', content: response }]);
     } catch (error) {
-      console.error('Error sending message:', error);
+      console.error('Error:', error);
       setMessages(prev => [...prev, { 
         role: 'assistant', 
-        content: 'Sorry, I encountered an error processing your request. Please try again.' 
+        content: "I'm sorry, I encountered an error. Please try again." 
       }]);
+    } finally {
       setIsProcessing(false);
     }
   };
-
-  // Scroll to the bottom when messages change
-  useEffect(() => {
-    if (messageEndRef.current) {
-      messageEndRef.current.scrollIntoView({ behavior: 'smooth' });
+  
+  // Handle sending a message
+  const handleSendMessage = () => {
+    if (inputValue.trim() && !isProcessing) {
+      sendMessage(inputValue.trim());
+      setInputValue('');
     }
-  }, [messages]);
-
-  // Handle key press events
+  };
+  
+  // Handle key press for sending messages
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSendMessage();
     }
   };
-
-  // Toggle voice activation
-  const toggleVoice = () => {
-    setVoiceEnabled(!voiceEnabled);
+  
+  // Toggle voice recording
+  const toggleRecording = () => {
+    setIsRecording(!isRecording);
+    if (isRecording) {
+      // Simulating voice transcription
+      setInputValue("This is a voice transcription example");
+    }
   };
-
+  
   // Generate QR code (placeholder)
   const generateQRCode = () => {
-    alert('QR Code generation feature will be implemented here');
+    alert('QR Code generation feature - coming soon');
   };
-
-  // Upload image (placeholder)
-  const handleImageUpload = () => {
-    alert('Image upload feature will be implemented here');
+  
+  // Scan QR code (placeholder)
+  const scanQRCode = () => {
+    alert('QR Code scanning feature - coming soon');
   };
-
-  // Handle camera access (placeholder)
-  const handleCameraAccess = () => {
-    alert('Camera access feature will be implemented here');
-  };
-
-  // Copy conversation (placeholder)
-  const copyConversation = () => {
-    const text = messages.map(m => `${m.role}: ${m.content}`).join('\n\n');
-    navigator.clipboard.writeText(text);
-    alert('Conversation copied to clipboard');
-  };
-
-  // Share conversation (placeholder)
-  const shareConversation = () => {
-    alert('Share feature will be implemented here');
-  };
-
+  
   return (
-    <Card className="w-full h-full flex flex-col shadow-lg border rounded-lg">
-      <CardHeader className="p-4 bg-primary text-primary-foreground">
-        <div className="flex items-center justify-between">
-          <CardTitle className="text-xl font-bold flex items-center gap-2">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M17.7 12L21.7 8C22.1 7.6 22.1 7 21.7 6.6L17.4 2.3C17 1.9 16.4 1.9 16 2.3L12 6.3L8 2.3C7.6 1.9 7 1.9 6.6 2.3L2.3 6.6C1.9 7 1.9 7.6 2.3 8L6.3 12L2.3 16C1.9 16.4 1.9 17 2.3 17.4L6.6 21.7C7 22.1 7.6 22.1 8 21.7L12 17.7L16 21.7C16.4 22.1 17 22.1 17.4 21.7L21.7 17.4C22.1 17 22.1 16.4 21.7 16L17.7 12Z" fill="currentColor"/>
-            </svg>
-            Fitness AI Assistant
-          </CardTitle>
-          <div className="flex items-center gap-1">
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    onClick={() => setIsFullScreen(!isFullScreen)}
-                    className="text-primary-foreground hover:bg-primary/90"
-                  >
-                    {isFullScreen ? <Minimize2 size={18} /> : <Maximize2 size={18} />}
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  {isFullScreen ? 'Exit Full Screen' : 'Full Screen'}
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          </div>
+    <div className="fixed inset-0 z-50 bg-background flex flex-col">
+      {/* Header */}
+      <div className="flex items-center justify-between p-3 bg-primary text-primary-foreground border-b">
+        <div className="flex items-center gap-2">
+          <Activity className="h-5 w-5" />
+          <h3 className="font-medium">Fitness AI Universal Assistant</h3>
         </div>
-      </CardHeader>
-
-      <Tabs defaultValue="chat" value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
-        <div className="border-b">
-          <TabsList className="w-full justify-start px-4 h-12">
-            <TabsTrigger value="chat" className="data-[state=active]:bg-primary/10">Chat</TabsTrigger>
-            <TabsTrigger value="qr" className="data-[state=active]:bg-primary/10">QR Code</TabsTrigger>
-            <TabsTrigger value="ar" className="data-[state=active]:bg-primary/10">AR/VR</TabsTrigger>
-          </TabsList>
-        </div>
-        
-        {/* Chat Tab */}
-        <TabsContent value="chat" className="flex-1 flex flex-col p-0 m-0">
-          <ScrollArea className="flex-1 p-4">
-            {messages.map((message, index) => (
-              <div 
-                key={index} 
-                className={`mb-4 flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
-              >
-                <div 
-                  className={`rounded-lg px-4 py-2 max-w-[80%] ${
-                    message.role === 'user' 
-                      ? 'bg-primary text-primary-foreground ml-auto' 
-                      : 'bg-secondary text-secondary-foreground'
-                  }`}
+        <div className="flex items-center gap-2">
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="h-8 w-8 text-primary-foreground"
+                  onClick={onClose}
                 >
-                  <div className="prose prose-sm dark:prose-invert max-w-none">
-                    <ReactMarkdown>
-                      {message.content}
-                    </ReactMarkdown>
+                  <X className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Close</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
+      </div>
+      
+      {/* Tab navigation - CryptoBot style */}
+      <div className="flex border-b">
+        <Button 
+          variant={activeTab === "chat" ? "ghost" : "ghost"} 
+          onClick={() => setActiveTab('chat')}
+          className={`flex-1 rounded-none border-b-2 ${activeTab === 'chat' ? 'border-primary' : 'border-transparent'} py-3 px-4`}
+        >
+          <MessageSquare className="h-5 w-5 mr-2" />
+          <span>Chat</span>
+        </Button>
+        
+        <Button 
+          variant={activeTab === "qr" ? "ghost" : "ghost"} 
+          onClick={() => setActiveTab('qr')}
+          className={`flex-1 rounded-none border-b-2 ${activeTab === 'qr' ? 'border-primary' : 'border-transparent'} py-3 px-4`}
+        >
+          <QrCode className="h-5 w-5 mr-2" />
+          <span>Scan QR</span>
+        </Button>
+        
+        <Button 
+          variant={activeTab === "scan" ? "ghost" : "ghost"} 
+          onClick={() => setActiveTab('scan')}
+          className={`flex-1 rounded-none border-b-2 ${activeTab === 'scan' ? 'border-primary' : 'border-transparent'} py-3 px-4`}
+        >
+          <Scan className="h-5 w-5 mr-2" />
+          <span>AR View</span>
+        </Button>
+      </div>
+      
+      {/* Content container */}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {/* Chat Content */}
+        {activeTab === 'chat' && (
+          <div className="flex-1 flex flex-col overflow-hidden">
+            <ScrollArea className="flex-1 p-4">
+              {messages.length === 0 ? (
+                <div className="h-full flex items-center justify-center text-center p-4">
+                  <div>
+                    <MessageSquare className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                    <h3 className="font-medium text-lg mb-2">Welcome to Fitness AI</h3>
+                    <p className="text-muted-foreground">
+                      Your personal AI fitness coach. Ask me anything about workouts, nutrition, or health goals!
+                    </p>
                   </div>
                 </div>
-              </div>
-            ))}
-            
-            {isProcessing && (
-              <div className="mb-4 flex justify-start">
-                <div className="rounded-lg px-4 py-2 bg-secondary text-secondary-foreground">
-                  <div className="flex space-x-2">
-                    <div className="w-2 h-2 rounded-full bg-primary/60 animate-bounce" style={{ animationDelay: '0s' }}></div>
-                    <div className="w-2 h-2 rounded-full bg-primary/60 animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-                    <div className="w-2 h-2 rounded-full bg-primary/60 animate-bounce" style={{ animationDelay: '0.4s' }}></div>
-                  </div>
+              ) : (
+                <div className="space-y-4">
+                  {messages.map((message, index) => (
+                    <div 
+                      key={index} 
+                      className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                    >
+                      <div 
+                        className={`flex max-w-[80%] ${
+                          message.role === 'user' 
+                            ? 'flex-row-reverse' 
+                            : 'flex-row'
+                        }`}
+                      >
+                        <div 
+                          className={`rounded-full h-8 w-8 flex items-center justify-center ${
+                            message.role === 'user' 
+                              ? 'bg-primary text-primary-foreground ml-2' 
+                              : 'bg-muted mr-2'
+                          }`}
+                        >
+                          {message.role === 'user' ? 'U' : 'AI'}
+                        </div>
+                        <div 
+                          className={`p-3 rounded-lg ${
+                            message.role === 'user' 
+                              ? 'bg-primary text-primary-foreground' 
+                              : 'bg-muted'
+                          }`}
+                        >
+                          <div className="prose prose-sm dark:prose-invert">
+                            <ReactMarkdown>
+                              {message.content}
+                            </ReactMarkdown>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                  <div ref={messagesEndRef} />
                 </div>
+              )}
+            </ScrollArea>
+            
+            {/* AI model selector */}
+            <div className="flex justify-end p-2 border-t border-b">
+              {AI_MODELS.map(model => (
+                <Button
+                  key={model.id}
+                  variant={activeModel === model.id ? "default" : "ghost"}
+                  size="sm"
+                  className="text-xs px-2 py-1 h-auto mx-1"
+                  onClick={() => setActiveModel(model.id)}
+                  disabled={!model.active && model.id !== 'gemini'}
+                >
+                  {model.name}
+                </Button>
+              ))}
+            </div>
+            
+            {/* Input Area */}
+            <div className="p-4 border-t">
+              <div className="flex gap-2">
+                <Input
+                  ref={inputRef}
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  onKeyDown={handleKeyPress}
+                  placeholder="Type your message here..."
+                  className="flex-1"
+                  disabled={isProcessing}
+                />
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button 
+                        size="icon" 
+                        variant="ghost"
+                        onClick={toggleRecording}
+                        disabled={isProcessing}
+                      >
+                        {isRecording ? <MicOff className="h-5 w-5" /> : <Mic className="h-5 w-5" />}
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>{isRecording ? 'Stop recording' : 'Start voice input'}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+                
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button 
+                        size="icon" 
+                        variant="ghost"
+                        onClick={() => {
+                          const input = document.createElement("input");
+                          input.type = "file";
+                          input.accept = "image/*";
+                          input.click();
+                        }}
+                        disabled={isProcessing}
+                      >
+                        <Image className="h-5 w-5" />
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>Upload image</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+                
+                <Button 
+                  size="icon" 
+                  onClick={handleSendMessage}
+                  disabled={!inputValue.trim() || isProcessing}
+                  className="bg-primary"
+                >
+                  <Send className="h-5 w-5" />
+                </Button>
               </div>
-            )}
-            
-            <div ref={messageEndRef} />
-          </ScrollArea>
-          
-          {/* Action Bar */}
-          <div className="border-t p-2 flex flex-wrap gap-1 justify-center">
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon" onClick={toggleVoice}>
-                    {voiceEnabled ? <Volume2 size={18} /> : <VolumeX size={18} />}
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  {voiceEnabled ? 'Disable Voice' : 'Enable Voice'}
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-            
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon" onClick={handleVoiceInput} disabled={isProcessing}>
-                    {isRecording ? <MicOff size={18} className="text-red-500" /> : <Mic size={18} />}
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  {isRecording ? 'Stop Recording' : 'Start Voice Input'}
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-            
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon" onClick={handleImageUpload} disabled={isProcessing}>
-                    <Image size={18} />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  Upload Image
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-            
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon" onClick={handleCameraAccess} disabled={isProcessing}>
-                    <Camera size={18} />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  Camera
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-            
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon" onClick={generateQRCode} disabled={isProcessing}>
-                    <QrCode size={18} />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  Generate QR Code
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-            
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon" onClick={copyConversation} disabled={isProcessing}>
-                    <Copy size={18} />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  Copy Conversation
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-            
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon" onClick={shareConversation} disabled={isProcessing}>
-                    <Share2 size={18} />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  Share
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-            
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button variant="ghost" size="icon" disabled={isProcessing}>
-                    <Settings size={18} />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  Settings
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          </div>
-          
-          {/* Input Area */}
-          <div className="p-4 pt-2 flex gap-2">
-            <Textarea 
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              onKeyDown={handleKeyPress}
-              placeholder="Message Fitness AI..."
-              className="min-h-[60px] resize-none"
-              disabled={isProcessing}
-            />
-            <Button 
-              onClick={handleSendMessage} 
-              disabled={!inputValue.trim() || isProcessing} 
-              className="self-end"
-            >
-              <Send size={18} />
-            </Button>
-          </div>
-        </TabsContent>
-        
-        {/* QR Code Tab */}
-        <TabsContent value="qr" className="flex-1 flex flex-col items-center justify-center">
-          <div className="text-center p-6">
-            <QrCode size={120} className="mx-auto mb-4 text-primary" />
-            <h3 className="text-lg font-semibold mb-2">QR Code Generator</h3>
-            <p className="text-muted-foreground mb-4">
-              Generate QR codes for fitness profiles, workout plans, and more.
-            </p>
-            <Button onClick={generateQRCode}>Generate New QR Code</Button>
-          </div>
-        </TabsContent>
-        
-        {/* AR/VR Tab */}
-        <TabsContent value="ar" className="flex-1 flex flex-col items-center justify-center">
-          <div className="text-center p-6">
-            <svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mx-auto mb-4 text-primary">
-              <path d="M3 7v4a1 1 0 0 0 1 1h3 M7 7v4 M13 7v4 M17 7v4a1 1 0 0 0 1 1h3 M10 7h4 M21 15v2a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-2 M10 16.4l4 2.6 M4.8 15l4.053-6.08a2 2 0 0 1 3.331-.524L19.5 15"/>
-            </svg>
-            <h3 className="text-lg font-semibold mb-2">AR/VR Experience</h3>
-            <p className="text-muted-foreground mb-4">
-              Visualize workouts, fitness data, and environments in augmented reality.
-            </p>
-            <div className="flex gap-2 justify-center">
-              <Button variant="outline">Launch AR Mode</Button>
-              <Button>Enter VR Mode</Button>
             </div>
           </div>
-        </TabsContent>
-      </Tabs>
-    </Card>
+        )}
+        
+        {/* QR Code Tab */}
+        {activeTab === 'qr' && (
+          <div className="flex-1 flex items-center justify-center p-4">
+            <div className="text-center">
+              <QrCodeImage />
+              <h3 className="font-medium mt-4 mb-2">QR Code Scanner</h3>
+              <p className="text-muted-foreground text-sm mb-4">
+                Scan QR codes to import workout plans or connect with fitness devices
+              </p>
+              <div className="flex flex-col gap-3 max-w-xs mx-auto">
+                <Button onClick={scanQRCode}>Scan QR Code</Button>
+                <Button variant="outline">Upload QR Image</Button>
+              </div>
+            </div>
+          </div>
+        )}
+        
+        {/* AR/VR Tab */}
+        {activeTab === 'scan' && (
+          <div className="flex-1 flex items-center justify-center p-4">
+            <div className="text-center">
+              <ArVrImage />
+              <h3 className="font-medium mt-4 mb-2">AR Workout Viewer</h3>
+              <p className="text-muted-foreground text-sm mb-4">
+                Experience virtual workouts and fitness guidance in augmented reality
+              </p>
+              <div className="grid grid-cols-2 gap-3 max-w-xs mx-auto">
+                <Button onClick={() => alert('AR Mode - Coming soon!')}>Start AR</Button>
+                <Button variant="outline" onClick={() => alert('VR Mode - Coming soon!')}>View Library</Button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
   );
 }

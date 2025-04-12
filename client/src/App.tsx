@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Switch, Route, Link } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
@@ -12,6 +13,7 @@ import ChatPage from "@/pages/chat";
 import { UserProvider } from "./contexts/UserContext";
 import { ChatProvider } from "./contexts/ChatContext";
 import FitnessSystemInitializer from "./components/FitnessSystemInitializer";
+import FullpageChatbot from "./components/FullpageChatbot";
 
 import VoiceCoachingPage from "@/pages/voice-coaching";
 import { 
@@ -20,7 +22,8 @@ import {
   BarChart2, 
   FileDigit, 
   Headphones, 
-  Settings as SettingsIcon 
+  Settings as SettingsIcon,
+  MessageSquare
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 
@@ -78,6 +81,8 @@ function Router() {
 }
 
 function App() {
+  const [showChatbot, setShowChatbot] = useState(false);
+
   return (
     <QueryClientProvider client={queryClient}>
       <UserProvider>
@@ -87,7 +92,17 @@ function App() {
           <Router />
           <MainNavigation />
           
-          {/* Floating chat button is now integrated in each page layout instead */}
+          {/* Universal chatbot trigger button (CryptoBot style) */}
+          <Button 
+            onClick={() => setShowChatbot(true)} 
+            className="fixed bottom-4 right-4 z-40 h-14 w-14 rounded-full shadow-lg bg-primary hover:bg-primary/90 text-white"
+            aria-label="Open AI Assistant"
+          >
+            <MessageSquare className="h-6 w-6" />
+          </Button>
+          
+          {/* Fullpage chatbot (CryptoBot style) */}
+          {showChatbot && <FullpageChatbot onClose={() => setShowChatbot(false)} />}
         </ChatProvider>
       </UserProvider>
       <Toaster />
