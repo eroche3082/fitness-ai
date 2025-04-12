@@ -213,12 +213,12 @@ export class FitbitMockAdapter implements FitnessTrackerService {
 }
 
 /**
- * Adapter Mock para Strava
+ * Mock Adapter for Strava
  */
 export class StravaMockAdapter implements FitnessTrackerService {
   id = 'strava';
   name = 'Strava';
-  description = 'La red social para atletas';
+  description = 'Social network for athletes';
   apiDocumentation = 'https://developers.strava.com/docs/reference/';
   requiredSecrets = ['STRAVA_CLIENT_ID', 'STRAVA_CLIENT_SECRET'];
   
@@ -232,10 +232,9 @@ export class StravaMockAdapter implements FitnessTrackerService {
   
   async exchangeCodeForToken(code: string, userId: number): Promise<any> {
     const mockToken = {
-      access_token: 'mock_strava_access_token',
-      refresh_token: 'mock_strava_refresh_token',
-      expires_in: 3600,
-      token_type: 'Bearer',
+      accessToken: 'mock_strava_access_token',
+      refreshToken: 'mock_strava_refresh_token',
+      expiresAt: new Date(Date.now() + 3600 * 1000).toISOString(),
     };
     
     await storeServiceToken(userId, this.id, mockToken);
@@ -364,18 +363,18 @@ export class StravaMockAdapter implements FitnessTrackerService {
 }
 
 /**
- * Adapter Mock para Apple Health
- * Ya está implementado en el sistema
+ * Mock Adapter for Apple Health
+ * Already implemented in the system
  */
 export class AppleHealthAdapter implements FitnessTrackerService {
   id = 'apple-health';
   name = 'Apple Health';
-  description = 'El servicio de salud y actividad física de Apple';
+  description = 'Apple\'s health and fitness tracking service';
   apiDocumentation = 'https://developer.apple.com/documentation/healthkit';
-  requiredSecrets = []; // No requiere credenciales OAuth, usa carga de archivos de exportación
+  requiredSecrets = []; // No OAuth credentials required, uses file export uploads
   
   isConfigured(): boolean {
-    return true; // Siempre está configurado ya que usa exportación de archivos
+    return true; // Always configured as it uses file exports
   }
   
   getAuthUrl(userId: number, redirectUri: string): string {
@@ -383,7 +382,7 @@ export class AppleHealthAdapter implements FitnessTrackerService {
   }
   
   async exchangeCodeForToken(code: string, userId: number): Promise<any> {
-    // Apple Health no usa OAuth, sino que procesa archivos de exportación
+    // Apple Health doesn't use OAuth, it processes exported files instead
     return { status: 'success', message: 'Apple Health uses file uploads instead of OAuth' };
   }
   
@@ -470,7 +469,7 @@ export class AppleHealthAdapter implements FitnessTrackerService {
   }
   
   async syncData(userId: number): Promise<any> {
-    // Simular sincronización exitosa desde un archivo
+    // Simulate successful synchronization from a file
     return {
       status: 'success',
       message: 'Data synchronized successfully from uploaded file',
@@ -488,7 +487,7 @@ export class AppleHealthAdapter implements FitnessTrackerService {
   }
 }
 
-// Exportar los adaptadores para su uso en el sistema
+// Export the adapters for use in the system
 export const mockAdapters = {
   GoogleFitMockAdapter,
   FitbitMockAdapter,
