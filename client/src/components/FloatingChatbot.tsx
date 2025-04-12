@@ -32,12 +32,23 @@ export default function FloatingChatbot() {
   const [inputValue, setInputValue] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
 
-  const { 
+  // Get chat context
+  const {
+    messages: contextMessages,
     sending,
-    handleVoiceInput,
-    isRecording,
-    sendMessage
+    handleSendMessage: contextSendMessage,
+    setInputValue: setContextInputValue
   } = useCustomChat();
+  
+  const [isRecording, setIsRecording] = useState(false);
+  
+  // Voice input handler (simplified for now)
+  const handleVoiceInput = () => {
+    setIsRecording(prev => !prev);
+    setTimeout(() => {
+      setIsRecording(false);
+    }, 3000);
+  };
 
   // Handle sending messages
   const handleSendMessage = async () => {
@@ -51,9 +62,12 @@ export default function FloatingChatbot() {
     setIsProcessing(true);
     
     try {
-      // Send the message to the main chat interface
-      if (sendMessage) {
-        sendMessage(messageToBeSent);
+      // Set the input value in the context and send the message to the main chat interface
+      if (contextSendMessage && setContextInputValue) {
+        setContextInputValue(messageToBeSent);
+        setTimeout(() => {
+          contextSendMessage();
+        }, 100);
       }
       
       // Add AI response to the conversation after a short delay
