@@ -2,7 +2,7 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import FormCheckAnalyzer from "./FormCheckAnalyzer";
 import QRCodeScanner from "./QRCodeScanner";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { 
   BarChartBig, 
   FileUp, 
@@ -16,6 +16,8 @@ import {
 
 // This component renders a toolbar with all the Fitness AI tools
 export default function ToolsHeader() {
+  const [location] = useLocation();
+  
   // Upload file handler
   const handleFileUpload = () => {
     // In production, this would open a file picker and process the selected file
@@ -55,58 +57,88 @@ export default function ToolsHeader() {
             <span>Upload</span>
           </Button>
           
+          {/* Voice Coaching */}
+          <Button 
+            variant="outline"
+            className={`flex items-center gap-2 ${location === '/voice-coaching' ? 'bg-primary/10 text-primary' : ''}`}
+            asChild
+          >
+            <Link href="/voice-coaching">
+              <Mic className="h-4 w-4" />
+              <span>Voice Coach</span>
+            </Link>
+          </Button>
+          
           {/* Workout Plan */}
           <Button 
             variant="outline"
             className="flex items-center gap-2"
+            asChild
           >
-            <Dumbbell className="h-4 w-4" />
-            <span>Workouts</span>
+            <Link href="/">
+              <Dumbbell className="h-4 w-4" />
+              <span>Workouts</span>
+            </Link>
           </Button>
           
           {/* Nutrition Coach */}
           <Button 
             variant="outline"
             className="flex items-center gap-2"
+            asChild
           >
-            <Utensils className="h-4 w-4" />
-            <span>Nutrition</span>
+            <Link href="/">
+              <Utensils className="h-4 w-4" />
+              <span>Nutrition</span>
+            </Link>
           </Button>
           
           {/* Habit Builder */}
           <Button 
             variant="outline"
             className="flex items-center gap-2"
+            asChild
           >
-            <ListChecks className="h-4 w-4" />
-            <span>Habits</span>
+            <Link href="/">
+              <ListChecks className="h-4 w-4" />
+              <span>Habits</span>
+            </Link>
           </Button>
           
           {/* Sleep Optimizer */}
           <Button 
             variant="outline"
             className="flex items-center gap-2"
+            asChild
           >
-            <Bed className="h-4 w-4" />
-            <span>Sleep</span>
+            <Link href="/">
+              <Bed className="h-4 w-4" />
+              <span>Sleep</span>
+            </Link>
           </Button>
           
           {/* Progress Dashboard */}
           <Button 
             variant="outline"
             className="flex items-center gap-2"
+            asChild
           >
-            <BarChartBig className="h-4 w-4" />
-            <span>Progress</span>
+            <Link href="/">
+              <BarChartBig className="h-4 w-4" />
+              <span>Progress</span>
+            </Link>
           </Button>
           
-          {/* Health Stats */}
+          {/* Fitness Devices */}
           <Button 
             variant="outline"
-            className="flex items-center gap-2"
+            className={`flex items-center gap-2 ${location === '/fitness-trackers' ? 'bg-primary/10 text-primary' : ''}`}
+            asChild
           >
-            <Heart className="h-4 w-4" />
-            <span>Health</span>
+            <Link href="/fitness-trackers">
+              <Heart className="h-4 w-4" />
+              <span>Devices</span>
+            </Link>
           </Button>
         </div>
       </div>
