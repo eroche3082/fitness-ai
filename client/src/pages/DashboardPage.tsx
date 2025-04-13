@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'wouter';
 import Dashboard from '../components/Dashboard';
+import ChatbotDemo from '../components/ChatbotDemo';
 import userService from '../lib/userService';
 
 /**
@@ -88,7 +89,10 @@ const DashboardPage: React.FC = () => {
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
           </div>
         ) : (
-          <Dashboard userCode={userProfile.uniqueCode} />
+          <>
+            <Dashboard userCode={userProfile.uniqueCode} />
+            <ChatbotDemo />
+          </>
         )}
       </main>
       
