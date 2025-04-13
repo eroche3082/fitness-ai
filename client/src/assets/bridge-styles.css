@@ -1,0 +1,471 @@
+/* Bridge Fitness & Gym Theme Styles */
+
+:root {
+  /* Primary Colors */
+  --bridge-primary: #1d4ed8;    /* Blue 700 */
+  --bridge-secondary: #f97316;  /* Orange 500 */
+  --bridge-accent: #3b82f6;     /* Blue 500 */
+  
+  /* Text Colors */
+  --bridge-text-dark: #1f2937;  /* Gray 800 */
+  --bridge-text-medium: #6b7280; /* Gray 500 */
+  --bridge-text-light: #f9fafb; /* Gray 50 */
+  
+  /* Background Colors */
+  --bridge-bg-dark: #111827;    /* Gray 900 */
+  --bridge-bg-medium: #f3f4f6;  /* Gray 100 */
+  --bridge-bg-light: #ffffff;   /* White */
+  
+  /* Border Colors */
+  --bridge-border: #e5e7eb;    /* Gray 200 */
+}
+
+/* Typography */
+.bridge-heading {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 700;
+}
+
+.bridge-subheading {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.bridge-text {
+  font-family: 'Open Sans', sans-serif;
+  line-height: 1.7;
+}
+
+/* Buttons */
+.bridge-btn {
+  border-radius: 0.5rem;
+  font-weight: 600;
+  letter-spacing: 0.025em;
+  transition: all 0.3s ease;
+}
+
+.bridge-btn-primary {
+  background-color: var(--bridge-primary);
+  color: var(--bridge-text-light);
+}
+
+.bridge-btn-primary:hover {
+  background-color: var(--bridge-accent);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+}
+
+.bridge-btn-secondary {
+  background-color: transparent;
+  color: var(--bridge-text-light);
+  border: 2px solid var(--bridge-text-light);
+}
+
+.bridge-btn-secondary:hover {
+  background-color: var(--bridge-text-light);
+  color: var(--bridge-primary);
+  transform: translateY(-2px);
+}
+
+/* Cards */
+.bridge-card {
+  border-radius: 0.5rem;
+  overflow: hidden;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.bridge-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+/* Feature Cards */
+.bridge-feature {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 2rem;
+  transition: all 0.3s ease;
+}
+
+.bridge-feature:hover {
+  transform: translateY(-5px);
+}
+
+.bridge-feature-icon {
+  background-color: var(--bridge-primary);
+  color: var(--bridge-text-light);
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+}
+
+/* Program Cards */
+.bridge-program {
+  position: relative;
+  overflow: hidden;
+  border-radius: 0.5rem;
+  aspect-ratio: 1/1;
+}
+
+.bridge-program img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: all 0.5s ease;
+}
+
+.bridge-program:hover img {
+  transform: scale(1.1);
+}
+
+.bridge-program-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 1.5rem;
+  color: var(--bridge-text-light);
+}
+
+.bridge-program-title {
+  font-weight: 700;
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.bridge-program-info {
+  display: flex;
+  gap: 1rem;
+}
+
+.bridge-program-info span {
+  display: flex;
+  align-items: center;
+  font-size: 0.875rem;
+}
+
+.bridge-program-info svg {
+  margin-right: 0.375rem;
+}
+
+/* Testimonial Cards */
+.bridge-testimonial {
+  position: relative;
+  background-color: var(--bridge-bg-medium);
+  border-radius: 0.5rem;
+  padding: 2rem;
+  padding-top: 3rem;
+}
+
+.bridge-testimonial-avatar {
+  position: absolute;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  top: -32px;
+  left: 2rem;
+  overflow: hidden;
+  border: 4px solid var(--bridge-bg-light);
+}
+
+.bridge-testimonial-rating {
+  display: flex;
+  color: var(--bridge-secondary);
+  margin-bottom: 1rem;
+}
+
+/* Dividers */
+.bridge-divider {
+  width: 80px;
+  height: 4px;
+  background-color: var(--bridge-primary);
+  margin-bottom: 2rem;
+}
+
+.bridge-divider.center {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Animation utilities */
+.bridge-fade-in {
+  animation: fadeIn 1s ease forwards;
+}
+
+.bridge-fade-up {
+  animation: fadeUp 1s ease forwards;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Custom styles for the Bridge theme navbar */
+.bridge-navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background-color: var(--bridge-bg-dark);
+  z-index: 1000;
+  padding: 1rem 0;
+  transition: all 0.3s ease;
+}
+
+.bridge-navbar.scrolled {
+  padding: 0.5rem 0;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.bridge-navbar-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.bridge-navbar-logo {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--bridge-text-light);
+}
+
+.bridge-navbar-logo span {
+  color: var(--bridge-primary);
+}
+
+.bridge-navbar-menu {
+  display: flex;
+  gap: 2rem;
+}
+
+.bridge-navbar-link {
+  color: var(--bridge-text-light);
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.bridge-navbar-link:hover, 
+.bridge-navbar-link.active {
+  color: var(--bridge-primary);
+}
+
+/* Media Queries */
+@media (max-width: 768px) {
+  .bridge-navbar-menu {
+    display: none;
+  }
+  
+  .bridge-navbar-mobile-menu {
+    display: flex;
+  }
+}
+
+@media (min-width: 769px) {
+  .bridge-navbar-mobile-menu {
+    display: none;
+  }
+}
+
+/* Hero Section */
+.bridge-hero {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+}
+
+.bridge-hero-overlay {
+  position: absolute;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  z-index: 1;
+}
+
+.bridge-hero-content {
+  position: relative;
+  z-index: 2;
+  color: var(--bridge-text-light);
+  max-width: 800px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.bridge-hero-title {
+  font-size: 3.5rem;
+  font-weight: 800;
+  margin-bottom: 1.5rem;
+  line-height: 1.1;
+}
+
+.bridge-hero-subtitle {
+  font-size: 1.5rem;
+  margin-bottom: 2rem;
+  opacity: 0.9;
+}
+
+.bridge-hero-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+@media (max-width: 768px) {
+  .bridge-hero-title {
+    font-size: 2.5rem;
+  }
+  
+  .bridge-hero-subtitle {
+    font-size: 1.25rem;
+  }
+  
+  .bridge-hero-buttons {
+    flex-direction: column;
+    align-items: center;
+  }
+}
+
+/* Footer */
+.bridge-footer {
+  background-color: var(--bridge-bg-dark);
+  color: var(--bridge-text-light);
+  padding: 4rem 0 2rem;
+}
+
+.bridge-footer-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2rem;
+}
+
+.bridge-footer-heading {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+}
+
+.bridge-footer-logo {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.bridge-footer-logo span {
+  color: var(--bridge-primary);
+}
+
+.bridge-footer-links {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.bridge-footer-link {
+  margin-bottom: 0.75rem;
+}
+
+.bridge-footer-link a {
+  color: var(--bridge-text-medium);
+  transition: color 0.3s ease;
+}
+
+.bridge-footer-link a:hover {
+  color: var(--bridge-primary);
+}
+
+.bridge-footer-social {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.bridge-footer-social-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.bridge-footer-social-icon:hover {
+  background-color: var(--bridge-primary);
+  transform: translateY(-3px);
+}
+
+.bridge-footer-bottom {
+  margin-top: 3rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.bridge-footer-copyright {
+  color: var(--bridge-text-medium);
+  font-size: 0.875rem;
+}
+
+.bridge-footer-bottom-links {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.bridge-footer-bottom-link {
+  color: var(--bridge-text-medium);
+  font-size: 0.875rem;
+  transition: color 0.3s ease;
+}
+
+.bridge-footer-bottom-link:hover {
+  color: var(--bridge-primary);
+}
+
+@media (max-width: 768px) {
+  .bridge-footer-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .bridge-footer-bottom {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .bridge-footer-grid {
+    grid-template-columns: 1fr;
+  }
+}
