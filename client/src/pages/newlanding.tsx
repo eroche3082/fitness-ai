@@ -555,7 +555,13 @@ export default function LandingPage() {
       </section>
 
       {/* Pricing Plans */}
-      <section className="py-20 bg-gradient-bg">
+      <section className="py-20 bg-gradient-bg relative overflow-hidden">
+        {/* Abstract Background Elements */}
+        <div className="absolute inset-0 w-full h-full overflow-hidden z-0 pointer-events-none opacity-30">
+          <div className="absolute top-10 left-1/4 w-56 h-56 rounded-full bg-green-200"></div>
+          <div className="absolute bottom-20 right-1/4 w-72 h-72 rounded-full bg-green-300 opacity-30"></div>
+          <div className="absolute top-1/3 right-0 w-48 h-48 rounded-full bg-primary opacity-20"></div>
+        </div>
         <div className="container mx-auto px-4 md:px-6">
           <div className="text-center mb-16">
             <div className="inline-block px-4 py-1 rounded-full bg-green-100 text-primary text-sm font-medium mb-4">
@@ -708,7 +714,13 @@ export default function LandingPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 fitness-header">
+      <section className="py-20 fitness-header relative overflow-hidden">
+        {/* Abstract Background Elements */}
+        <div className="absolute inset-0 w-full h-full overflow-hidden z-0 pointer-events-none opacity-50">
+          <div className="absolute -bottom-20 -left-20 w-64 h-64 rounded-full bg-green-500 opacity-20"></div>
+          <div className="absolute top-10 right-10 w-32 h-32 rounded-full bg-green-300 opacity-30"></div>
+          <div className="absolute bottom-1/3 right-1/4 w-40 h-40 rounded-full bg-white opacity-10"></div>
+        </div>
         <div className="container mx-auto px-4 md:px-6">
           <div className="max-w-3xl mx-auto text-center">
             <h2 className="text-3xl md:text-4xl font-bold mb-6 text-white">Start Your Fitness Transformation Today</h2>
