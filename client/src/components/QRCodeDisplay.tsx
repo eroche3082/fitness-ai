@@ -3,118 +3,102 @@ import React, { useEffect, useRef } from 'react';
 interface QRCodeDisplayProps {
   code: string;
   size?: number;
-  backgroundColor?: string;
-  foregroundColor?: string;
-  logoUrl?: string;
+  foreground?: string;
+  background?: string;
 }
 
 const QRCodeDisplay: React.FC<QRCodeDisplayProps> = ({
   code,
   size = 200,
-  backgroundColor = '#FFFFFF',
-  foregroundColor = '#000000',
-  logoUrl
+  foreground = '#000000',
+  background = '#ffffff'
 }) => {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  
+  const qrContainerRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
-    if (!canvasRef.current) return;
-    
-    // Simple QR code rendering function
-    // In a production app, you'd use a library like qrcode.react
-    const renderQRCode = () => {
-      const canvas = canvasRef.current;
-      if (!canvas) return;
+    // Simple QR code rendering using SVG
+    // In a real app, you would use a dedicated QR code library
+    // This is a simplified fallback for demonstration purposes
+    if (qrContainerRef.current) {
+      // Create a simple QR code representation for demo
+      const svgSize = size;
+      const cellSize = svgSize / 10;
+
+      // Layout a simple pattern that looks like a QR code
+      // (This doesn't actually encode the data, it's just for visual representation)
+      let pathData = '';
       
-      const ctx = canvas.getContext('2d');
-      if (!ctx) return;
-      
-      // Clear canvas
-      ctx.fillStyle = backgroundColor;
-      ctx.fillRect(0, 0, size, size);
-      
-      // Create a pattern based on the code (simplified for demo)
-      const codeChars = code.replace(/-/g, '').split('');
-      const gridSize = Math.min(Math.ceil(Math.sqrt(codeChars.length * 3)), 25);
-      const cellSize = size / gridSize;
-      
-      // Draw the QR-like pattern
-      ctx.fillStyle = foregroundColor;
-      
-      // Always draw the three corner squares (simplified QR positioning markers)
-      // Top-left corner
-      ctx.fillRect(cellSize, cellSize, cellSize * 3, cellSize * 3);
-      ctx.fillStyle = backgroundColor;
-      ctx.fillRect(cellSize * 2, cellSize * 2, cellSize, cellSize);
-      ctx.fillStyle = foregroundColor;
-      
-      // Top-right corner
-      ctx.fillRect(size - cellSize * 4, cellSize, cellSize * 3, cellSize * 3);
-      ctx.fillStyle = backgroundColor;
-      ctx.fillRect(size - cellSize * 3, cellSize * 2, cellSize, cellSize);
-      ctx.fillStyle = foregroundColor;
-      
-      // Bottom-left corner
-      ctx.fillRect(cellSize, size - cellSize * 4, cellSize * 3, cellSize * 3);
-      ctx.fillStyle = backgroundColor;
-      ctx.fillRect(cellSize * 2, size - cellSize * 3, cellSize, cellSize);
-      ctx.fillStyle = foregroundColor;
-      
-      // Use the code to create a unique pattern
-      let charIndex = 0;
-      for (let y = 0; y < gridSize; y++) {
-        for (let x = 0; x < gridSize; x++) {
-          // Skip the corner markers
-          if ((x < 4 && y < 4) || (x > gridSize - 5 && y < 4) || (x < 4 && y > gridSize - 5)) {
-            continue;
-          }
-          
-          if (charIndex < codeChars.length) {
-            // Use character code to determine if a cell should be filled
-            const charCode = codeChars[charIndex].charCodeAt(0);
-            if (charCode % 2 === 0) {
-              ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
-            }
-            charIndex++;
-          }
+      // Create a simple QR-like pattern based on the code string
+      const codeChars = code.split('');
+      for (let i = 0; i < codeChars.length; i++) {
+        const charCode = codeChars[i].charCodeAt(0);
+        const row = Math.floor(i / 5) + 1;
+        const col = i % 5 + 1;
+        
+        // Only add squares for certain character codes to create a pattern
+        if (charCode % 2 === 0) {
+          pathData += `M${col * cellSize},${row * cellSize} h${cellSize} v${cellSize} h-${cellSize} Z `;
         }
       }
       
-      // Add the logo if provided
-      if (logoUrl) {
-        const logoSize = size * 0.2;
-        const logoX = (size - logoSize) / 2;
-        const logoY = (size - logoSize) / 2;
-        
-        const logo = new Image();
-        logo.onload = () => {
-          // Draw white background for logo
-          ctx.fillStyle = backgroundColor;
-          ctx.fillRect(logoX, logoY, logoSize, logoSize);
-          
-          // Draw the logo
-          ctx.drawImage(logo, logoX, logoY, logoSize, logoSize);
-        };
-        logo.src = logoUrl;
-      }
-    };
-    
-    renderQRCode();
-  }, [code, size, backgroundColor, foregroundColor, logoUrl]);
-  
+      // Add the fixed position markers (corners and alignment)
+      // Top-left position marker
+      pathData += `M${cellSize},${cellSize} h${cellSize * 3} v${cellSize * 3} h-${cellSize * 3} Z `;
+      pathData += `M${cellSize * 2},${cellSize * 2} h${cellSize} v${cellSize} h-${cellSize} Z `;
+      
+      // Top-right position marker
+      pathData += `M${cellSize * 6},${cellSize} h${cellSize * 3} v${cellSize * 3} h-${cellSize * 3} Z `;
+      pathData += `M${cellSize * 7},${cellSize * 2} h${cellSize} v${cellSize} h-${cellSize} Z `;
+      
+      // Bottom-left position marker
+      pathData += `M${cellSize},${cellSize * 6} h${cellSize * 3} v${cellSize * 3} h-${cellSize * 3} Z `;
+      pathData += `M${cellSize * 2},${cellSize * 7} h${cellSize} v${cellSize} h-${cellSize} Z `;
+      
+      // Alignment pattern
+      pathData += `M${cellSize * 5},${cellSize * 5} h${cellSize * 2} v${cellSize * 2} h-${cellSize * 2} Z `;
+      
+      // Create the SVG element
+      const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+      svg.setAttribute('width', String(svgSize));
+      svg.setAttribute('height', String(svgSize));
+      svg.setAttribute('viewBox', `0 0 ${svgSize} ${svgSize}`);
+      
+      // Create the path for the QR code
+      const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+      path.setAttribute('d', pathData);
+      path.setAttribute('fill', foreground);
+      
+      // Create the background
+      const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+      rect.setAttribute('width', String(svgSize));
+      rect.setAttribute('height', String(svgSize));
+      rect.setAttribute('fill', background);
+      
+      // Add the elements to the SVG
+      svg.appendChild(rect);
+      svg.appendChild(path);
+      
+      // Clear the container and add the SVG
+      qrContainerRef.current.innerHTML = '';
+      qrContainerRef.current.appendChild(svg);
+    }
+  }, [code, size, foreground, background]);
+
   return (
-    <div style={{ textAlign: 'center' }}>
-      <canvas 
-        ref={canvasRef} 
-        width={size} 
-        height={size} 
-        style={{ 
-          display: 'block', 
-          margin: '0 auto',
-          borderRadius: '8px'
-        }}
-      />
-    </div>
+    <div 
+      ref={qrContainerRef} 
+      className="qr-code-container"
+      style={{ 
+        width: size, 
+        height: size,
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        border: '1px solid #e2e8f0',
+        borderRadius: '8px',
+        overflow: 'hidden'
+      }}
+    />
   );
 };
 

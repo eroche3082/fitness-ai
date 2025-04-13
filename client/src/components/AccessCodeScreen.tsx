@@ -1,108 +1,147 @@
 import React, { useState } from 'react';
+import { useLocation } from 'wouter';
+import userService from '../lib/userService';
 import QRCodeDisplay from './QRCodeDisplay';
-import { UserCategory } from '../lib/userCodeGenerator';
 
-interface AccessCodeScreenProps {
-  code: string;
-  category: UserCategory;
-  userName: string;
-  onContinue: () => void;
-}
+const AccessCodeScreen: React.FC = () => {
+  const [code, setCode] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [, setLocation] = useLocation();
 
-const AccessCodeScreen: React.FC<AccessCodeScreenProps> = ({ 
-  code, 
-  category, 
-  userName,
-  onContinue
-}) => {
-  const [copied, setCopied] = useState(false);
-  
-  // Format category name for display
-  const getCategoryFullName = (cat: UserCategory): string => {
-    switch (cat) {
-      case 'BEG': return 'Beginner';
-      case 'INT': return 'Intermediate';
-      case 'ADV': return 'Advanced';
-      case 'PRO': return 'Professional';
-      case 'VIP': return 'VIP';
-      default: return 'Member';
+  // Handle code validation
+  const handleValidateCode = async () => {
+    // Check if code is provided
+    if (!code.trim()) {
+      setError('Please enter your access code');
+      return;
+    }
+    
+    // Reset states
+    setError(null);
+    setLoading(true);
+    
+    try {
+      // Validate code using userService
+      const result = await userService.validateCode(code.trim());
+      
+      if (result.valid) {
+        // Redirect to dashboard if valid
+        setLocation('/dashboard');
+      } else {
+        // Show error if invalid
+        setError('Invalid access code. Please check and try again.');
+      }
+    } catch (err) {
+      console.error('Error validating code:', err);
+      setError('An error occurred while validating your code. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
-  
-  // Copy code to clipboard
-  const copyCode = () => {
-    navigator.clipboard.writeText(code).then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    });
+
+  // Handle input change
+  const handleCodeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // Convert to uppercase for better readability
+    setCode(e.target.value.toUpperCase());
+    
+    // Clear error when typing
+    if (error) {
+      setError(null);
+    }
   };
 
-  // Generate dashboard URL
-  const getDashboardURL = () => {
-    return `${window.location.origin}/dashboard/${code}`;
+  // Handle form submission
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    handleValidateCode();
   };
-  
+
   return (
-    <div className="flex flex-col items-center justify-center p-4 h-full">
-      <div className="text-center mb-4">
-        <h3 className="text-lg font-bold text-white mb-1">
-          Welcome to Fitness AI, {userName}!
-        </h3>
-        <p className="text-sm text-gray-300">
-          Your {getCategoryFullName(category)} level dashboard is ready
-        </p>
-      </div>
-      
-      <div className="bg-white p-3 rounded-lg mb-4">
-        <QRCodeDisplay 
-          code={code} 
-          size={150}
-          backgroundColor="#FFFFFF"
-          foregroundColor="#000000"
-        />
-      </div>
-      
-      <div className="bg-gray-800 rounded-lg p-3 w-full text-center mb-4">
-        <div className="text-xs text-gray-400 mb-1">YOUR UNIQUE ACCESS CODE</div>
-        <div className="font-mono text-xl text-green-400 font-bold mb-2">{code}</div>
-        <div className="flex justify-center space-x-2">
-          <button 
-            onClick={copyCode}
-            className="bg-gray-700 hover:bg-gray-600 text-white text-sm px-3 py-1 rounded flex items-center"
+    <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-gray-50 dark:bg-gray-900">
+      <div className="w-full max-w-md p-6 bg-white dark:bg-gray-800 rounded-lg shadow-md">
+        <div className="text-center mb-6">
+          <h1 className="text-2xl font-bold mb-2">Enter Access Code</h1>
+          <p className="text-gray-600 dark:text-gray-400">
+            Enter your unique access code to continue to your personalized fitness program.
+          </p>
+        </div>
+        
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label htmlFor="access-code" className="block text-sm font-medium mb-1">
+              Access Code
+            </label>
+            <input
+              id="access-code"
+              type="text"
+              placeholder="e.g. FIT-BEG-1234"
+              value={code}
+              onChange={handleCodeChange}
+              className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-md font-mono bg-white dark:bg-gray-800"
+              disabled={loading}
+            />
+            {error && (
+              <p className="mt-1 text-sm text-red-600 dark:text-red-400">{error}</p>
+            )}
+          </div>
+          
+          <button
+            type="submit"
+            disabled={loading}
+            className={`w-full p-3 rounded-md bg-blue-600 text-white font-medium ${
+              loading ? 'opacity-70 cursor-not-allowed' : 'hover:bg-blue-700'
+            }`}
           >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
-              <path d="M8 2a1 1 0 000 2h2a1 1 0 100-2H8z" />
-              <path d="M3 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v6h-4.586l1.293-1.293a1 1 0 00-1.414-1.414l-3 3a1 1 0 000 1.414l3 3a1 1 0 001.414-1.414L10.414 13H15v3a2 2 0 01-2 2H5a2 2 0 01-2-2V5zM15 11h2a1 1 0 110 2h-2v-2z" />
-            </svg>
-            {copied ? 'Copied!' : 'Copy Code'}
+            {loading ? 'Validating...' : 'Continue'}
           </button>
-          <a 
-            href={getDashboardURL()}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="bg-gray-700 hover:bg-gray-600 text-white text-sm px-3 py-1 rounded flex items-center"
+        </form>
+        
+        <div className="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
+          <div className="text-center mb-4">
+            <h2 className="text-lg font-medium">Don't have a code?</h2>
+            <p className="text-sm text-gray-600 dark:text-gray-400">
+              Complete the fitness assessment to get your personalized access code.
+            </p>
+          </div>
+          
+          <button
+            onClick={() => setLocation('/')}
+            className="w-full p-3 border border-gray-300 dark:border-gray-600 rounded-md bg-gray-50 dark:bg-gray-700 text-gray-800 dark:text-gray-200 font-medium"
           >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
-              <path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z" />
-              <path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z" />
-            </svg>
-            Open in New Tab
-          </a>
+            Take Assessment
+          </button>
         </div>
       </div>
       
-      <div className="text-sm text-gray-300 text-center mb-4">
-        <p>Use this code to access your personalized fitness dashboard anytime.</p>
-        <p>You can share it with others to show your progress.</p>
-      </div>
-      
-      <div className="mt-2">
-        <button 
-          onClick={onContinue}
-          className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
-        >
-          Continue to Chat
-        </button>
+      {/* Example Codes for Demo */}
+      <div className="mt-8 p-4 bg-white dark:bg-gray-800 rounded-lg shadow-md max-w-md w-full">
+        <h2 className="text-lg font-medium mb-3">Sample Access Codes</h2>
+        <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+          For demonstration purposes only:
+        </p>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="p-3 border border-gray-200 dark:border-gray-700 rounded-md flex items-center">
+            <div className="w-16 h-16 mr-3">
+              <QRCodeDisplay code="FIT-BEG-1234" size={64} background="#f9fafb" />
+            </div>
+            <div>
+              <div className="font-mono font-medium">FIT-BEG-1234</div>
+              <div className="text-xs text-gray-500 dark:text-gray-400">Beginner</div>
+            </div>
+          </div>
+          
+          <div className="p-3 border border-gray-200 dark:border-gray-700 rounded-md flex items-center">
+            <div className="w-16 h-16 mr-3">
+              <QRCodeDisplay code="FIT-ADV-5678" size={64} background="#f9fafb" />
+            </div>
+            <div>
+              <div className="font-mono font-medium">FIT-ADV-5678</div>
+              <div className="text-xs text-gray-500 dark:text-gray-400">Advanced</div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -12,7 +12,9 @@ import ApiStatusPage from "@/pages/api-status";
 import SystemAuditPage from "@/pages/system-audit";
 import FitnessApiPage from "@/pages/fitness-api";
 import ChatPage from "@/pages/chat";
-import DashboardPage from "@/pages/DashboardPage";
+import DashboardPage from "./pages/DashboardPage";
+import AccessCodePage from "./pages/AccessCodePage";
+import AdminPanelPage from "./pages/AdminPanelPage";
 import { UserProvider } from "./contexts/UserContext";
 import { ChatProvider } from "./contexts/ChatContext";
 import FitnessSystemInitializer from "./components/FitnessSystemInitializer";
@@ -151,7 +153,8 @@ function Router() {
   // Check auth status and redirect if needed
   useEffect(() => {
     if (!isAuthenticated && location !== '/landing' && location !== '/bridge' && 
-        !location.startsWith('/status/')) {
+        !location.startsWith('/status/') && 
+        location !== '/access' && location !== '/dashboard' && !location.startsWith('/dashboard/')) {
       setLocation('/bridge');
     }
   }, [isAuthenticated, location, setLocation]);
@@ -161,9 +164,14 @@ function Router() {
       {/* Public routes */}
       <Route path="/landing" component={LandingPage} />
       <Route path="/bridge" component={BridgeLanding} />
-      {/* Dashboard route - publicly accessible with code */}
+      
+      {/* New Routes - User Journey */}
+      <Route path="/access" component={AccessCodePage} />
       <Route path="/dashboard/:code" component={DashboardPage} />
       <Route path="/dashboard" component={DashboardPage} />
+      <Route path="/admin" component={AdminPanelPage} />
+      
+      {/* Status routes */}
       <Route path="/status/landing">
         {() => <StatusRoute path="landing" statusInfo="Landing page is fully operational" />}
       </Route>
