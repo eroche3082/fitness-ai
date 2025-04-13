@@ -1,0 +1,55 @@
+<svg width="1600" height="900" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#191919;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#000000;stop-opacity:1" />
+    </linearGradient>
+    
+    <linearGradient id="overlayGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#e63946;stop-opacity:0.1" />
+      <stop offset="100%" style="stop-color:#1d3557;stop-opacity:0.3" />
+    </linearGradient>
+    
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <rect width="40" height="40" fill="none"/>
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#333" stroke-width="1"/>
+    </pattern>
+    
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="10" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="100%" height="100%" fill="url(#bgGradient)" />
+  <rect width="100%" height="100%" fill="url(#grid)" opacity="0.3" />
+  <rect width="100%" height="100%" fill="url(#overlayGradient)" />
+  
+  <!-- Diagonal lines for dynamism -->
+  <line x1="0" y1="0" x2="1600" y2="900" stroke="#333" stroke-width="2" />
+  <line x1="1600" y1="0" x2="0" y2="900" stroke="#333" stroke-width="2" />
+  
+  <!-- Abstract fitness elements -->
+  <g opacity="0.7" transform="translate(1200, 500)">
+    <!-- Stylized barbells/weights -->
+    <circle cx="0" cy="0" r="80" fill="none" stroke="#fff" stroke-width="2" />
+    <circle cx="0" cy="0" r="60" fill="none" stroke="#fff" stroke-width="2" />
+    <line x1="-120" y1="0" x2="120" y2="0" stroke="#fff" stroke-width="8" />
+    <circle cx="-150" cy="0" r="40" fill="none" stroke="#fff" stroke-width="4" />
+    <circle cx="150" cy="0" r="40" fill="none" stroke="#fff" stroke-width="4" />
+  </g>
+  
+  <!-- Branding area in bottom right -->
+  <g transform="translate(1400, 800)">
+    <text x="0" y="0" font-family="Arial" font-size="16" fill="#fff" text-anchor="end">FITNESS AI</text>
+    <text x="0" y="25" font-family="Arial" font-size="14" fill="#aaa" text-anchor="end">POWERED BY BRIDGE</text>
+  </g>
+  
+  <!-- Main hero text: NOT YOUR TYPICAL FITNESS -->
+  <g transform="translate(800, 450)" filter="url(#glow)">
+    <text x="0" y="-90" font-family="Arial" font-size="80" fill="#fff" text-anchor="middle" font-weight="bold">NOT YOUR</text>
+    <text x="0" y="0" font-family="Arial" font-size="80" fill="#fff" text-anchor="middle" font-weight="bold">TYPICAL</text>
+    <text x="0" y="90" font-family="Arial" font-size="80" fill="#fff" text-anchor="middle" font-weight="bold">FITNESS</text>
+  </g>
+</svg>

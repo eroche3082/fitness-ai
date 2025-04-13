@@ -3,6 +3,7 @@
 
 // Hero section background
 export const heroBackground = '/src/assets/bridge-images/hero-bg.svg';
+export const hero = '/src/assets/bridge-images/hero.svg'; 
 export const logoWhite = '/src/assets/bridge-images/logo-white.svg';
 
 // Trainer images

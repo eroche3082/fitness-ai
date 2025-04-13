@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import {
   heroBackground,
+  hero,
   logoWhite,
   trainer1,
   trainer2,
@@ -62,9 +63,9 @@ export default function BridgeLanding() {
       <section className="bridge-hero min-h-screen flex items-center pt-20 relative bg-black">
         <div className="absolute inset-0 z-0 bg-black opacity-70"></div>
         <div className="absolute inset-0 z-[-1] bg-black">
-          {/* Background image using SVG gradient */}
+          {/* Background image using enhanced SVG with visual elements */}
           <div className="w-full h-full" style={{ 
-            backgroundImage: `url(${heroBackground})`, 
+            backgroundImage: `url(${hero})`, 
             backgroundSize: 'cover',
             backgroundPosition: 'center'
           }}></div>
