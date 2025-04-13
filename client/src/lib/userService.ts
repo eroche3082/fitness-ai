@@ -37,6 +37,33 @@ const STORAGE_KEYS = {
 
 // In-memory user service with localStorage persistence
 const userService = {
+  // Create a new lead object
+  createLead: (userInfo: {
+    name: string;
+    email: string;
+    category: UserCategory;
+    uniqueCode: string;
+    phone?: string;
+    source?: string;
+  }): LeadInfo => {
+    // Generate a unique ID
+    const id = Math.random().toString(36).substring(2, 11);
+    
+    // Create lead object
+    const lead: LeadInfo = {
+      id,
+      name: userInfo.name,
+      email: userInfo.email,
+      phone: userInfo.phone,
+      uniqueCode: userInfo.uniqueCode,
+      category: userInfo.category,
+      date: new Date().toISOString(),
+      source: userInfo.source || 'Chatbot',
+    };
+    
+    return lead;
+  },
+  
   // Save a new lead to the system
   saveLead: (leadInfo: LeadInfo): void => {
     // Get existing leads
