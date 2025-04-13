@@ -516,6 +516,109 @@ export default function VoiceCoaching() {
               <p className="text-sm text-muted-foreground mb-2">
                 {exerciseTypes.find(ex => ex.id === selectedExercise)?.description}
               </p>
+              
+              {/* Form Visualization - Animated SVG guidance */}
+              <div className="bg-muted/30 rounded-md p-2 mb-2 border border-muted">
+                <h5 className="text-xs font-medium mb-1 flex items-center gap-1">
+                  <CheckCircle className="h-3 w-3 text-green-500" />
+                  Proper Form Guide
+                </h5>
+                <div className="relative h-20 overflow-hidden rounded">
+                  {selectedExercise === 'pushup' && (
+                    <div className="flex justify-center h-full items-center">
+                      <div className="relative w-16 h-6 bg-primary/10 rounded">
+                        <div className="absolute left-0 w-3 h-4 bg-primary/20 rounded-sm animate-[bounce_2s_ease-in-out_infinite]" 
+                             style={{transformOrigin: 'bottom left'}} />
+                        <div className="absolute right-0 w-3 h-4 bg-primary/20 rounded-sm animate-[bounce_2s_ease-in-out_infinite]"
+                             style={{transformOrigin: 'bottom right'}} />
+                        <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-14 h-1 bg-primary/50 rounded-full" />
+                      </div>
+                    </div>
+                  )}
+                  {selectedExercise === 'squat' && (
+                    <div className="flex justify-center h-full items-center">
+                      <div className="relative w-6 h-14">
+                        <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-4 h-4 bg-primary/30 rounded-full" />
+                        <div className="absolute top-4 left-1/2 transform -translate-x-1/2 w-1 h-6 bg-primary/20"
+                             style={{animation: 'squatMove 2s ease-in-out infinite'}} />
+                        <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-6 h-2 bg-primary/20 rounded-sm animate-[squatLeg_2s_ease-in-out_infinite]" />
+                        <style jsx>{`
+                          @keyframes squatMove {
+                            0%, 100% { transform: translateY(0) translateX(-50%); }
+                            50% { transform: translateY(3px) translateX(-50%); }
+                          }
+                          @keyframes squatLeg {
+                            0%, 100% { transform: translateX(-50%) scaleY(1); }
+                            50% { transform: translateX(-50%) scaleY(0.6); }
+                          }
+                        `}</style>
+                      </div>
+                    </div>
+                  )}
+                  {selectedExercise === 'jumping_jack' && (
+                    <div className="flex justify-center h-full items-center">
+                      <div className="relative h-16 w-10">
+                        <div className="absolute top-0 left-1/2 transform -translate-x-1/2 w-3 h-3 bg-primary/30 rounded-full" />
+                        <div className="absolute top-3 left-1/2 transform -translate-x-1/2 w-1 h-5 bg-primary/20" />
+                        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 rotate-45 w-1 h-6 bg-primary/20 animate-[jumpingJackLeg1_1s_ease-in-out_infinite]" 
+                             style={{transformOrigin: 'top center'}} />
+                        <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 -rotate-45 w-1 h-6 bg-primary/20 animate-[jumpingJackLeg2_1s_ease-in-out_infinite]"
+                             style={{transformOrigin: 'top center'}} />
+                        <div className="absolute top-3 left-1/2 transform -translate-x-1/2 rotate-45 w-1 h-5 bg-primary/20 animate-[jumpingJackArm1_1s_ease-in-out_infinite]"
+                             style={{transformOrigin: 'top center'}} />
+                        <div className="absolute top-3 left-1/2 transform -translate-x-1/2 -rotate-45 w-1 h-5 bg-primary/20 animate-[jumpingJackArm2_1s_ease-in-out_infinite]"
+                             style={{transformOrigin: 'top center'}} />
+                        <style jsx>{`
+                          @keyframes jumpingJackLeg1 {
+                            0%, 100% { transform: translateX(-50%) rotate(20deg); }
+                            50% { transform: translateX(-50%) rotate(45deg); }
+                          }
+                          @keyframes jumpingJackLeg2 {
+                            0%, 100% { transform: translateX(-50%) rotate(-20deg); }
+                            50% { transform: translateX(-50%) rotate(-45deg); }
+                          }
+                          @keyframes jumpingJackArm1 {
+                            0%, 100% { transform: translateX(-50%) rotate(20deg); }
+                            50% { transform: translateX(-50%) rotate(80deg); }
+                          }
+                          @keyframes jumpingJackArm2 {
+                            0%, 100% { transform: translateX(-50%) rotate(-20deg); }
+                            50% { transform: translateX(-50%) rotate(-80deg); }
+                          }
+                        `}</style>
+                      </div>
+                    </div>
+                  )}
+                  {selectedExercise === 'crunch' && (
+                    <div className="flex justify-center h-full items-center">
+                      <div className="relative w-14 h-5 bg-primary/10 rounded">
+                        <div className="absolute left-1/2 top-0 transform -translate-x-1/2 -translate-y-1/2 w-4 h-4 bg-primary/20 rounded-full animate-[crunchMove_2s_ease-in-out_infinite]" />
+                        <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-10 h-1 bg-primary/50 rounded-full" />
+                        <style jsx>{`
+                          @keyframes crunchMove {
+                            0%, 100% { transform: translate(-50%, -50%); }
+                            50% { transform: translate(-50%, 30%); }
+                          }
+                        `}</style>
+                      </div>
+                    </div>
+                  )}
+                  {selectedExercise === 'generic' && (
+                    <div className="flex justify-center h-full items-center">
+                      <p className="text-xs text-muted-foreground italic">Select a specific exercise to see form guidance</p>
+                    </div>
+                  )}
+                </div>
+                <div className="mt-1">
+                  <h6 className="text-xs font-medium">Form Tips:</h6>
+                  <ul className="list-disc text-xs pl-4 text-muted-foreground pt-1 space-y-0.5">
+                    {exerciseTypes.find(ex => ex.id === selectedExercise)?.formTips.map((tip, index) => (
+                      <li key={index}>{tip}</li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+              
               <div className="text-xs space-y-1">
                 <div className="flex items-center gap-1">
                   <Timer className="h-3 w-3" />
