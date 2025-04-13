@@ -104,9 +104,7 @@ const AccessCodeScreen: React.FC<AccessCodeScreenProps> = ({ onSuccess, onRegist
       // Call the onSuccess callback with the validated code
       // This will happen after showing the success animation
       setTimeout(() => {
-        if (typeof onSuccess === 'function') {
-          onSuccess(code);
-        }
+        onSuccess(code);
       }, 2000);
     } catch (err) {
       setError('Error validating code. Please try again.');
@@ -144,68 +142,38 @@ const AccessCodeScreen: React.FC<AccessCodeScreenProps> = ({ onSuccess, onRegist
     }
   };
   
-  // If showing success screen - Styled to match screenshot
+  // If showing success screen
   if (showSuccess) {
     return (
-      <div className="w-full max-w-md mx-auto rounded-xl shadow-lg overflow-hidden">
-        {/* Header */}
-        <div className="flex items-center justify-between bg-green-500 p-4 text-white">
-          <div className="flex items-center">
-            <div className="text-white mr-2">
-              <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+      <div className="w-full max-w-md mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+        <div className="p-8 text-center">
+          <div className="flex justify-center mb-6 animate-bounce">
+            <div className="bg-green-100 dark:bg-green-900 rounded-full p-2">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-green-600 dark:text-green-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
             </div>
-            <h1 className="text-xl font-semibold">Fitness AI Assistant</h1>
           </div>
-          <button className="text-white hover:text-gray-200">
-            <svg viewBox="0 0 24 24" width="24" height="24" stroke="currentColor" strokeWidth="2" fill="none" strokeLinecap="round" strokeLinejoin="round">
-              <line x1="18" y1="6" x2="6" y2="18"></line>
-              <line x1="6" y1="6" x2="18" y2="18"></line>
-            </svg>
-          </button>
-        </div>
-        
-        {/* Tabs navigation */}
-        <div className="flex border-b border-gray-200">
-          <button className="flex-1 py-4 px-6 bg-white text-green-600 font-medium border-b-2 border-green-500">
-            Chat
-          </button>
-          <button className="flex-1 py-4 px-6 bg-gray-900 text-gray-300 font-medium">
-            Workout
-          </button>
-          <button className="flex-1 py-4 px-6 bg-gray-900 text-gray-300 font-medium">
-            QR Code
-          </button>
-          <button className="flex-1 py-4 px-6 bg-gray-900 text-gray-300 font-medium">
-            AR/VR
-          </button>
-        </div>
-        
-        {/* Success content area - White background */}
-        <div className="bg-white py-10 px-6 text-center">
-          <h2 className="text-2xl font-bold mb-3 text-gray-800">Access Code Verified!</h2>
-          <p className="text-gray-600 mb-6">
+          
+          <h2 className="text-2xl font-bold mb-2 text-gray-900 dark:text-white">
+            Access Code Verified!
+          </h2>
+          
+          <p className="text-gray-600 dark:text-gray-400 mb-6">
             You're being redirected to your personalized dashboard...
           </p>
           
           <div className="flex justify-center mb-6">
-            <div className="bg-gray-100 rounded-lg p-4">
+            <div className="bg-gray-100 dark:bg-gray-700 rounded-lg p-4">
               <QRCodeDisplay code={validatedCode} size={180} />
             </div>
           </div>
           
-          <div className="text-gray-800">
+          <div className="text-gray-600 dark:text-gray-400">
             <div className="font-medium text-xl mb-1">{validatedCode}</div>
-            <div className="text-sm text-gray-500">
+            <div className="text-sm opacity-75">
               Category: {getCategoryFromCode(validatedCode)}
             </div>
-          </div>
-          
-          <div className="mt-8">
-            <svg className="mx-auto h-8 w-8 text-green-500" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <polyline points="20 6 9 17 4 12"></polyline>
-            </svg>
           </div>
         </div>
       </div>

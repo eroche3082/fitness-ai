@@ -1,9 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { UserProfile, UserCategory } from '../shared/types';
+import { UserProfile, UserCategory, generateUserCode, determineUserCategory } from '../lib/userCodeGenerator';
 import userService from '../lib/userService';
+import { analyzeUserWithAI } from '../lib/vertexAIService';
 import { onboardingQuestions, processOnboardingAnswers } from '../lib/onboardingFlow';
 import AccessCodeScreen from './AccessCodeScreen';
-import EnlargedChatbot from './EnlargedChatbot';
 
 interface Question {
   id: number;
@@ -252,24 +252,9 @@ export default function MiniChatbot() {
   const inputRef = useRef<HTMLInputElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // State for enlarged chatbot
-  const [showEnlarged, setShowEnlarged] = useState(false);
-
-  // Toggle basic chat open/close
+  // Toggle chat open/close
   const toggleChat = () => {
-    if (!showEnlarged) {
-      // Open regular chat
-      setIsOpen(!isOpen);
-    } else {
-      // Close enlarged chat
-      setShowEnlarged(false);
-    }
-  };
-  
-  // Open the enlarged chatbot
-  const openEnlargedChat = () => {
-    setIsOpen(false);
-    setShowEnlarged(true);
+    setIsOpen(!isOpen);
   };
 
   // Handle input changes
@@ -349,18 +334,17 @@ export default function MiniChatbot() {
     };
     
     try {
-      // Simulate Vertex AI service response - in a real app this would call the AI API
-      // Get the category based on fitness level
-      let category: UserCategory = 'BEG';
+      // Use VertexAI service to analyze the user data
+      const analysis = await vertexAIService.analyzeWithVertexAI({
+        type: 'user_categorization',
+        userData: userProfile
+      });
       
-      if (userProfile.fitnessLevel === 'advanced') {
-        category = 'ADV';
-      } else if (userProfile.fitnessLevel === 'intermediate') {
-        category = 'INT';
-      }
+      // Get the category from the analysis
+      const category = (analysis.result?.category || 'BEG') as UserCategory;
       
       // Generate code
-      const code = `FIT-${category}-${Math.floor(1000 + Math.random() * 9000)}`;
+      const code = createUserProfile(userProfile).uniqueCode || '';
       
       return {
         category,
@@ -605,38 +589,17 @@ export default function MiniChatbot() {
 
   return (
     <div className="fixed bottom-4 right-4 z-50">
-      {/* Enlarged chatbot when active */}
-      {showEnlarged && (
-        <EnlargedChatbot 
-          onClose={() => setShowEnlarged(false)}
-          initialUserProfile={userService.getUserProfile()}
-        />
-      )}
-      
       {/* Chat icon button when closed */}
-      {!isOpen && !showEnlarged ? (
-        <div className="flex flex-col gap-2 items-end">
-          <button 
-            onClick={openEnlargedChat}
-            className="flex items-center justify-center w-auto h-10 px-3 rounded-full bg-green-600 shadow-lg hover:bg-green-700 transition-colors text-white"
-            title="Open full-screen chat"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2">
-              <path d="M15 3h6v6M14 10l6.1-6.1M9 21H3v-6M10 14l-6.1 6.1"/>
-            </svg>
-            <span>Enlarged Chat</span>
-          </button>
-          
-          <button 
-            onClick={toggleChat}
-            className="flex items-center justify-center w-14 h-14 rounded-full bg-green-600 shadow-lg hover:bg-green-700 transition-colors"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-            </svg>
-          </button>
-        </div>
-      ) : !showEnlarged ? (
+      {!isOpen ? (
+        <button 
+          onClick={toggleChat}
+          className="flex items-center justify-center w-14 h-14 rounded-full bg-green-600 shadow-lg hover:bg-green-700 transition-colors"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+          </svg>
+        </button>
+      ) : (
         /* Chat window when open */
         <div className="w-[350px] h-[500px] bg-black rounded-lg shadow-xl flex flex-col border border-green-600">
           {/* Chat header */}
@@ -647,23 +610,12 @@ export default function MiniChatbot() {
               </svg>
               <span className="font-bold">Fitness AI Assistant</span>
             </div>
-            <div className="flex items-center gap-2">
-              <button 
-                onClick={openEnlargedChat}
-                className="text-white hover:text-gray-200 p-1"
-                title="Open enlarged chatbot"
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M15 3h6v6M14 10l6.1-6.1M9 21H3v-6M10 14l-6.1 6.1"/>
-                </svg>
-              </button>
-              <button onClick={toggleChat} className="text-white hover:text-gray-200">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <line x1="18" y1="6" x2="6" y2="18"></line>
-                  <line x1="6" y1="6" x2="18" y2="18"></line>
-                </svg>
-              </button>
-            </div>
+            <button onClick={toggleChat} className="text-white hover:text-gray-200">
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="18" y1="6" x2="6" y2="18"></line>
+                <line x1="6" y1="6" x2="18" y2="18"></line>
+              </svg>
+            </button>
           </div>
           
           {/* Tab navigation */}
@@ -729,13 +681,17 @@ export default function MiniChatbot() {
             showAccessScreen && userAnalysis ? (
               <div className="flex-1 overflow-y-auto bg-black">
                 <AccessCodeScreen 
-                  onSuccess={(code) => {
-                    // Success function when code is used
-                    console.log("Code used successfully:", code);
-                  }}
-                  onRegister={() => {
-                    // Handle registration
-                    console.log("User wants to register");
+                  code={userAnalysis.code}
+                  category={userAnalysis.category}
+                  userName={answers[1] || 'User'}
+                  onContinue={() => {
+                    // Reset the chatbot for future interactions
+                    setShowAccessScreen(false);
+                    setActiveTab('chat');
+                    setMessages([
+                      { text: `Welcome back, ${answers[1] || 'User'}! Your personalized fitness dashboard is ready.`, sender: 'bot' },
+                      { text: 'Feel free to ask me any fitness-related questions or explore the other tabs.', sender: 'bot' }
+                    ]);
                   }}
                 />
               </div>
@@ -834,7 +790,7 @@ export default function MiniChatbot() {
                   <div className="mb-4 text-white text-center">
                     <h3 className="text-xl font-bold mb-2">Rest Time</h3>
                     <p className="text-5xl font-bold">{restTimeLeft}s</p>
-                    <p className="mt-2 text-gray-300">Next: Set {currentSet + 1} of {currentExercise?.sets}</p>
+                    <p className="mt-2 text-gray-300">Next: Set {currentSet + 1} of {currentExercise.sets}</p>
                   </div>
                   <button 
                     onClick={() => {
@@ -851,15 +807,15 @@ export default function MiniChatbot() {
                 // Active exercise screen
                 <div className="flex-1 flex flex-col">
                   <div className="mb-4">
-                    <h3 className="text-xl text-white font-bold">{currentExercise?.name}</h3>
-                    <p className="text-sm text-gray-300">{currentExercise?.instructions}</p>
+                    <h3 className="text-xl text-white font-bold">{currentExercise.name}</h3>
+                    <p className="text-sm text-gray-300">{currentExercise.instructions}</p>
                   </div>
                   
                   <div className="flex-1 flex flex-col items-center justify-center">
                     <div className="relative mb-8">
                       <div className="text-7xl font-bold text-white mb-2 text-center">{repCount}</div>
-                      <div className="text-gray-400 text-center">of {currentExercise?.reps} reps</div>
-                      <div className="text-sm text-green-500 mt-2 text-center">Set {currentSet} of {currentExercise?.sets}</div>
+                      <div className="text-gray-400 text-center">of {currentExercise.reps} reps</div>
+                      <div className="text-sm text-green-500 mt-2 text-center">Set {currentSet} of {currentExercise.sets}</div>
                     </div>
                     
                     <div className="space-y-3 w-full">
@@ -877,10 +833,10 @@ export default function MiniChatbot() {
                             speak("Workout stopped.");
                             
                             // Simulate completing the set
-                            if (currentExercise && currentSet < currentExercise.sets) {
+                            if (currentSet < currentExercise.sets) {
                               setIsResting(true);
                               setRestTimeLeft(currentExercise.restTime);
-                              // Simulate rest timer
+                              // Simulate rest timer (in a real app, this would be a proper interval)
                               const timer = setInterval(() => {
                                 setRestTimeLeft(prev => {
                                   if (prev <= 1) {
@@ -888,99 +844,130 @@ export default function MiniChatbot() {
                                     setIsResting(false);
                                     setCurrentSet(currentSet + 1);
                                     setRepCount(0);
-                                    speak(`Let's begin set ${currentSet + 1} of ${currentExercise.name}`);
                                     return 0;
-                                  }
-                                  // Say some countdown prompts
-                                  if (prev === 30 || prev === 20 || prev === 10 || prev === 5) {
-                                    speak(`${prev} seconds remaining.`);
-                                  } else if (prev === 3) {
-                                    speak("Get ready. 3 seconds left.");
                                   }
                                   return prev - 1;
                                 });
                               }, 1000);
                             } else {
                               // Workout complete
-                              speak("Congratulations! You've completed all sets of this exercise!");
                               setWorkoutComplete(true);
+                              setCurrentExercise(null);
                             }
                           }}
                           className="w-full p-3 bg-red-600 hover:bg-red-700 text-white rounded flex items-center justify-center gap-2"
                         >
+                          <span>Stop Listening</span>
                           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <circle cx="12" cy="12" r="10"></circle>
-                            <rect x="9" y="9" width="6" height="6"></rect>
+                            <rect x="6" y="4" width="4" height="16"/>
+                            <rect x="14" y="4" width="4" height="16"/>
                           </svg>
-                          Stop Exercise
                         </button>
                       ) : (
                         <button 
                           onClick={() => {
                             setIsListening(true);
-                            speak(`Starting ${currentExercise?.name}, set ${currentSet} of ${currentExercise?.sets}. I'll count your reps.`);
                             
-                            // Simulate rep counting
-                            let count = 0;
+                            // Speak initial instructions
+                            if (currentExercise) {
+                              speak(`Let's start with ${currentExercise.name}. Set ${currentSet} of ${currentExercise.sets}. ${currentExercise.instructions}`);
+                            }
+                            
+                            // Simulate rep counting (in a real app, this would use voice recognition)
                             const repInterval = setInterval(() => {
-                              count++;
-                              setRepCount(count);
-                              speak(count.toString());
-                              
-                              if (currentExercise && count >= currentExercise.reps) {
-                                clearInterval(repInterval);
-                                setIsListening(false);
+                              setRepCount(prev => {
+                                const newRepCount = prev + 1;
                                 
-                                // Check if more sets left
-                                if (currentExercise && currentSet < currentExercise.sets) {
-                                  speak("Good job! Take a rest now.");
-                                  setIsResting(true);
-                                  setRestTimeLeft(currentExercise.restTime);
+                                // Speak the rep count
+                                if (currentExercise) {
+                                  speak(`${newRepCount}`);
                                   
-                                  // Rest timer
-                                  const timer = setInterval(() => {
-                                    setRestTimeLeft(prev => {
-                                      if (prev <= 1) {
-                                        clearInterval(timer);
-                                        setIsResting(false);
-                                        setCurrentSet(currentSet + 1);
-                                        setRepCount(0);
-                                        speak(`Let's begin set ${currentSet + 1} of ${currentExercise.name}`);
-                                        return 0;
+                                  // For the last few reps, add encouragement
+                                  if (newRepCount >= currentExercise.reps - 2 && newRepCount < currentExercise.reps) {
+                                    setTimeout(() => speak("Almost there! Keep pushing!"), 800);
+                                  }
+                                
+                                  // When all reps are completed
+                                  if (newRepCount >= currentExercise.reps) {
+                                    clearInterval(repInterval);
+                                    setIsListening(false);
+                                    
+                                    // Speak completion message
+                                    setTimeout(() => {
+                                      speak("Great job! Set completed.");
+                                      
+                                      if (currentSet < currentExercise.sets) {
+                                        setIsResting(true);
+                                        setRestTimeLeft(currentExercise.restTime);
+                                        speak(`Take a ${currentExercise.restTime} second rest.`);
+                                        
+                                        // Simulate rest timer
+                                        const timer = setInterval(() => {
+                                          setRestTimeLeft(prev => {
+                                            // Speak countdown at specific intervals
+                                            if (prev === 30 || prev === 20 || prev === 10 || prev === 5) {
+                                              speak(`${prev} seconds remaining.`);
+                                            } else if (prev === 3) {
+                                              speak("Get ready. 3 seconds left.");
+                                            }
+                                            
+                                            if (prev <= 1) {
+                                              clearInterval(timer);
+                                              setIsResting(false);
+                                              setCurrentSet(currentSet + 1);
+                                              setRepCount(0);
+                                              // Announce next set
+                                              setTimeout(() => {
+                                                speak(`Starting set ${currentSet + 1}. Get ready!`);
+                                              }, 500);
+                                              return 0;
+                                            }
+                                            return prev - 1;
+                                          });
+                                        }, 1000);
+                                      } else {
+                                        // Workout complete
+                                        speak("Congratulations! You've completed all sets of this exercise!");
+                                        setWorkoutComplete(true);
+                                        setCurrentExercise(null);
                                       }
-                                      return prev - 1;
-                                    });
-                                  }, 1000);
-                                } else {
-                                  // Workout complete
-                                  speak("Congratulations! You've completed all sets of this exercise!");
-                                  setTimeout(() => {
-                                    setWorkoutComplete(true);
-                                  }, 2000);
+                                    }, 500);
+                                    
+                                    return currentExercise.reps;
+                                  }
                                 }
-                              }
-                            }, 2000); // Simulate 2 seconds per rep
+                                return newRepCount;
+                              });
+                            }, 1500); // Count a rep every 1.5 seconds for demo purposes
                           }}
                           className="w-full p-3 bg-green-600 hover:bg-green-700 text-white rounded flex items-center justify-center gap-2"
                         >
+                          <span>Start Voice Counting</span>
                           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                            <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                            <line x1="12" y1="19" x2="12" y2="23"/>
+                            <line x1="8" y1="23" x2="16" y2="23"/>
                           </svg>
-                          Start Exercise
                         </button>
                       )}
                       
                       <button 
                         onClick={() => {
-                          setCurrentExercise(null);
-                          setIsListening(false);
+                          // Cancel any ongoing speech
                           if ('speechSynthesis' in window) {
                             window.speechSynthesis.cancel();
                           }
+                          
+                          // Announce exit
+                          speak("Exiting workout mode.");
+                          
+                          setCurrentExercise(null);
+                          setWorkoutComplete(false);
                         }}
-                        className="w-full p-2 bg-gray-700 hover:bg-gray-600 text-white rounded"
+                        className="w-full p-3 bg-gray-700 hover:bg-gray-600 text-white rounded"
                       >
-                        Change Exercise
+                        Exit Workout
                       </button>
                     </div>
                   </div>
@@ -990,84 +977,150 @@ export default function MiniChatbot() {
           )}
           
           {activeTab === 'ar' && (
-            // AR/VR View
+            // AR/VR content
             <div className="flex-1 overflow-y-auto p-3 bg-black flex flex-col items-center justify-center">
-              <svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className="text-green-500 mx-auto">
-                <path d="M21 6H3a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h18a1 1 0 0 0 1-1V7a1 1 0 0 0-1-1"></path>
-                <path d="M12 8v8"></path>
-                <path d="M10 8V4a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v4"></path>
-              </svg>
-              <div className="text-center text-white mt-4">
-                <h3 className="text-xl font-bold mb-4">AR/VR Mode Coming Soon</h3>
-                <p className="text-gray-300 mb-4">Experience 3D guided workouts with our upcoming AR/VR features</p>
+              <div className="mb-4 bg-gray-800 p-2 rounded-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className="text-green-500 mx-auto">
+                  <path d="M3 12a9 9 0 1 0 18 0 9 9 0 0 0-18 0M4 12a8 8 0 1 1 16 0M12 2v2M12 20v2M2 12h2M20 12h2"/>
+                  <path d="M8 12a4 4 0 1 0 8 0 4 4 0 0 0-8 0M9.5 9.5l5 5M9.5 14.5l5-5"/>
+                </svg>
+              </div>
+              <div className="text-center text-white">
+                <h4 className="text-lg font-bold mb-2">AR Workout Experience</h4>
+                <p className="text-sm text-gray-300 mb-4">Experience personalized workouts in augmented reality with a virtual trainer</p>
                 <button className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded mb-2 w-full">
-                  Join Waitlist
+                  Launch AR Workout
                 </button>
                 <button className="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded w-full">
-                  Learn More
+                  View VR Gym Tour
                 </button>
               </div>
             </div>
           )}
           
-          {/* Footer Input - only shown for chat tab when not showing access code */}
-          {activeTab === 'chat' && !showAccessScreen && !onboardingComplete && (
+          {/* Onboarding input box - only show for chat tab */}
+          {activeTab === 'chat' && !showAccessScreen && (
             <div className="p-3 border-t border-gray-800 bg-gray-900">
-              {currentStep > 1 && (
-                <button 
-                  onClick={goToPreviousStep}
-                  className="w-full p-2 bg-gray-700 hover:bg-gray-600 text-white rounded mb-2"
-                >
-                  Back to Previous Question
-                </button>
-              )}
-              <div className="mb-2">
-                <div className="text-white mb-2">
-                  Step {currentStep} of 10: {getCurrentQuestion().text}
+              {onboardingComplete ? (
+                // Post-onboarding dashboard access
+                <div className="bg-[#131313] rounded-lg p-3">
+                  {userAnalysis ? (
+                    // User has completed analysis - show access button
+                    <div className="space-y-3">
+                      <p className="text-sm text-gray-300">
+                        Your personalized fitness dashboard is ready.
+                      </p>
+                      <button
+                        className="w-full p-2 bg-green-600 hover:bg-green-700 text-white rounded flex items-center justify-center gap-2"
+                        onClick={() => setShowAccessScreen(true)}
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
+                          <circle cx="12" cy="12" r="3"/>
+                        </svg>
+                        <span>View Your Access Code</span>
+                      </button>
+                    </div>
+                  ) : (
+                    // Default login button
+                    <button
+                      className="w-full p-2 bg-green-600 hover:bg-green-700 text-white rounded"
+                      onClick={handleLoginRedirect}
+                    >
+                      Login to Dashboard
+                    </button>
+                  )}
                 </div>
-                {renderQuestionInput()}
-              </div>
+              ) : (
+                // During onboarding - show question form
+                <div className="bg-[#131313] rounded-lg p-3 mb-3">
+                  <h3 className="text-white text-lg mb-1">Welcome to Fitness AI</h3>
+                  <p className="text-gray-300 text-sm mb-2">
+                    Step {currentStep} of 10: {getCurrentQuestion().text}
+                  </p>
+                  
+                  {renderQuestionInput()}
+                  
+                  {currentStep > 1 && (
+                    <div className="mt-3 flex justify-start">
+                      <button 
+                        className="bg-gray-700 text-white px-3 py-1 rounded text-sm"
+                        onClick={goToPreviousStep}
+                      >
+                        Back
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+              
+              {/* Only show text input for text/email questions during onboarding */}
+              {!onboardingComplete && (getCurrentQuestion().type === 'text' || getCurrentQuestion().type === 'email') && (
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    className="flex-1 p-2 rounded-l-lg border border-gray-700 bg-black text-white"
+                    placeholder={getCurrentQuestion().type === 'email' ? "your@email.com" : "Type your answer..."}
+                    value={input}
+                    onChange={handleInputChange}
+                    onKeyPress={handleKeyPress}
+                  />
+                  <button 
+                    className="bg-green-600 hover:bg-green-700 text-white p-2 rounded-r-lg"
+                    onClick={sendMessage}
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <line x1="22" y1="2" x2="11" y2="13"></line>
+                      <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                    </svg>
+                  </button>
+                </div>
+              )}
+              
+              {/* Regular chat input after onboarding is complete */}
+              {onboardingComplete && !showAccessScreen && (
+                <div className="flex gap-2 mt-3">
+                  <input
+                    type="text"
+                    className="flex-1 p-2 rounded-l-lg border border-gray-700 bg-black text-white"
+                    placeholder="Ask me about your fitness plan..."
+                    value={input}
+                    onChange={handleInputChange}
+                    onKeyPress={handleKeyPress}
+                  />
+                  <button 
+                    className="bg-green-600 hover:bg-green-700 text-white p-2 rounded-r-lg"
+                    onClick={sendMessage}
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <line x1="22" y1="2" x2="11" y2="13"></line>
+                      <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                    </svg>
+                  </button>
+                </div>
+              )}
             </div>
           )}
           
-          {/* Show send button for questions that need text input */}
-          {activeTab === 'chat' && !showAccessScreen && !onboardingComplete && (getCurrentQuestion().type === 'text' || getCurrentQuestion().type === 'email') && (
-            <div className="p-3 pt-0 bg-gray-900">
-              <div className="flex">
-                <input
-                  type={getCurrentQuestion().type}
-                  className="flex-1 p-2 rounded-l-lg border border-gray-700 bg-black text-white"
-                  placeholder={getCurrentQuestion().type === 'email' ? "your@email.com" : "Type your answer..."}
-                  value={input}
-                  onChange={handleInputChange}
-                  onKeyPress={handleKeyPress}
-                />
-                <button
-                  onClick={sendMessage}
-                  className="bg-green-600 hover:bg-green-700 text-white p-2 rounded-r-lg"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <line x1="22" y1="2" x2="11" y2="13"></line>
-                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-                  </svg>
-                </button>
-              </div>
-            </div>
-          )}
-          
-          {/* Show continue button after onboarding completed */}
-          {activeTab === 'chat' && showAccessScreen && userAnalysis && (
+          {/* Footer for QR and AR tabs */}
+          {activeTab !== 'chat' && (
             <div className="p-3 border-t border-gray-800 bg-gray-900">
               <button
-                onClick={handleLoginRedirect}
                 className="w-full p-2 bg-green-600 hover:bg-green-700 text-white rounded"
+                onClick={() => {
+                  // Cancel any ongoing speech when switching tabs
+                  if ('speechSynthesis' in window) {
+                    window.speechSynthesis.cancel();
+                  }
+                  setActiveTab('chat');
+                }}
               >
-                Go to Dashboard
+                Return to Chat
               </button>
             </div>
           )}
         </div>
-      ) : null}
+      )}
     </div>
   );
 }
