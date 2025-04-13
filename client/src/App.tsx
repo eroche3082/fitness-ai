@@ -15,7 +15,7 @@ import ChatPage from "@/pages/chat";
 import { UserProvider } from "./contexts/UserContext";
 import { ChatProvider } from "./contexts/ChatContext";
 import FitnessSystemInitializer from "./components/FitnessSystemInitializer";
-import EnhancedChatbot from "@/components/EnhancedChatbot";
+import SimpleChatbot from "./components/SimpleChatbot";
 
 // Import CSS para el tema Bridge
 import "./assets/bridge-styles.css";
@@ -233,7 +233,7 @@ function App() {
             )}
             
             {/* Add the floating chatbot to all pages, according to MEGAPROMPT */}
-            <EnhancedChatbot />
+            <SimpleChatbot />
           </ChatProvider>
         </UserProvider>
       </AuthProvider>
