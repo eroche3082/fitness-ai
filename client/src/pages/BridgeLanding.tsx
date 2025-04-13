@@ -556,6 +556,32 @@ export default function BridgeLanding() {
         </div>
       </section>
 
+      {/* CTA Block After Memberships */}
+      <section className="py-20 bg-green-500 text-black">
+        <div className="container mx-auto px-4 md:px-6">
+          <div className="flex flex-col lg:flex-row items-center justify-between gap-10">
+            <div className="max-w-2xl">
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">Ready to transform your fitness journey?</h2>
+              <p className="text-lg md:text-xl mb-0">
+                Join thousands who have already elevated their training with our AI-powered platform.
+              </p>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Link to="/signup">
+                <Button className="py-6 px-8 bg-black text-white hover:bg-gray-800 text-lg font-medium min-w-[200px]">
+                  Get Started Today
+                </Button>
+              </Link>
+              <Link to="/contact">
+                <Button variant="outline" className="py-6 px-8 border-black text-black hover:bg-black hover:text-white text-lg font-medium min-w-[200px]">
+                  Contact Us
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Footer */}
       <footer className="bg-black text-white pt-16 pb-8">
         <div className="container mx-auto px-4 md:px-6">
