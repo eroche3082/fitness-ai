@@ -3,10 +3,10 @@
 @tailwind utilities;
 
 :root {
-  --fitness-green: #4ade80;
-  --fitness-dark-green: #22c55e;
-  --fitness-light-green: #86efac;
-  --fitness-bg-green: #65D580;
+  --fitness-primary: #3b82f6;
+  --fitness-dark: #1d4ed8;
+  --fitness-light: #93c5fd;
+  --fitness-bg: #2563eb;
 }
 
 @layer base {

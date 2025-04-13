@@ -273,13 +273,13 @@ export default function LandingPage() {
       <section className="py-20 bg-gradient-bg relative overflow-hidden">
         {/* Abstract Background Elements */}
         <div className="absolute inset-0 w-full h-full overflow-hidden z-0 pointer-events-none opacity-30">
-          <div className="absolute top-1/4 -left-10 w-40 h-40 rounded-full bg-green-200"></div>
-          <div className="absolute bottom-1/3 -right-20 w-64 h-64 rounded-full bg-green-300 opacity-30"></div>
+          <div className="absolute top-1/4 -left-10 w-40 h-40 rounded-full bg-blue-200"></div>
+          <div className="absolute bottom-1/3 -right-20 w-64 h-64 rounded-full bg-blue-300 opacity-30"></div>
           <div className="absolute bottom-0 left-1/3 w-40 h-40 rounded-full bg-primary opacity-20"></div>
         </div>
         <div className="container mx-auto px-4 md:px-6">
           <div className="text-center mb-16">
-            <div className="inline-block px-4 py-1 rounded-full bg-green-100 text-primary text-sm font-medium mb-4">
+            <div className="inline-block px-4 py-1 rounded-full bg-blue-100 text-primary text-sm font-medium mb-4">
               <span className="flex items-center justify-center">
                 <Zap className="h-4 w-4 mr-2" />
                 Smart Features
@@ -294,7 +294,7 @@ export default function LandingPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {/* Feature 1 */}
             <div className="fitness-card p-6 hover-scale fade-in">
-              <div className="stat-icon green mb-6">
+              <div className="stat-icon blue mb-6">
                 <Dumbbell className="h-6 w-6" />
               </div>
               <h3 className="text-xl font-semibold mb-2 text-primary-dark">Smart Workout Plans</h3>
@@ -305,7 +305,7 @@ export default function LandingPage() {
             
             {/* Feature 2 */}
             <div className="fitness-card p-6 hover-scale fade-in">
-              <div className="stat-icon energy mb-6">
+              <div className="stat-icon primary mb-6">
                 <Utensils className="h-6 w-6" />
               </div>
               <h3 className="text-xl font-semibold mb-2 text-primary-dark">Nutrition Analysis</h3>
@@ -316,7 +316,7 @@ export default function LandingPage() {
             
             {/* Feature 3 */}
             <div className="fitness-card p-6 hover-scale fade-in">
-              <div className="stat-icon dark-green mb-6">
+              <div className="stat-icon dark-blue mb-6">
                 <Heart className="h-6 w-6" />
               </div>
               <h3 className="text-xl font-semibold mb-2 text-primary-dark">Health Monitoring</h3>
@@ -327,7 +327,7 @@ export default function LandingPage() {
             
             {/* Feature 4 */}
             <div className="fitness-card p-6 hover-scale fade-in">
-              <div className="stat-icon green mb-6">
+              <div className="stat-icon blue mb-6">
                 <Mic className="h-6 w-6" />
               </div>
               <h3 className="text-xl font-semibold mb-2 text-primary-dark">Voice Coaching</h3>
@@ -338,7 +338,7 @@ export default function LandingPage() {
             
             {/* Feature 5 */}
             <div className="fitness-card p-6 hover-scale fade-in">
-              <div className="stat-icon dark-green mb-6">
+              <div className="stat-icon dark-blue mb-6">
                 <LineChart className="h-6 w-6" />
               </div>
               <h3 className="text-xl font-semibold mb-2 text-primary-dark">Progress Analytics</h3>
@@ -349,7 +349,7 @@ export default function LandingPage() {
             
             {/* Feature 6 */}
             <div className="fitness-card p-6 hover-scale fade-in">
-              <div className="stat-icon energy mb-6">
+              <div className="stat-icon primary mb-6">
                 <Smartphone className="h-6 w-6" />
               </div>
               <h3 className="text-xl font-semibold mb-2 text-primary-dark">Multi-Device Sync</h3>
@@ -360,7 +360,7 @@ export default function LandingPage() {
           </div>
 
           <div className="mt-16 text-center">
-            <Button className="primary-button" size="lg">
+            <Button className="bg-[var(--fitness-primary)] text-white hover:bg-[var(--fitness-dark)] py-2 px-6" size="lg">
               Explore All Features
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
@@ -372,7 +372,7 @@ export default function LandingPage() {
       <section className="py-20 bg-white">
         <div className="container mx-auto px-4 md:px-6">
           <div className="text-center mb-16">
-            <div className="inline-block px-4 py-1 rounded-full bg-green-100 text-primary text-sm font-medium mb-4">
+            <div className="inline-block px-4 py-1 rounded-full bg-blue-100 text-primary text-sm font-medium mb-4">
               <span className="flex items-center justify-center">
                 <RefreshCw className="h-4 w-4 mr-2" />
                 How It Works
@@ -419,13 +419,13 @@ export default function LandingPage() {
       <section className="py-20 bg-gradient-bg relative overflow-hidden">
         {/* Abstract Background Elements */}
         <div className="absolute inset-0 w-full h-full overflow-hidden z-0 pointer-events-none opacity-30">
-          <div className="absolute -top-10 right-1/4 w-48 h-48 rounded-full bg-green-200"></div>
-          <div className="absolute top-1/2 -right-10 w-36 h-36 rounded-full bg-green-300 opacity-30"></div>
+          <div className="absolute -top-10 right-1/4 w-48 h-48 rounded-full bg-blue-200"></div>
+          <div className="absolute top-1/2 -right-10 w-36 h-36 rounded-full bg-blue-300 opacity-30"></div>
           <div className="absolute -bottom-10 left-1/4 w-52 h-52 rounded-full bg-primary opacity-20"></div>
         </div>
         <div className="container mx-auto px-4 md:px-6">
           <div className="text-center mb-16">
-            <div className="inline-block px-4 py-1 rounded-full bg-green-100 text-primary text-sm font-medium mb-4">
+            <div className="inline-block px-4 py-1 rounded-full bg-blue-100 text-primary text-sm font-medium mb-4">
               <span className="flex items-center justify-center">
                 <Users className="h-4 w-4 mr-2" />
                 Success Stories
@@ -567,7 +567,7 @@ export default function LandingPage() {
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-0 max-w-5xl mx-auto relative">
             {/* Background line */}
-            <div className="absolute hidden md:block top-1/2 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-green-200 to-transparent z-0"></div>
+            <div className="absolute hidden md:block top-1/2 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-blue-200 to-transparent z-0"></div>
             
             {/* Basic Plan */}
             <div className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200 z-10 pt-8 pb-6 px-6">
@@ -582,26 +582,26 @@ export default function LandingPage() {
               
               <ul className="space-y-3 mb-8">
                 <li className="flex items-center">
-                  <div className="w-5 h-5 flex-shrink-0 rounded-full flex items-center justify-center bg-[#D1FAE5] mr-3">
-                    <Check className="h-3 w-3 text-[var(--fitness-dark-green)]" />
+                  <div className="w-5 h-5 flex-shrink-0 rounded-full flex items-center justify-center bg-blue-50 mr-3">
+                    <Check className="h-3 w-3 text-[var(--fitness-dark)]" />
                   </div>
                   <span className="text-sm">Basic workout plans</span>
                 </li>
                 <li className="flex items-center">
-                  <div className="w-5 h-5 flex-shrink-0 rounded-full flex items-center justify-center bg-[#D1FAE5] mr-3">
-                    <Check className="h-3 w-3 text-[var(--fitness-dark-green)]" />
+                  <div className="w-5 h-5 flex-shrink-0 rounded-full flex items-center justify-center bg-blue-50 mr-3">
+                    <Check className="h-3 w-3 text-[var(--fitness-dark)]" />
                   </div>
                   <span className="text-sm">AI-powered nutrition guidance</span>
                 </li>
                 <li className="flex items-center">
-                  <div className="w-5 h-5 flex-shrink-0 rounded-full flex items-center justify-center bg-[#D1FAE5] mr-3">
-                    <Check className="h-3 w-3 text-[var(--fitness-dark-green)]" />
+                  <div className="w-5 h-5 flex-shrink-0 rounded-full flex items-center justify-center bg-blue-50 mr-3">
+                    <Check className="h-3 w-3 text-[var(--fitness-dark)]" />
                   </div>
                   <span className="text-sm">Connect 2 fitness devices</span>
                 </li>
                 <li className="flex items-center">
-                  <div className="w-5 h-5 flex-shrink-0 rounded-full flex items-center justify-center bg-[#D1FAE5] mr-3">
-                    <Check className="h-3 w-3 text-[var(--fitness-dark-green)]" />
+                  <div className="w-5 h-5 flex-shrink-0 rounded-full flex items-center justify-center bg-blue-50 mr-3">
+                    <Check className="h-3 w-3 text-[var(--fitness-dark)]" />
                   </div>
                   <span className="text-sm">Weekly progress reports</span>
                 </li>
@@ -620,17 +620,17 @@ export default function LandingPage() {
               </ul>
               
               <div className="mt-auto">
-                <Button variant="outline" className="w-full border-[var(--fitness-dark-green)] text-[var(--fitness-dark-green)] hover:bg-green-50 py-1.5">Get Started</Button>
+                <Button variant="outline" className="w-full border-[var(--fitness-dark)] text-[var(--fitness-dark)] hover:bg-blue-50 py-1.5">Get Started</Button>
               </div>
             </div>
             
             {/* Pro Plan */}
-            <div className="bg-white rounded-lg shadow-xl overflow-hidden border border-[var(--fitness-dark-green)] z-20 transform scale-105 relative">
+            <div className="bg-white rounded-lg shadow-xl overflow-hidden border border-[var(--fitness-dark)] z-20 transform scale-105 relative">
               <div className="pt-8 pb-6 px-8">
                 <div className="text-center mb-6">
                   <h3 className="text-lg font-bold text-gray-800 mb-4">Pro</h3>
                   <div className="flex items-end justify-center mb-2">
-                    <span className="text-4xl font-bold text-[var(--fitness-dark-green)]">$19</span>
+                    <span className="text-4xl font-bold text-[var(--fitness-primary)]">$19</span>
                     <span className="text-gray-500 ml-1">/month</span>
                   </div>
                   <p className="text-gray-600 text-sm">Most popular for fitness enthusiasts</p>
@@ -638,45 +638,45 @@ export default function LandingPage() {
                 
                 <ul className="space-y-3 mb-8">
                   <li className="flex items-center">
-                    <div className="w-5 h-5 flex-shrink-0 rounded-full flex items-center justify-center bg-[#D1FAE5] mr-3">
-                      <Check className="h-3 w-3 text-[var(--fitness-dark-green)]" />
+                    <div className="w-5 h-5 flex-shrink-0 rounded-full flex items-center justify-center bg-blue-50 mr-3">
+                      <Check className="h-3 w-3 text-[var(--fitness-dark)]" />
                     </div>
                     <span className="text-sm">Advanced workout plans</span>
                   </li>
                   <li className="flex items-center">
-                    <div className="w-5 h-5 flex-shrink-0 rounded-full flex items-center justify-center bg-[#D1FAE5] mr-3">
-                      <Check className="h-3 w-3 text-[var(--fitness-dark-green)]" />
+                    <div className="w-5 h-5 flex-shrink-0 rounded-full flex items-center justify-center bg-blue-50 mr-3">
+                      <Check className="h-3 w-3 text-[var(--fitness-dark)]" />
                     </div>
                     <span className="text-sm">Personalized meal planning</span>
                   </li>
                   <li className="flex items-center">
-                    <div className="w-5 h-5 flex-shrink-0 rounded-full flex items-center justify-center bg-[#D1FAE5] mr-3">
-                      <Check className="h-3 w-3 text-[var(--fitness-dark-green)]" />
+                    <div className="w-5 h-5 flex-shrink-0 rounded-full flex items-center justify-center bg-blue-50 mr-3">
+                      <Check className="h-3 w-3 text-[var(--fitness-dark)]" />
                     </div>
                     <span className="text-sm">Connect 5 fitness devices</span>
                   </li>
                   <li className="flex items-center">
-                    <div className="w-5 h-5 flex-shrink-0 rounded-full flex items-center justify-center bg-[#D1FAE5] mr-3">
-                      <Check className="h-3 w-3 text-[var(--fitness-dark-green)]" />
+                    <div className="w-5 h-5 flex-shrink-0 rounded-full flex items-center justify-center bg-blue-50 mr-3">
+                      <Check className="h-3 w-3 text-[var(--fitness-dark)]" />
                     </div>
                     <span className="text-sm">Voice coaching with rep counting</span>
                   </li>
                   <li className="flex items-center">
-                    <div className="w-5 h-5 flex-shrink-0 rounded-full flex items-center justify-center bg-[#D1FAE5] mr-3">
-                      <Check className="h-3 w-3 text-[var(--fitness-dark-green)]" />
+                    <div className="w-5 h-5 flex-shrink-0 rounded-full flex items-center justify-center bg-blue-50 mr-3">
+                      <Check className="h-3 w-3 text-[var(--fitness-dark)]" />
                     </div>
                     <span className="text-sm">Detailed progress analytics</span>
                   </li>
                   <li className="flex items-center">
-                    <div className="w-5 h-5 flex-shrink-0 rounded-full flex items-center justify-center bg-[#D1FAE5] mr-3">
-                      <Check className="h-3 w-3 text-[var(--fitness-dark-green)]" />
+                    <div className="w-5 h-5 flex-shrink-0 rounded-full flex items-center justify-center bg-blue-50 mr-3">
+                      <Check className="h-3 w-3 text-[var(--fitness-dark)]" />
                     </div>
                     <span className="text-sm">Priority support</span>
                   </li>
                 </ul>
                 
                 <div className="mt-auto">
-                  <Button className="w-full bg-[var(--fitness-dark-green)] text-white hover:bg-[#1bb04e] py-1.5">Get Pro</Button>
+                  <Button className="w-full bg-[var(--fitness-dark)] text-white hover:bg-[var(--fitness-primary)] py-1.5">Get Pro</Button>
                 </div>
               </div>
             </div>
@@ -694,45 +694,45 @@ export default function LandingPage() {
               
               <ul className="space-y-3 mb-8">
                 <li className="flex items-center">
-                  <div className="w-5 h-5 flex-shrink-0 rounded-full flex items-center justify-center bg-[#D1FAE5] mr-3">
-                    <Check className="h-3 w-3 text-[var(--fitness-dark-green)]" />
+                  <div className="w-5 h-5 flex-shrink-0 rounded-full flex items-center justify-center bg-blue-50 mr-3">
+                    <Check className="h-3 w-3 text-[var(--fitness-dark)]" />
                   </div>
                   <span className="text-sm">Elite workout plans</span>
                 </li>
                 <li className="flex items-center">
-                  <div className="w-5 h-5 flex-shrink-0 rounded-full flex items-center justify-center bg-[#D1FAE5] mr-3">
-                    <Check className="h-3 w-3 text-[var(--fitness-dark-green)]" />
+                  <div className="w-5 h-5 flex-shrink-0 rounded-full flex items-center justify-center bg-blue-50 mr-3">
+                    <Check className="h-3 w-3 text-[var(--fitness-dark)]" />
                   </div>
                   <span className="text-sm">Pro nutrition & recovery coaching</span>
                 </li>
                 <li className="flex items-center">
-                  <div className="w-5 h-5 flex-shrink-0 rounded-full flex items-center justify-center bg-[#D1FAE5] mr-3">
-                    <Check className="h-3 w-3 text-[var(--fitness-dark-green)]" />
+                  <div className="w-5 h-5 flex-shrink-0 rounded-full flex items-center justify-center bg-blue-50 mr-3">
+                    <Check className="h-3 w-3 text-[var(--fitness-dark)]" />
                   </div>
                   <span className="text-sm">Unlimited device connections</span>
                 </li>
                 <li className="flex items-center">
-                  <div className="w-5 h-5 flex-shrink-0 rounded-full flex items-center justify-center bg-[#D1FAE5] mr-3">
-                    <Check className="h-3 w-3 text-[var(--fitness-dark-green)]" />
+                  <div className="w-5 h-5 flex-shrink-0 rounded-full flex items-center justify-center bg-blue-50 mr-3">
+                    <Check className="h-3 w-3 text-[var(--fitness-dark)]" />
                   </div>
                   <span className="text-sm">Advanced voice coaching</span>
                 </li>
                 <li className="flex items-center">
-                  <div className="w-5 h-5 flex-shrink-0 rounded-full flex items-center justify-center bg-[#D1FAE5] mr-3">
-                    <Check className="h-3 w-3 text-[var(--fitness-dark-green)]" />
+                  <div className="w-5 h-5 flex-shrink-0 rounded-full flex items-center justify-center bg-blue-50 mr-3">
+                    <Check className="h-3 w-3 text-[var(--fitness-dark)]" />
                   </div>
                   <span className="text-sm">Predictive performance analytics</span>
                 </li>
                 <li className="flex items-center">
-                  <div className="w-5 h-5 flex-shrink-0 rounded-full flex items-center justify-center bg-[#D1FAE5] mr-3">
-                    <Check className="h-3 w-3 text-[var(--fitness-dark-green)]" />
+                  <div className="w-5 h-5 flex-shrink-0 rounded-full flex items-center justify-center bg-blue-50 mr-3">
+                    <Check className="h-3 w-3 text-[var(--fitness-dark)]" />
                   </div>
                   <span className="text-sm">1-on-1 expert consultations</span>
                 </li>
               </ul>
               
               <div className="mt-auto">
-                <Button variant="outline" className="w-full border-[var(--fitness-dark-green)] text-[var(--fitness-dark-green)] hover:bg-green-50 py-1.5">Get Premium</Button>
+                <Button variant="outline" className="w-full border-[var(--fitness-dark)] text-[var(--fitness-dark)] hover:bg-blue-50 py-1.5">Get Premium</Button>
               </div>
             </div>
           </div>
@@ -744,7 +744,7 @@ export default function LandingPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-[var(--fitness-bg-green)]">
+      <section className="py-20 bg-[var(--fitness-bg)]">
         <div className="container mx-auto px-4 md:px-6">
           <div className="max-w-3xl mx-auto text-center">
             <h2 className="text-3xl md:text-4xl font-bold mb-6 text-white">Start Your Fitness Transformation Today</h2>
@@ -753,7 +753,7 @@ export default function LandingPage() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button 
-                className="bg-white text-[var(--fitness-dark-green)] hover:bg-white/95 font-medium py-2 px-6 rounded-full text-sm flex items-center"
+                className="bg-white text-[var(--fitness-dark)] hover:bg-white/95 font-medium py-2 px-6 rounded-full text-sm flex items-center"
                 onClick={() => setShowSignupModal(true)}
               >
                 Start For Free
