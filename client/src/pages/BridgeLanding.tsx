@@ -48,8 +48,8 @@ export default function BridgeLanding() {
             <Link to="/" className="text-white hover:text-green-500 transition-colors uppercase font-medium">
               Home
             </Link>
-            <Link to="/about" className="text-white hover:text-green-500 transition-colors uppercase font-medium">
-              About Us
+            <Link to="/features" className="text-white hover:text-green-500 transition-colors uppercase font-medium">
+              Features
             </Link>
             <Link to="/programs" className="text-white hover:text-green-500 transition-colors uppercase font-medium">
               Programs

@@ -117,9 +117,9 @@ export default function ContactPage() {
           <div className="absolute inset-0 bg-gradient-to-b from-green-500/20 to-transparent"></div>
           <div className="container mx-auto px-4 md:px-6 relative z-10">
             <div className="max-w-3xl mx-auto text-center">
-              <h1 className="text-4xl md:text-6xl font-bold mb-6">Contáctanos</h1>
+              <h1 className="text-4xl md:text-6xl font-bold mb-6">Contact Us</h1>
               <p className="text-xl text-gray-300 mb-8">
-                Estamos aquí para ayudarte. Ponte en contacto con nuestro equipo para cualquier consulta o soporte que necesites.
+                We're here to help. Get in touch with our team for any questions or support you need.
               </p>
             </div>
           </div>
@@ -139,25 +139,25 @@ export default function ContactPage() {
                           <CheckCircle className="h-12 w-12 text-green-500" />
                         </div>
                       </div>
-                      <h2 className="text-2xl font-bold mb-4">¡Mensaje Enviado!</h2>
+                      <h2 className="text-2xl font-bold mb-4">Message Sent!</h2>
                       <p className="text-gray-300 mb-6">
-                        Gracias por contactarnos. Hemos recibido tu mensaje y te responderemos lo antes posible.
+                        Thank you for contacting us. We have received your message and will respond as soon as possible.
                       </p>
                       <Button
                         onClick={() => setIsSubmitted(false)}
                         className="bg-green-500 hover:bg-green-600 text-black"
                       >
-                        Enviar otro mensaje
+                        Send another message
                       </Button>
                     </div>
                   </div>
                 ) : (
                   <div className="bg-gray-900 p-8 rounded-lg border border-gray-800">
-                    <h2 className="text-2xl font-bold mb-6">Envíanos un mensaje</h2>
+                    <h2 className="text-2xl font-bold mb-6">Send us a message</h2>
                     <form onSubmit={handleSubmit} className="space-y-6">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
-                          <Label htmlFor="name">Nombre</Label>
+                          <Label htmlFor="name">Name</Label>
                           <Input
                             id="name"
                             name="name"
@@ -183,7 +183,7 @@ export default function ContactPage() {
                       
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
-                          <Label htmlFor="phone">Teléfono (opcional)</Label>
+                          <Label htmlFor="phone">Phone (optional)</Label>
                           <Input
                             id="phone"
                             name="phone"
@@ -193,7 +193,7 @@ export default function ContactPage() {
                           />
                         </div>
                         <div className="space-y-2">
-                          <Label htmlFor="subject">Asunto</Label>
+                          <Label htmlFor="subject">Subject</Label>
                           <Input
                             id="subject"
                             name="subject"
@@ -206,7 +206,7 @@ export default function ContactPage() {
                       </div>
                       
                       <div className="space-y-2">
-                        <Label htmlFor="message">Mensaje</Label>
+                        <Label htmlFor="message">Message</Label>
                         <Textarea
                           id="message"
                           name="message"
@@ -225,12 +225,12 @@ export default function ContactPage() {
                         {isLoading ? (
                           <div className="flex items-center">
                             <div className="animate-spin mr-2 h-4 w-4 border-2 border-current border-t-transparent rounded-full"></div>
-                            <span>Enviando...</span>
+                            <span>Sending...</span>
                           </div>
                         ) : (
                           <div className="flex items-center">
                             <Send className="mr-2 h-4 w-4" />
-                            <span>Enviar Mensaje</span>
+                            <span>Send Message</span>
                           </div>
                         )}
                       </Button>
