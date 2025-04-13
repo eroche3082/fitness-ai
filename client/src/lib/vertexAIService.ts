@@ -1,224 +1,147 @@
-/**
- * Vertex AI Service
- * 
- * This service provides integration with Google Cloud's Vertex AI Platform
- * and Gemini Flash for advanced AI-powered user profiling and categorization.
- * 
- * For the purpose of this implementation, we're using a simulated version
- * that mimics the real service behavior without requiring actual API keys.
- */
+import { UserProfile, UserCategory, determineUserCategory, analyzeUserData } from './userCodeGenerator';
 
-import { UserCategory, UserProfile } from './userCodeGenerator';
+// Simulated Vertex AI service for fitness analysis
+// In a real app, this would connect to Google Cloud Vertex AI
 
-/**
- * Types of fitness analysis that Vertex AI can perform
- */
-export type AnalysisType = 
-  | 'user_categorization'
-  | 'workout_recommendation'
-  | 'nutrition_plan'
-  | 'progression_prediction';
-
-/**
- * Interface for analysis request to Vertex AI
- */
-export interface AnalysisRequest {
-  type: AnalysisType;
-  userData: Record<string, any>;
-  options?: Record<string, any>;
+// Interface for AI analysis results
+export interface AnalysisResult {
+  code: string;
+  category: UserCategory;
+  analysisResults: string;
+  recommendedPlans: string[];
+  insights: string[];
 }
 
-/**
- * Interface for analysis response from Vertex AI
- */
-export interface AnalysisResponse {
-  status: 'success' | 'error';
-  result: any;
-  confidence: number;
-  reasoning?: string[];
-  recommendedActions?: string[];
-}
+// Simulate a delay to mimic API call
+const simulateApiDelay = (ms: number = 1000): Promise<void> => {
+  return new Promise(resolve => setTimeout(resolve, ms));
+};
 
-/**
- * Simulates sending data to Vertex AI for analysis
- * In a real implementation, this would call the actual Vertex AI API
- * 
- * @param request Analysis request object
- * @returns Promise with analysis response
- */
-export async function analyzeWithVertexAI(request: AnalysisRequest): Promise<AnalysisResponse> {
-  // In a real implementation, this would be an API call to Vertex AI
-  // Here we simulate the response based on the request type
-  
-  // Simulate network delay
-  await new Promise(resolve => setTimeout(resolve, 1500));
-  
-  switch (request.type) {
-    case 'user_categorization':
-      return simulateUserCategorization(request.userData);
-    case 'workout_recommendation':
-      return simulateWorkoutRecommendation(request.userData);
-    case 'nutrition_plan':
-      return simulateNutritionPlan(request.userData);
-    case 'progression_prediction':
-      return simulateProgressionPrediction(request.userData);
+// Generate workout recommendations based on user category
+const getWorkoutRecommendations = (category: UserCategory): string[] => {
+  switch (category) {
+    case 'BEG':
+      return [
+        'Full Body Basics - 3x per week',
+        'Beginner Cardio Program',
+        'Foundational Strength Training'
+      ];
+    case 'INT':
+      return [
+        'Upper/Lower Split - 4x per week',
+        'Intermediate Hypertrophy Program',
+        'Cardio and Strength Balance Plan'
+      ];
+    case 'ADV':
+      return [
+        'Push/Pull/Legs Split - 6x per week',
+        'Advanced Periodization Program',
+        'Sport-Specific Performance Training'
+      ];
+    case 'PRO':
+      return [
+        'Professional Competition Prep',
+        'Elite Performance Program',
+        'Specialized Athletic Development'
+      ];
+    case 'VIP':
+      return [
+        'Personalized Elite Training Protocol',
+        'Custom Competition Preparation',
+        'VIP Recovery and Performance System'
+      ];
     default:
-      return {
-        status: 'error',
-        result: null,
-        confidence: 0,
-        reasoning: ['Unsupported analysis type']
-      };
+      return [
+        'Full Body Basics - 3x per week',
+        'Beginner Cardio Program',
+        'Foundational Strength Training'
+      ];
   }
-}
+};
 
-/**
- * Simulates user categorization analysis
- * 
- * @param userData User data from onboarding
- * @returns Analysis response with category
- */
-function simulateUserCategorization(userData: Record<string, any>): AnalysisResponse {
-  // Extract key data points
-  const fitnessLevel = (userData.fitnessLevel || '').toLowerCase();
-  const fitnessGoals = Array.isArray(userData.fitnessGoals) ? userData.fitnessGoals : [];
-  const workoutFrequency = (userData.workoutFrequency || '').toLowerCase();
+// Generate fitness insights based on user data
+const generateInsights = (profile: UserProfile): string[] => {
+  const insights: string[] = [];
+  const preferences = profile.preferences || {};
   
-  // Determine category based on multiple factors
-  let category: UserCategory = 'BEG';
-  let confidence = 0.7;
-  let reasoning: string[] = [];
-  
-  // Basic categorization logic (in real app, this would be AI-based)
-  if (fitnessLevel.includes('advanced')) {
-    category = workoutFrequency.includes('frequent') ? 'PRO' : 'ADV';
-    confidence = 0.85;
-    reasoning.push('User has advanced fitness level');
-    reasoning.push(workoutFrequency.includes('frequent') 
-      ? 'User works out frequently' 
-      : 'User has advanced knowledge but moderate workout frequency');
-  } else if (fitnessLevel.includes('intermediate')) {
-    category = 'INT';
-    confidence = 0.82;
-    reasoning.push('User has intermediate fitness experience');
-    reasoning.push('User is familiar with standard workout protocols');
+  // Based on fitness level
+  if (profile.category === 'BEG') {
+    insights.push('Focus on building consistency in your workout routine first and foremost.');
+    insights.push('Master proper form before increasing weights or intensity.');
+  } else if (profile.category === 'INT') {
+    insights.push('You are ready to increase training volume and intensity for continued progress.');
+    insights.push('Consider adding more specialized training for your specific goals.');
   } else {
-    category = 'BEG';
-    confidence = 0.9;
-    reasoning.push('User is new to structured fitness programs');
-    reasoning.push('User needs foundational guidance and support');
+    insights.push('Your advanced level indicates you are ready for periodized training protocols.');
+    insights.push('Recovery optimization will be key to your continued progress.');
   }
   
-  // Special case for VIP categorization
-  if (fitnessGoals.includes('professional_athlete') || fitnessGoals.includes('competition')) {
-    category = 'VIP';
-    confidence = 0.78;
-    reasoning.push('User has professional/competitive fitness goals');
+  // Based on goals (if available)
+  if (preferences.fitnessGoals) {
+    if (preferences.fitnessGoals.includes('build_muscle')) {
+      insights.push('For muscle growth, prioritize progressive overload and adequate protein intake.');
+    }
+    if (preferences.fitnessGoals.includes('lose_weight')) {
+      insights.push('For weight loss, combine strength training with strategic cardio and nutrition management.');
+    }
+    if (preferences.fitnessGoals.includes('improve_health')) {
+      insights.push('For overall health, ensure a balance of strength, cardio, flexibility, and recovery work.');
+    }
   }
   
-  return {
-    status: 'success',
-    result: {
-      category,
-      primaryGoal: fitnessGoals[0] || 'general_fitness',
-      recommendedPlan: `${category}_standard_plan`
-    },
-    confidence,
-    reasoning,
-    recommendedActions: [
-      'Provide personalized onboarding',
-      `Show ${category}-level workout recommendations`,
-      'Offer appropriate nutrition guidance'
-    ]
-  };
-}
+  // Based on limitations (if available)
+  if (preferences.limitations) {
+    if (preferences.limitations.includes('back_pain')) {
+      insights.push('With your back pain, focus on core strengthening and proper spine alignment during all exercises.');
+    }
+    if (preferences.limitations.includes('time_constraints')) {
+      insights.push('Given your time constraints, high-efficiency workouts like HIIT or supersets may be optimal.');
+    }
+  }
+  
+  return insights;
+};
 
-/**
- * Simulates workout recommendation analysis
- * 
- * @param userData User data
- * @returns Analysis response with workout recommendations
- */
-function simulateWorkoutRecommendation(userData: Record<string, any>): AnalysisResponse {
-  // This would contain complex AI-based workout recommendation logic
-  // Simplified for this implementation
-  return {
-    status: 'success',
-    result: {
-      recommendedWorkouts: [
-        'Full Body Strength',
-        'HIIT Cardio',
-        'Core Stability'
-      ],
-      weeklySchedule: [
-        { day: 'Monday', workout: 'Full Body Strength' },
-        { day: 'Wednesday', workout: 'HIIT Cardio' },
-        { day: 'Friday', workout: 'Core Stability' }
-      ]
-    },
-    confidence: 0.82,
-    reasoning: [
-      'Based on user fitness level and goals',
-      'Accounting for reported physical limitations',
-      'Optimized for reported available time'
-    ]
-  };
-}
-
-/**
- * Simulates nutrition plan analysis
- * 
- * @param userData User data
- * @returns Analysis response with nutrition recommendations
- */
-function simulateNutritionPlan(userData: Record<string, any>): AnalysisResponse {
-  return {
-    status: 'success',
-    result: {
-      macroSplit: { protein: '30%', carbs: '40%', fat: '30%' },
-      calorieTarget: 2200,
-      mealRecommendations: [
-        { meal: 'Breakfast', options: ['Protein oats', 'Greek yogurt parfait'] },
-        { meal: 'Lunch', options: ['Chicken salad', 'Quinoa bowl'] },
-        { meal: 'Dinner', options: ['Salmon with vegetables', 'Turkey and sweet potato'] }
-      ]
-    },
-    confidence: 0.75,
-    reasoning: [
-      'Based on user fitness goals',
-      'Adjusted for reported dietary preferences',
-      'Calculated for optimal recovery and performance'
-    ]
-  };
-}
-
-/**
- * Simulates progression prediction analysis
- * 
- * @param userData User data
- * @returns Analysis response with progression predictions
- */
-function simulateProgressionPrediction(userData: Record<string, any>): AnalysisResponse {
-  return {
-    status: 'success',
-    result: {
-      timeToGoal: '12 weeks',
-      milestones: [
-        { week: 4, achievement: 'Initial strength adaptation' },
-        { week: 8, achievement: 'Noticeable body composition changes' },
-        { week: 12, achievement: 'Primary goal achievement' }
-      ],
-      expectedChallenges: ['Weeks 3-4 plateau', 'Recovery management']
-    },
-    confidence: 0.68,
-    reasoning: [
-      'Based on statistical models of similar users',
-      'Accounts for reported starting fitness level',
-      'Adjusted for realistic progression rates'
-    ]
-  };
-}
-
-export default {
-  analyzeWithVertexAI
+// Main AI analysis function
+export const analyzeUserWithAI = async (userProfile: UserProfile): Promise<AnalysisResult> => {
+  try {
+    console.log('Sending user data to Vertex AI for analysis...');
+    
+    // Simulate API delay
+    await simulateApiDelay(1500);
+    
+    // Determine user category if not already set
+    const category = userProfile.category || determineUserCategory(userProfile.preferences || {});
+    
+    // Generate base analysis
+    const baseAnalysis = analyzeUserData({
+      ...userProfile,
+      category
+    });
+    
+    // Generate workout recommendations
+    const recommendations = getWorkoutRecommendations(category);
+    
+    // Generate insights
+    const insights = generateInsights({
+      ...userProfile,
+      category
+    });
+    
+    // Combine results
+    const result: AnalysisResult = {
+      code: baseAnalysis.code,
+      category: baseAnalysis.category,
+      analysisResults: baseAnalysis.analysisResults,
+      recommendedPlans: recommendations,
+      insights
+    };
+    
+    console.log('AI analysis complete:', result);
+    
+    return result;
+  } catch (error) {
+    console.error('Error in Vertex AI analysis:', error);
+    throw new Error('Failed to analyze user data with AI.');
+  }
 };

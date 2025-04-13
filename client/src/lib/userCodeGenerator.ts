@@ -1,175 +1,181 @@
-/**
- * User Code Generator and Categorization System
- * 
- * This module handles:
- * 1. Analyzing user onboarding answers
- * 2. Categorizing users into specific levels/types
- * 3. Generating unique alphanumeric codes based on category and session
- * 4. Creating QR codes for dashboard access
- */
-
+// Define user categories
 export type UserCategory = 'BEG' | 'INT' | 'ADV' | 'PRO' | 'VIP';
 
 export interface UserProfile {
   name: string;
   email: string;
-  fitnessLevel: string;
-  fitnessGoals: string[];
-  limitations: string;
-  workoutFrequency: string;
-  preferredTime: string;
-  dietPreference: string;
-  sleepHours: string;
-  waterIntake: string;
-  uniqueCode?: string; 
+  uniqueCode?: string;
   category?: UserCategory;
+  preferences?: Record<string, any>;
 }
 
-/**
- * Categorize user based on their answers to onboarding questions
- * 
- * @param answers Record of user answers from onboarding
- * @returns User category code (3 letters)
- */
-export function categorizeUser(answers: Record<number, any>): UserCategory {
-  // In a real implementation, this would use Vertex AI for more advanced categorization
+// Generate a unique user code based on category
+export const generateUserCode = (category: UserCategory): string => {
+  // Format: FIT-[CATEGORY]-[4-DIGIT NUMBER]
+  const randomNum = Math.floor(1000 + Math.random() * 9000);
+  return `FIT-${category}-${randomNum}`;
+};
+
+// Determine user category based on questionnaire answers
+export const determineUserCategory = (answers: Record<string, any>): UserCategory => {
+  // Extract fitness level from answers
+  const fitnessLevel = answers.fitnessLevel || 'beginner';
   
-  // Basic categorization based on fitness level (question 3) and frequency (question 6)
-  const fitnessLevel = answers[3]?.toString().toLowerCase() || '';
-  const workoutFrequency = answers[6]?.toString().toLowerCase() || '';
+  // Determine category based on fitness level
+  let category: UserCategory = 'BEG';
   
-  if (fitnessLevel.includes('advanced')) {
-    return workoutFrequency.includes('frequent') ? 'PRO' : 'ADV';
-  } else if (fitnessLevel.includes('intermediate')) {
-    return 'INT';
-  } else {
-    return 'BEG';
+  if (fitnessLevel === 'advanced') {
+    category = 'ADV';
+  } else if (fitnessLevel === 'intermediate') {
+    category = 'INT';
   }
-}
-
-/**
- * Generate a unique code for user based on their category and random numbers
- * 
- * @param category User category code
- * @returns Unique identifier code in format: FIT-[CATEGORY]-[4-DIGIT]
- */
-export function generateUniqueCode(category: UserCategory): string {
-  // Generate random 4-digit number
-  const randomDigits = Math.floor(1000 + Math.random() * 9000);
   
-  // Create code in format: FIT-[CATEGORY]-[4-DIGIT]
-  return `FIT-${category}-${randomDigits}`;
-}
-
-/**
- * Analyze user answers and create a full user profile with category and code
- * 
- * @param answers Record of user answers from onboarding
- * @returns Complete user profile with category and unique code
- */
-export function createUserProfile(answers: Record<number, any>): UserProfile {
-  // Map answers to profile properties
-  const profile: UserProfile = {
-    name: answers[1] || '',
-    email: answers[2] || '',
-    fitnessLevel: answers[3] || '',
-    fitnessGoals: Array.isArray(answers[4]) ? answers[4] : [answers[4] || ''],
-    limitations: answers[5] || '',
-    workoutFrequency: answers[6] || '',
-    preferredTime: answers[7] || '',
-    dietPreference: answers[8] || '',
-    sleepHours: answers[9] || '',
-    waterIntake: answers[10] || '',
-  };
+  // Other factors that could influence category
+  const workoutFrequency = answers.workoutFrequency || '';
+  const isFrequentTrainer = workoutFrequency === '5-6' || workoutFrequency === 'daily';
   
-  // Add category and unique code
-  const category = categorizeUser(answers);
-  profile.category = category;
-  profile.uniqueCode = generateUniqueCode(category);
+  // Adjust category for frequent trainers
+  if (category === 'INT' && isFrequentTrainer) {
+    category = 'ADV';
+  } else if (category === 'BEG' && isFrequentTrainer) {
+    category = 'INT';
+  }
   
-  return profile;
-}
+  return category;
+};
 
-/**
- * Extract important information about user based on their category
- * 
- * @param category User category
- * @returns Description of the user category
- */
-export function getCategoryDescription(category: UserCategory): string {
-  switch (category) {
+// Get descriptive text for a user category
+export const getCategoryDescription = (category: UserCategory): string => {
+  switch(category) {
     case 'BEG':
-      return 'Beginner level with foundational fitness programs';
+      return 'Beginner: Focus on building consistency, learning proper form, and establishing fitness habits.';
     case 'INT':
-      return 'Intermediate level with progressive workout plans';
+      return 'Intermediate: Ready for more challenging workouts, increased intensity, and specialized training.';
     case 'ADV':
-      return 'Advanced level with complex fitness routines';
+      return 'Advanced: Experienced fitness enthusiast ready for complex training protocols and higher intensity.';
     case 'PRO':
-      return 'Professional level with athlete-grade training';
+      return 'Professional: Elite-level training with advanced periodization and competition-specific programming.';
     case 'VIP':
-      return 'VIP member with premium coaching and personalized plans';
+      return 'VIP Member: Complete access to personalized coaching, premium features, and exclusive content.';
     default:
-      return 'Standard fitness member';
+      return 'Beginner: Focus on building consistency, learning proper form, and establishing fitness habits.';
   }
-}
+};
 
-/**
- * Get available features based on user category
- * 
- * @param category User category
- * @returns List of features available to this user category
- */
-export function getAvailableFeatures(category: UserCategory): string[] {
+// Get available features for a user category
+export const getAvailableFeatures = (category: UserCategory): string[] => {
   const baseFeatures = [
-    'Personalized Workout Plans',
-    'Progress Tracking',
-    'Basic Nutrition Advice',
+    'Personalized workout plans',
+    'Exercise library',
+    'Progress tracking',
+    'Basic nutrition guidance'
   ];
   
-  switch (category) {
+  switch(category) {
     case 'BEG':
       return baseFeatures;
     case 'INT':
-      return [...baseFeatures, 'Video Instruction Library', 'Community Access'];
+      return [
+        ...baseFeatures,
+        'Customized nutrition plans',
+        'Advanced workout variations',
+        'Recovery recommendations'
+      ];
     case 'ADV':
-      return [...baseFeatures, 'Video Instruction Library', 'Community Access', 'Advanced Analytics'];
+      return [
+        ...baseFeatures,
+        'Customized nutrition plans',
+        'Advanced workout variations',
+        'Recovery recommendations',
+        'Training periodization',
+        'Performance analytics'
+      ];
     case 'PRO':
-      return [...baseFeatures, 'Video Instruction Library', 'Community Access', 'Advanced Analytics', 'Priority Support'];
+      return [
+        ...baseFeatures,
+        'Customized nutrition plans',
+        'Advanced workout variations',
+        'Recovery recommendations',
+        'Training periodization',
+        'Performance analytics',
+        'One-on-one coaching',
+        'Competition preparation'
+      ];
     case 'VIP':
-      return [...baseFeatures, 'Video Instruction Library', 'Community Access', 'Advanced Analytics', 'Priority Support', '1-on-1 Coaching', 'Premium Content'];
+      return [
+        ...baseFeatures,
+        'Customized nutrition plans',
+        'Advanced workout variations',
+        'Recovery recommendations',
+        'Training periodization',
+        'Performance analytics',
+        'One-on-one coaching',
+        'Competition preparation',
+        'Priority support',
+        'Premium content access',
+        'Exclusive community access'
+      ];
     default:
       return baseFeatures;
   }
-}
+};
 
-/**
- * Get locked features that user needs to upgrade to access
- * 
- * @param category User category
- * @returns List of features locked for this user category
- */
-export function getLockedFeatures(category: UserCategory): string[] {
+// Get locked features for a user category
+export const getLockedFeatures = (category: UserCategory): string[] => {
   const allFeatures = [
-    'Personalized Workout Plans',
-    'Progress Tracking',
-    'Basic Nutrition Advice',
-    'Video Instruction Library',
-    'Community Access',
-    'Advanced Analytics',
-    'Priority Support',
-    '1-on-1 Coaching',
-    'Premium Content',
+    'Personalized workout plans',
+    'Exercise library',
+    'Progress tracking',
+    'Basic nutrition guidance',
+    'Customized nutrition plans',
+    'Advanced workout variations',
+    'Recovery recommendations',
+    'Training periodization',
+    'Performance analytics',
+    'One-on-one coaching',
+    'Competition preparation',
+    'Priority support',
+    'Premium content access',
+    'Exclusive community access'
   ];
   
   const available = getAvailableFeatures(category);
   return allFeatures.filter(feature => !available.includes(feature));
-}
+};
 
-export default {
-  categorizeUser,
-  generateUniqueCode,
-  createUserProfile,
-  getCategoryDescription,
-  getAvailableFeatures,
-  getLockedFeatures,
+// Generate comprehensive analysis for a user
+export const analyzeUserData = (userProfile: UserProfile): { 
+  code: string;
+  category: UserCategory;
+  analysisResults: string;
+} => {
+  // Determine category if not already set
+  const category = userProfile.category || determineUserCategory(userProfile.preferences || {});
+  
+  // Generate unique code
+  const code = userProfile.uniqueCode || generateUserCode(category);
+  
+  // Generate analysis text
+  const categoryDesc = getCategoryDescription(category);
+  const availableFeatures = getAvailableFeatures(category).join(', ');
+  
+  const analysisResults = `
+User Analysis:
+Name: ${userProfile.name}
+Email: ${userProfile.email}
+Fitness Category: ${category}
+${categoryDesc}
+
+Available Features:
+${getAvailableFeatures(category).map(feature => `- ${feature}`).join('\n')}
+
+Upgrade to unlock:
+${getLockedFeatures(category).map(feature => `- ${feature}`).join('\n')}
+  `.trim();
+  
+  return {
+    code,
+    category,
+    analysisResults
+  };
 };

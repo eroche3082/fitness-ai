@@ -1,386 +1,225 @@
-/**
- * Fitness AI Onboarding Flow System
- * Dynamic question flow for personalized onboarding experience
- */
+// Define agent types
+export type AgentType = 'fitness' | 'nutrition' | 'wellness' | 'general';
 
-export type QuestionType = 'text' | 'multipleChoice' | 'checkbox' | 'slider' | 'boolean' | 'file' | 'voice';
+// Define question types
+export type QuestionType = 'text' | 'email' | 'select' | 'multiselect';
 
-export interface OnboardingQuestion {
-  id: string;
+// Interface for question options (for select and multiselect)
+export interface QuestionOption {
   label: string;
-  field: string;
+  value: string;
+}
+
+// Interface for simplified onboarding questions
+export interface OnboardingQuestion {
+  text: string;
   type: QuestionType;
-  required: boolean;
+  options?: QuestionOption[];
+  placeholder?: string;
+  validation?: (value: any) => boolean;
+  errorMessage?: string;
+}
+
+// Interface for enhanced onboarding question format (for backward compatibility)
+export interface EnhancedOnboardingQuestion {
+  order: number;
+  label: string;
+  type: QuestionType;
+  key: string;
   options?: string[];
   optionLabels?: string[];
-  validation?: RegExp | ((value: any) => boolean);
-  min?: number;
-  max?: number;
-  step?: number;
-  helpText?: string;
-  order: number; // For sorting questions in the right order
+  required?: boolean;
+  placeholder?: string;
 }
 
-// Fitness-specific onboarding questions based on MEGAPROMPT requirements
-const fitnessOnboardingQuestions: OnboardingQuestion[] = [
-  {
-    id: 'name',
-    label: 'What\'s your name?',
-    field: 'name',
-    type: 'text',
-    required: true,
-    order: 1,
-    helpText: 'We\'ll use this to personalize your fitness journey.'
-  },
-  {
-    id: 'email',
-    label: 'What\'s your email address?',
-    field: 'email',
-    type: 'text',
-    required: true,
-    order: 2,
-    helpText: 'We\'ll use this to send you personalized workout plans and updates.',
-    validation: /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-  },
-  {
-    id: 'fitnessGoals',
-    label: 'What are your main fitness goals?',
-    field: 'fitnessGoals',
-    type: 'checkbox',
-    options: [
-      'build_muscle', 
-      'lose_weight', 
-      'improve_endurance', 
-      'increase_flexibility', 
-      'general_wellness'
-    ],
-    optionLabels: [
-      'Build muscle', 
-      'Lose weight', 
-      'Improve endurance', 
-      'Increase flexibility', 
-      'General wellness'
-    ],
-    required: true,
-    order: 3,
-    helpText: 'Select all that apply. We\'ll focus your program on these areas.'
-  },
-  {
-    id: 'preferredWorkouts',
-    label: 'Which type of workouts do you prefer?',
-    field: 'preferredWorkouts',
-    type: 'checkbox',
-    options: [
-      'strength_training', 
-      'crossfit', 
-      'hiit', 
-      'cardio', 
-      'yoga', 
-      'pilates'
-    ],
-    optionLabels: [
-      'Strength Training', 
-      'CrossFit', 
-      'HIIT', 
-      'Cardio', 
-      'Yoga', 
-      'Pilates'
-    ],
-    required: true,
-    order: 4,
-    helpText: 'Select all that you enjoy. We\'ll include these in your workout plans.'
-  },
-  {
-    id: 'usedDevices',
-    label: 'Do you use any fitness trackers or wearables?',
-    field: 'usedDevices',
-    type: 'checkbox',
-    options: [
-      'apple_watch', 
-      'fitbit', 
-      'google_fit', 
-      'whoop', 
-      'none'
-    ],
-    optionLabels: [
-      'Apple Watch', 
-      'Fitbit', 
-      'Google Fit', 
-      'WHOOP', 
-      'None'
-    ],
-    required: true,
-    order: 5,
-    helpText: 'We\'ll help you connect these devices to track your progress.'
-  },
-  {
-    id: 'workoutDays',
-    label: 'What days are best for working out?',
-    field: 'workoutDays',
-    type: 'checkbox',
-    options: [
-      'weekdays', 
-      'weekends', 
-      'flexible'
-    ],
-    optionLabels: [
-      'Monday to Friday', 
-      'Weekends', 
-      'Flexible schedule'
-    ],
-    required: true,
-    order: 6,
-    helpText: 'We\'ll create a workout schedule based on your availability.'
-  },
-  {
-    id: 'sessionDuration',
-    label: 'What\'s your ideal session duration?',
-    field: 'sessionDuration',
-    type: 'multipleChoice',
-    options: [
-      '15_30_minutes', 
-      '30_45_minutes', 
-      '60_plus_minutes'
-    ],
-    optionLabels: [
-      '15–30 minutes', 
-      '30–45 minutes', 
-      '60+ minutes'
-    ],
-    required: true,
-    order: 7,
-    helpText: 'We\'ll design workouts to fit your available time.'
-  },
-  {
-    id: 'intensityLevel',
-    label: 'What level of intensity do you want?',
-    field: 'intensityLevel',
-    type: 'multipleChoice',
-    options: [
-      'low', 
-      'medium', 
-      'high', 
-      'adaptive'
-    ],
-    optionLabels: [
-      'Low', 
-      'Medium', 
-      'High', 
-      'Adaptive AI-based'
-    ],
-    required: true,
-    order: 8,
-    helpText: 'This helps us set the right difficulty level for your workouts.'
-  },
-  {
-    id: 'nutritionAdvice',
-    label: 'Do you want personalized nutrition advice?',
-    field: 'nutritionAdvice',
-    type: 'boolean',
-    required: true,
-    order: 9,
-    helpText: 'We can provide meal plans and nutrition tips alongside your workouts.'
-  },
-  {
-    id: 'coachingPreference',
-    label: 'Would you like voice coaching or video guidance?',
-    field: 'coachingPreference',
-    type: 'boolean',
-    required: true,
-    order: 10,
-    helpText: 'You can receive real-time audio coaching or follow video demonstrations.'
-  }
-];
+// Function to get onboarding questions based on agent type
+export const getOnboardingQuestions = (agentType: AgentType): EnhancedOnboardingQuestion[] => {
+  // Convert our standard questions to the enhanced format
+  const enhancedQuestions: EnhancedOnboardingQuestion[] = onboardingQuestions.map((q, index) => {
+    return {
+      order: index + 1,
+      label: q.text,
+      type: q.type,
+      key: `question_${index + 1}`,
+      options: q.options ? q.options.map(opt => opt.value) : undefined,
+      optionLabels: q.options ? q.options.map(opt => opt.label) : undefined,
+      required: !!q.validation,
+      placeholder: q.placeholder
+    };
+  });
 
-// Nutrition-specific onboarding questions
-const nutritionOnboardingQuestions: OnboardingQuestion[] = [
-  {
-    id: 'name',
-    label: 'What\'s your name?',
-    field: 'name',
-    type: 'text',
-    required: true,
-    order: 1,
-    helpText: 'We\'ll use this to personalize your nutrition plans.'
-  },
-  {
-    id: 'dietGoals',
-    label: 'What are your nutrition goals?',
-    field: 'dietGoals',
-    type: 'checkbox',
-    options: [
-      'weight_loss',
-      'muscle_gain',
-      'maintenance',
-      'energy_boost',
-      'better_digestion',
-      'reduced_inflammation',
-      'hormonal_balance'
-    ],
-    optionLabels: [
-      'Weight Loss',
-      'Muscle Gain',
-      'Weight Maintenance',
-      'Energy Boost',
-      'Better Digestion',
-      'Reduced Inflammation',
-      'Hormonal Balance'
-    ],
-    required: true,
-    order: 2,
-    helpText: 'Select all that apply. We\'ll focus your meal plans on these goals.'
-  },
-  // More nutrition questions...
-];
-
-// Mental wellness onboarding questions
-const mentalWellnessOnboardingQuestions: OnboardingQuestion[] = [
-  {
-    id: 'name',
-    label: 'What\'s your name?',
-    field: 'name',
-    type: 'text',
-    required: true,
-    order: 1,
-    helpText: 'We\'ll use this to personalize your mental wellness program.'
-  },
-  {
-    id: 'stressLevel',
-    label: 'How would you rate your current stress level?',
-    field: 'stressLevel',
-    type: 'slider',
-    min: 1,
-    max: 10,
-    step: 1,
-    required: true,
-    order: 2,
-    helpText: '1 = Very Low, 10 = Very High'
-  },
-  // More mental wellness questions...
-];
-
-// Define different agent types
-export type AgentType = 'fitness' | 'nutrition' | 'mental_wellness';
-
-/**
- * Get onboarding questions based on agent type
- * @param agentType The type of agent
- * @returns Array of onboarding questions
- */
-export function getOnboardingQuestions(agentType: AgentType = 'fitness'): OnboardingQuestion[] {
+  // Return the questions, possibly filtered by agent type
   switch (agentType) {
-    case 'fitness':
-      return [...fitnessOnboardingQuestions].sort((a, b) => a.order - b.order);
     case 'nutrition':
-      return [...nutritionOnboardingQuestions].sort((a, b) => a.order - b.order);
-    case 'mental_wellness':
-      return [...mentalWellnessOnboardingQuestions].sort((a, b) => a.order - b.order);
+      // Filter for nutrition-related questions
+      return enhancedQuestions.filter(q => 
+        q.key.includes('diet') || 
+        q.key.includes('nutrition') || 
+        q.key.includes('allergies') ||
+        q.order <= 2 // Keep name and email
+      );
+    case 'wellness':
+      // Filter for wellness-related questions
+      return enhancedQuestions.filter(q => 
+        q.key.includes('wellness') || 
+        q.key.includes('health') || 
+        q.key.includes('sleep') ||
+        q.order <= 2 // Keep name and email
+      );
+    case 'fitness':
     default:
-      return [...fitnessOnboardingQuestions].sort((a, b) => a.order - b.order);
+      // Return all questions for fitness or default
+      return enhancedQuestions;
   }
-}
+};
 
-/**
- * Get specific onboarding question by ID and agent type
- * @param id Question ID
- * @param agentType Agent type
- * @returns Onboarding question or undefined if not found
- */
-export function getQuestionById(id: string, agentType: AgentType = 'fitness'): OnboardingQuestion | undefined {
-  const questions = getOnboardingQuestions(agentType);
-  return questions.find(q => q.id === id);
-}
+// Onboarding flow questions
+export const onboardingQuestions: OnboardingQuestion[] = [
+  // Question 1: Name
+  {
+    text: "What's your name?",
+    type: 'text',
+    placeholder: 'Enter your name',
+    validation: (value) => value.length > 0,
+    errorMessage: 'Please enter your name'
+  },
+  
+  // Question 2: Email
+  {
+    text: "What's your email address?",
+    type: 'email',
+    placeholder: 'your@email.com',
+    validation: (value) => {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return emailRegex.test(value);
+    },
+    errorMessage: 'Please enter a valid email address'
+  },
+  
+  // Question 3: Fitness Level
+  {
+    text: "What's your current fitness level?",
+    type: 'select',
+    options: [
+      { label: 'Beginner - New to fitness', value: 'beginner' },
+      { label: 'Intermediate - Regular exerciser', value: 'intermediate' },
+      { label: 'Advanced - Experienced fitness enthusiast', value: 'advanced' }
+    ]
+  },
+  
+  // Question 4: Fitness Goals
+  {
+    text: "What are your main fitness goals? (Select all that apply)",
+    type: 'multiselect',
+    options: [
+      { label: 'Build muscle', value: 'build_muscle' },
+      { label: 'Lose weight', value: 'lose_weight' },
+      { label: 'Improve cardiovascular health', value: 'improve_cardio' },
+      { label: 'Increase flexibility', value: 'increase_flexibility' },
+      { label: 'Improve athletic performance', value: 'improve_performance' },
+      { label: 'General health and wellness', value: 'general_health' }
+    ]
+  },
+  
+  // Question 5: Limitations
+  {
+    text: "Do you have any physical limitations or health concerns?",
+    type: 'select',
+    options: [
+      { label: 'None', value: 'none' },
+      { label: 'Back pain or injury', value: 'back_pain' },
+      { label: 'Joint issues (knees, shoulders, etc.)', value: 'joint_issues' },
+      { label: 'Cardiovascular condition', value: 'cardio_condition' },
+      { label: 'Limited mobility', value: 'limited_mobility' },
+      { label: 'Other health concern', value: 'other' }
+    ]
+  },
+  
+  // Question 6: Workout Frequency
+  {
+    text: "How many days per week can you commit to working out?",
+    type: 'select',
+    options: [
+      { label: '1-2 days per week', value: '1-2' },
+      { label: '3-4 days per week', value: '3-4' },
+      { label: '5-6 days per week', value: '5-6' },
+      { label: 'Daily', value: 'daily' }
+    ]
+  },
+  
+  // Question 7: Workout Location
+  {
+    text: "Where do you primarily work out?",
+    type: 'select',
+    options: [
+      { label: 'At a gym', value: 'gym' },
+      { label: 'At home with equipment', value: 'home_equipment' },
+      { label: 'At home with minimal/no equipment', value: 'home_minimal' },
+      { label: 'Outdoors', value: 'outdoors' },
+      { label: 'Varies/Multiple locations', value: 'varies' }
+    ]
+  },
+  
+  // Question 8: Diet Preference
+  {
+    text: "What is your dietary preference?",
+    type: 'select',
+    options: [
+      { label: 'No specific diet', value: 'no_preference' },
+      { label: 'Vegetarian', value: 'vegetarian' },
+      { label: 'Vegan', value: 'vegan' },
+      { label: 'Keto/Low-carb', value: 'keto' },
+      { label: 'Paleo', value: 'paleo' },
+      { label: 'Mediterranean', value: 'mediterranean' },
+      { label: 'Other', value: 'other' }
+    ]
+  },
+  
+  // Question 9: Preferred workout style
+  {
+    text: "What types of workouts do you enjoy most? (Select all that apply)",
+    type: 'multiselect',
+    options: [
+      { label: 'Weight Training', value: 'weights' },
+      { label: 'HIIT/Circuit Training', value: 'hiit' },
+      { label: 'Cardio (running, cycling, etc.)', value: 'cardio' },
+      { label: 'Yoga/Pilates', value: 'yoga' },
+      { label: 'Calisthenics/Bodyweight', value: 'calisthenics' },
+      { label: 'Sports and Outdoor Activities', value: 'sports' },
+      { label: 'Group Fitness Classes', value: 'group_classes' }
+    ]
+  },
+  
+  // Question 10: Motivation
+  {
+    text: "What motivates you most to stay consistent with exercise?",
+    type: 'select',
+    options: [
+      { label: 'Tracking progress and seeing results', value: 'progress' },
+      { label: 'Having a structured plan to follow', value: 'structure' },
+      { label: 'Social support and accountability', value: 'social' },
+      { label: 'Challenging myself with new goals', value: 'challenge' },
+      { label: 'Feeling better physically and mentally', value: 'wellbeing' },
+      { label: 'Competing with others or myself', value: 'competition' }
+    ]
+  }
+];
 
-/**
- * Get the next question in the onboarding flow
- * @param currentId Current question ID
- * @param agentType Agent type
- * @returns Next question or undefined if at the end
- */
-export function getNextQuestion(currentId: string, agentType: AgentType = 'fitness'): OnboardingQuestion | undefined {
-  const questions = getOnboardingQuestions(agentType);
-  const currentIndex = questions.findIndex(q => q.id === currentId);
+// Process answers from onboarding flow
+export const processOnboardingAnswers = (answers: Record<number, any>): Record<string, any> => {
+  // Map question indices to more descriptive keys
+  const processedData: Record<string, any> = {
+    name: answers[1],
+    email: answers[2],
+    fitnessLevel: answers[3],
+    fitnessGoals: answers[4],
+    limitations: answers[5],
+    workoutFrequency: answers[6],
+    workoutLocation: answers[7],
+    dietPreference: answers[8],
+    preferredWorkouts: answers[9],
+    motivation: answers[10]
+  };
   
-  if (currentIndex >= 0 && currentIndex < questions.length - 1) {
-    return questions[currentIndex + 1];
-  }
-  
-  return undefined;
-}
-
-/**
- * Get the previous question in the onboarding flow
- * @param currentId Current question ID
- * @param agentType Agent type
- * @returns Previous question or undefined if at the beginning
- */
-export function getPreviousQuestion(currentId: string, agentType: AgentType = 'fitness'): OnboardingQuestion | undefined {
-  const questions = getOnboardingQuestions(agentType);
-  const currentIndex = questions.findIndex(q => q.id === currentId);
-  
-  if (currentIndex > 0) {
-    return questions[currentIndex - 1];
-  }
-  
-  return undefined;
-}
-
-/**
- * Check if a value passes validation for a question
- * @param question Onboarding question
- * @param value Value to validate
- * @returns True if valid, false otherwise
- */
-export function validateAnswer(question: OnboardingQuestion, value: any): boolean {
-  // Required field validation
-  if (question.required && (value === undefined || value === null || value === '')) {
-    return false;
-  }
-  
-  // If not required and no value, it's valid
-  if (!question.required && (value === undefined || value === null || value === '')) {
-    return true;
-  }
-  
-  // Type-specific validation
-  switch (question.type) {
-    case 'text':
-      if (question.validation instanceof RegExp) {
-        return question.validation.test(value);
-      } else if (typeof question.validation === 'function') {
-        return question.validation(value);
-      }
-      return true;
-      
-    case 'multipleChoice':
-      return question.options?.includes(value) ?? false;
-      
-    case 'checkbox':
-      if (!Array.isArray(value)) {
-        return false;
-      }
-      return value.every(v => question.options?.includes(v) ?? false);
-      
-    case 'slider':
-      const numValue = Number(value);
-      if (isNaN(numValue)) {
-        return false;
-      }
-      return (question.min === undefined || numValue >= question.min) && 
-             (question.max === undefined || numValue <= question.max);
-      
-    case 'boolean':
-      return typeof value === 'boolean';
-      
-    default:
-      return true;
-  }
-}
-
-export default {
-  getOnboardingQuestions,
-  getQuestionById,
-  getNextQuestion,
-  getPreviousQuestion,
-  validateAnswer
+  return processedData;
 };

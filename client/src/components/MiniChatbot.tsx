@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { createUserProfile, UserCategory } from '../lib/userCodeGenerator';
+import { UserProfile, UserCategory, generateUserCode, determineUserCategory } from '../lib/userCodeGenerator';
 import userService from '../lib/userService';
-import vertexAIService from '../lib/vertexAIService';
+import { analyzeUserWithAI } from '../lib/vertexAIService';
+import { onboardingQuestions, processOnboardingAnswers } from '../lib/onboardingFlow';
 import AccessCodeScreen from './AccessCodeScreen';
 
 interface Question {
