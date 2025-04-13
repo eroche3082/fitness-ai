@@ -1,8 +1,5 @@
-import React, { useState } from 'react';
-import { Share2, Download, Copy, Check } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import React, { useEffect, useState } from 'react';
 import { UserProfile } from '../shared/types';
-import { useToast } from '@/hooks/use-toast';
 import QRCodeDisplay from './QRCodeDisplay';
 
 interface AccessCodeQRProps {
@@ -11,129 +8,197 @@ interface AccessCodeQRProps {
 
 const AccessCodeQR: React.FC<AccessCodeQRProps> = ({ userProfile }) => {
   const [copied, setCopied] = useState(false);
-  const { toast } = useToast();
+  const [showQR, setShowQR] = useState(false);
   
-  const dashboardUrl = `${window.location.origin}/dashboard?code=${userProfile.uniqueCode}`;
+  // Reset copied state after 2 seconds
+  useEffect(() => {
+    if (copied) {
+      const timer = setTimeout(() => {
+        setCopied(false);
+      }, 2000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [copied]);
   
-  const handleShare = async () => {
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: 'My Fitness AI Access Code',
-          text: `Join me on Fitness AI! Use my access code: ${userProfile.uniqueCode}`,
-          url: dashboardUrl,
-        });
-        
-        toast({
-          title: 'Shared Successfully',
-          description: 'Your access code has been shared!',
-        });
-      } catch (error) {
-        console.error('Error sharing:', error);
-      }
-    } else {
-      // Fallback for browsers that don't support the Web Share API
-      handleCopyLink();
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(userProfile.uniqueCode);
+    setCopied(true);
+  };
+  
+  const toggleQRCode = () => {
+    setShowQR(!showQR);
+  };
+  
+  const getAccessLevel = () => {
+    switch (userProfile.category) {
+      case 'BEG': return 'Basic';
+      case 'INT': return 'Intermediate';
+      case 'ADV': return 'Advanced';
+      case 'PRO': return 'Professional';
+      case 'VIP': return 'VIP';
+      default: return 'Basic';
     }
   };
   
-  const handleCopyLink = () => {
-    navigator.clipboard.writeText(dashboardUrl);
-    setCopied(true);
-    
-    toast({
-      title: 'Link Copied',
-      description: 'Your access link has been copied to clipboard!',
-    });
-    
-    setTimeout(() => setCopied(false), 2000);
-  };
-  
-  const handleDownloadQR = () => {
-    const canvas = document.getElementById('access-qr-code')?.querySelector('canvas');
-    if (!canvas) return;
-    
-    const link = document.createElement('a');
-    link.download = `fitness-ai-${userProfile.uniqueCode}.png`;
-    link.href = canvas.toDataURL('image/png');
-    link.click();
-    
-    toast({
-      title: 'QR Code Downloaded',
-      description: 'Your QR code has been downloaded successfully!',
-    });
-  };
+  const isPremium = userProfile.paymentStatus === 'paid' || userProfile.unlockedLevels.length > 0;
   
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-      <h2 className="text-xl font-semibold mb-4">Your Access Code</h2>
-      
-      <div className="flex flex-col md:flex-row items-center gap-6">
-        <div id="access-qr-code" className="bg-white p-4 rounded-lg shadow-sm">
-          <QRCodeDisplay code={dashboardUrl} size={180} />
+    <div className="space-y-6">
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+        <h2 className="text-xl font-semibold mb-4">Your Personal Access Code</h2>
+        <p className="text-gray-600 dark:text-gray-400 mb-6">
+          Your unique access code provides you with seamless access to all features and services you've unlocked.
+        </p>
+        
+        <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-6 mb-6">
+          <div className="text-center mb-4">
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">Your Access Code:</p>
+            <div className="flex items-center justify-center space-x-2">
+              <span className="text-2xl font-bold tracking-wide">{userProfile.uniqueCode}</span>
+              <button 
+                onClick={copyToClipboard}
+                className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full"
+              >
+                {copied ? (
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                ) : (
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                  </svg>
+                )}
+              </button>
+            </div>
+          </div>
+          
+          <div className="flex justify-center mb-4">
+            <button 
+              onClick={toggleQRCode}
+              className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md"
+            >
+              {showQR ? 'Hide QR Code' : 'Show QR Code'}
+            </button>
+          </div>
+          
+          {showQR && (
+            <div className="flex justify-center p-4 bg-white rounded-lg shadow-inner">
+              <QRCodeDisplay code={userProfile.uniqueCode} size={200} />
+            </div>
+          )}
         </div>
         
-        <div className="flex-1">
-          <div className="mb-4">
-            <h3 className="text-lg font-medium mb-1">Access Code</h3>
-            <div className="flex items-center">
-              <span className="text-2xl font-bold tracking-wide">{userProfile.uniqueCode}</span>
-              <Button
-                size="sm"
-                variant="ghost"
-                className="ml-2"
-                onClick={handleCopyLink}
-              >
-                {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-              </Button>
+        <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+          <div className="flex justify-between items-center">
+            <div>
+              <h3 className="font-medium">{getAccessLevel()} Tier</h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                {isPremium ? 'Premium Access' : 'Free Access'}
+              </p>
             </div>
-            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-              Level: {userProfile.category} • Status: {userProfile.paymentStatus.charAt(0).toUpperCase() + userProfile.paymentStatus.slice(1)}
-            </p>
-          </div>
-          
-          <p className="text-gray-700 dark:text-gray-300 mb-4">
-            Use this QR code to quickly access your personalized dashboard. 
-            Share with friends to earn rewards!
-          </p>
-          
-          <div className="flex flex-wrap gap-3">
-            <Button
-              variant="outline"
-              className="flex-1"
-              onClick={handleShare}
-            >
-              <Share2 className="mr-2 h-4 w-4" /> Share
-            </Button>
-            
-            <Button
-              variant="outline"
-              className="flex-1"
-              onClick={handleDownloadQR}
-            >
-              <Download className="mr-2 h-4 w-4" /> Download
-            </Button>
+            <div className="bg-green-100 dark:bg-green-900 py-1 px-3 rounded-full">
+              <span className="text-green-800 dark:text-green-300 text-sm font-medium">
+                {userProfile.paymentStatus === 'paid' ? 'Active' : 'Free'}
+              </span>
+            </div>
           </div>
         </div>
       </div>
       
-      <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
-        <h3 className="text-lg font-medium mb-3">How to Use Your Access Code</h3>
-        <ul className="space-y-2">
-          <li className="flex items-start">
-            <span className="flex-shrink-0 w-6 h-6 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center text-blue-600 dark:text-blue-300 mr-2">1</span>
-            <span className="text-gray-700 dark:text-gray-300">Scan the QR code with your mobile device to access your dashboard instantly</span>
-          </li>
-          <li className="flex items-start">
-            <span className="flex-shrink-0 w-6 h-6 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center text-blue-600 dark:text-blue-300 mr-2">2</span>
-            <span className="text-gray-700 dark:text-gray-300">Share your code with friends to earn referral points and unlock premium features</span>
-          </li>
-          <li className="flex items-start">
-            <span className="flex-shrink-0 w-6 h-6 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center text-blue-600 dark:text-blue-300 mr-2">3</span>
-            <span className="text-gray-700 dark:text-gray-300">Use your code to activate premium features and access personalized content</span>
-          </li>
-        </ul>
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+        <h2 className="text-xl font-semibold mb-4">Access Code Benefits</h2>
+        <p className="text-gray-600 dark:text-gray-400 mb-4">
+          Your access code unlocks premium features and enables secure collaboration.
+        </p>
+        
+        <div className="space-y-4">
+          <div className="flex items-start">
+            <div className="mt-1 mr-4 flex-shrink-0 w-6 h-6 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+              </svg>
+            </div>
+            <div>
+              <h3 className="font-medium">Secure Access</h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                Your personal code ensures secure access to all your fitness data and premium features.
+              </p>
+            </div>
+          </div>
+          
+          <div className="flex items-start">
+            <div className="mt-1 mr-4 flex-shrink-0 w-6 h-6 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+            </div>
+            <div>
+              <h3 className="font-medium">Quick Login</h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                Scan your QR code for instant access on any device without entering credentials.
+              </p>
+            </div>
+          </div>
+          
+          <div className="flex items-start">
+            <div className="mt-1 mr-4 flex-shrink-0 w-6 h-6 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
+            </div>
+            <div>
+              <h3 className="font-medium">Coach Sharing</h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                Share your code with your fitness coach to enable collaborative workout planning.
+              </p>
+            </div>
+          </div>
+          
+          {isPremium && (
+            <div className="flex items-start">
+              <div className="mt-1 mr-4 flex-shrink-0 w-6 h-6 bg-purple-100 dark:bg-purple-900 rounded-full flex items-center justify-center">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-purple-600 dark:text-purple-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                </svg>
+              </div>
+              <div>
+                <h3 className="font-medium">Premium Features</h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  Unlocks access to advanced training plans, AI routines, and exclusive content.
+                </p>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
+      
+      {userProfile.referralCount !== undefined && (
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+          <h2 className="text-xl font-semibold mb-4">Your Referrals</h2>
+          <p className="text-gray-600 dark:text-gray-400 mb-4">
+            Share your access code with friends and earn benefits when they join.
+          </p>
+          
+          <div className="flex justify-between items-center p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+            <div>
+              <h3 className="font-medium">Total Referrals</h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                You've referred {userProfile.referralCount} friends
+              </p>
+            </div>
+            <div className="text-3xl font-bold text-blue-600 dark:text-blue-400">
+              {userProfile.referralCount}
+            </div>
+          </div>
+          
+          <div className="mt-4">
+            <button className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-md">
+              Share Your Code
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

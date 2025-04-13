@@ -43,17 +43,20 @@ const Dashboard: React.FC<DashboardProps> = ({ userCode }) => {
     let multiplier = 1;
     
     switch (category) {
-      case 'beginner':
+      case 'BEG':
         multiplier = 1;
         break;
-      case 'intermediate':
+      case 'INT':
         multiplier = 2;
         break;
-      case 'advanced':
+      case 'ADV':
         multiplier = 3;
         break;
-      case 'professional':
+      case 'PRO':
         multiplier = 4;
+        break;
+      case 'VIP':
+        multiplier = 5;
         break;
       default:
         multiplier = 1;
