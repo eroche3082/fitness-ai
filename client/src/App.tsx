@@ -6,6 +6,7 @@ import { Toaster } from "@/components/ui/toaster";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
 import LandingPage from "@/pages/newlanding";
+import BridgeLanding from "@/pages/BridgeLanding";
 import FitnessTrackersPage from "@/pages/fitness-trackers";
 import ApiStatusPage from "@/pages/api-status";
 import SystemAuditPage from "@/pages/system-audit";
@@ -14,6 +15,9 @@ import ChatPage from "@/pages/chat";
 import { UserProvider } from "./contexts/UserContext";
 import { ChatProvider } from "./contexts/ChatContext";
 import FitnessSystemInitializer from "./components/FitnessSystemInitializer";
+
+// Import CSS para el tema Bridge
+import "./assets/bridge-styles.css";
 
 import VoiceCoachingPage from "@/pages/voice-coaching";
 import { 
@@ -144,9 +148,9 @@ function Router() {
   
   // Check auth status and redirect if needed
   useEffect(() => {
-    if (!isAuthenticated && location !== '/landing' && 
+    if (!isAuthenticated && location !== '/landing' && location !== '/bridge' && 
         !location.startsWith('/status/')) {
-      setLocation('/landing');
+      setLocation('/bridge');
     }
   }, [isAuthenticated, location, setLocation]);
   
@@ -154,6 +158,7 @@ function Router() {
     <Switch>
       {/* Public routes */}
       <Route path="/landing" component={LandingPage} />
+      <Route path="/bridge" component={BridgeLanding} />
       <Route path="/status/landing">
         {() => <StatusRoute path="landing" statusInfo="Landing page is fully operational" />}
       </Route>

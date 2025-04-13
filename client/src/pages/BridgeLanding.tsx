@@ -487,7 +487,8 @@ export default function BridgeLanding() {
       </footer>
 
       {/* Custom CSS */}
-      <style jsx>{`
+      <style dangerouslySetInnerHTML={{
+        __html: `
         .bridge-hero {
           min-height: 90vh;
           display: flex;
@@ -499,7 +500,7 @@ export default function BridgeLanding() {
             min-height: 80vh;
           }
         }
-      `}</style>
+      `}} />
     </div>
   );
 }
