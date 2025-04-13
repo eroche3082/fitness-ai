@@ -1,9 +1,23 @@
 <svg width="800" height="600" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#1a1a1a;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#000000;stop-opacity:1" />
+    <linearGradient id="gradientTraining1" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#333333;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#111111;stop-opacity:1" />
     </linearGradient>
+    <pattern id="diagonalPattern" patternUnits="userSpaceOnUse" width="40" height="40" patternTransform="rotate(45)">
+      <rect width="100%" height="100%" fill="#000" />
+      <rect x="0" y="0" width="20" height="40" fill="#222" />
+    </pattern>
   </defs>
-  <rect width="100%" height="100%" fill="url(#gradient)" />
+  <rect width="100%" height="100%" fill="url(#gradientTraining1)" />
+  <rect width="100%" height="100%" fill="url(#diagonalPattern)" opacity="0.3" />
+  
+  <!-- POWER text -->
+  <text x="400" y="300" font-family="Arial" font-size="80" text-anchor="middle" fill="#ffffff" font-weight="bold">POWER</text>
+  <text x="400" y="200" font-family="Arial" font-size="40" text-anchor="middle" fill="#ffffff" opacity="0.7">TRAINING</text>
+  
+  <!-- Stylistic elements - barbells -->
+  <rect x="250" y="400" width="300" height="20" rx="10" fill="#444" />
+  <circle cx="200" cy="410" r="40" fill="#333" stroke="#444" stroke-width="2" />
+  <circle cx="600" cy="410" r="40" fill="#333" stroke="#444" stroke-width="2" />
 </svg>
