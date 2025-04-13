@@ -5,7 +5,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
-import LandingPage from "@/pages/landing";
+import LandingPage from "@/pages/newlanding";
 import FitnessTrackersPage from "@/pages/fitness-trackers";
 import ApiStatusPage from "@/pages/api-status";
 import SystemAuditPage from "@/pages/system-audit";
