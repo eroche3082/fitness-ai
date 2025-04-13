@@ -3,25 +3,25 @@
 
 // Hero section background
 export const heroBackground = '/src/assets/bridge-images/hero-bg.svg';
-export const hero = '/images/fitness/yoga_plank.jpeg'; 
+export const hero = '/images/yoga_plank.jpeg'; 
 export const logoWhite = '/src/assets/bridge-images/logo-white.svg';
 
 // Trainer images
-export const trainer1 = '/images/fitness/kettlebell_swings.jpeg';
-export const trainer2 = '/images/fitness/barbell_squats.jpeg';
-export const trainer3 = '/images/fitness/group_class.jpeg';
+export const trainer1 = '/images/kettlebell_swings.jpeg';
+export const trainer2 = '/images/barbell_squats.jpeg';
+export const trainer3 = '/images/group_class.jpeg';
 
 // Training category images
-export const training1 = '/images/fitness/garage_gym.jpeg';       // Training Power
-export const training2 = '/images/fitness/treadmill_friends.jpeg'; // Strength
-export const training3 = '/images/fitness/resistance_band.jpeg';   // Mobility
-export const training4 = '/images/fitness/family_workout.jpeg';    // Endurance
-export const training5 = '/images/fitness/elderly_fitness.jpeg';   // Cardio
-export const training6 = '/images/fitness/meditation.jpeg';        // Recovery
+export const training1 = '/images/garage_gym.jpeg';       // Training Power
+export const training2 = '/images/treadmill_friends.jpeg'; // Strength
+export const training3 = '/images/resistance_band.jpeg';   // Mobility
+export const training4 = '/images/family_workout.jpeg';    // Endurance
+export const training5 = '/images/elderly_fitness.jpeg';   // Cardio
+export const training6 = '/images/meditation.jpeg';        // Recovery
 
 // Additional fitness images
-export const progressCheck = '/images/fitness/progress_check.jpeg';
-export const gymBreak = '/images/fitness/gym_break.jpeg';
+export const progressCheck = '/images/progress_check.jpeg';
+export const gymBreak = '/images/gym_break.jpeg';
 
 // Feature icons are imported directly in the component from lucide-react
 
