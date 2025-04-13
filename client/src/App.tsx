@@ -56,7 +56,9 @@ const AuthContext = createContext<AuthContextType>({
   logout: () => {},
 });
 
-export const useAuth = () => useContext(AuthContext);
+// Separar la definición de la exportación para evitar problemas con HMR
+const useAuth = () => useContext(AuthContext);
+export { useAuth };
 
 // Main navigation for the app
 function MainNavigation() {
@@ -157,9 +159,22 @@ function Router() {
   
   // Check auth status and redirect if needed
   useEffect(() => {
-    if (!isAuthenticated && location !== '/landing' && location !== '/bridge' && 
-        !location.startsWith('/status/') && 
-        location !== '/access' && location !== '/dashboard' && !location.startsWith('/dashboard/')) {
+    const publicRoutes = [
+      '/landing', 
+      '/bridge', 
+      '/login',
+      '/signup',
+      '/about',
+      '/programs',
+      '/contact',
+      '/access'
+    ];
+    const isPublicRoute = publicRoutes.includes(location) || 
+                          location.startsWith('/status/') || 
+                          location.startsWith('/dashboard/') ||
+                          location === '/dashboard';
+                          
+    if (!isAuthenticated && !isPublicRoute) {
       setLocation('/bridge');
     }
   }, [isAuthenticated, location, setLocation]);
@@ -169,6 +184,11 @@ function Router() {
       {/* Public routes */}
       <Route path="/landing" component={LandingPage} />
       <Route path="/bridge" component={BridgeLanding} />
+      <Route path="/login" component={LoginPage} />
+      <Route path="/signup" component={SignupPage} />
+      <Route path="/about" component={AboutPage} />
+      <Route path="/programs" component={ProgramsPage} />
+      <Route path="/contact" component={ContactPage} />
       
       {/* New Routes - User Journey */}
       <Route path="/access" component={AccessCodePage} />
@@ -212,7 +232,8 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   
   const login = (username: string, password: string): boolean => {
-    if (username === 'admin' && password === 'admin123456') {
+    if ((username === 'admin' && password === 'admin123456') || 
+        (username === 'demo' && password === 'demo123')) {
       setIsAuthenticated(true);
       return true;
     }
