@@ -4,21 +4,42 @@
   font-family: 'Poppins', sans-serif;
   color: white;
   background-color: black;
+  overflow-x: hidden; /* Prevent horizontal scrolling */
 }
 
+/* Section styles */
 .bridge-hero {
   min-height: 100vh;
   display: flex;
   align-items: center;
+  position: relative;
+}
+
+.bridge-section {
+  position: relative;
+  overflow: hidden;
+  padding: 120px 0;
+}
+
+.bridge-section-dark {
+  background-color: #000000;
+  color: white;
+}
+
+.bridge-section-overlap {
+  margin-top: -80px;
+  z-index: 10;
+  position: relative;
 }
 
 /* Text styles */
 .bridge-heading {
   font-size: 140px;
   font-weight: 700;
-  line-height: 1;
-  letter-spacing: -2px;
+  line-height: 0.9;
+  letter-spacing: -3px;
   text-transform: uppercase;
+  margin-bottom: 30px;
 }
 
 .bridge-subheading {
@@ -26,13 +47,30 @@
   font-weight: 700;
   line-height: 1.1;
   text-transform: uppercase;
+  margin-bottom: 20px;
 }
 
 .bridge-label {
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 600;
-  letter-spacing: 2px;
+  letter-spacing: 3px;
   text-transform: uppercase;
+  position: relative;
+  display: inline-block;
+}
+
+.bridge-label::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 0;
+  width: 40px;
+  height: 2px;
+  background-color: #ffffff;
+}
+
+.bridge-accent-text {
+  color: #e63946; /* Accent color that matches design */
 }
 
 /* Vertical text */
@@ -42,16 +80,40 @@
   white-space: nowrap;
   text-transform: uppercase;
   font-weight: 600;
-  letter-spacing: 1px;
+  letter-spacing: 2px;
+  margin: 30px 0;
 }
 
-/* Card hover effects */
+/* Card styles */
 .bridge-card {
-  transition: transform 0.3s ease;
+  background-color: rgba(17, 17, 17, 0.8);
+  padding: 40px;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.bridge-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(to right, #e63946, transparent);
+  transform: translateX(-100%);
+  transition: transform 0.4s ease;
 }
 
 .bridge-card:hover {
-  transform: translateY(-10px);
+  transform: translateY(-15px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.bridge-card:hover::before {
+  transform: translateX(0);
 }
 
 /* Social media icons */
@@ -61,29 +123,51 @@
 }
 
 .bridge-social-icon {
-  width: 40px;
-  height: 40px;
-  border: 1px solid white;
+  width: 44px;
+  height: 44px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
   display: flex;
   align-items: center;
   justify-content: center;
   transition: all 0.3s ease;
+  border-radius: 50%;
 }
 
 .bridge-social-icon:hover {
   background-color: white;
   color: black;
+  border-color: white;
+  transform: translateY(-5px);
 }
 
 /* Button styles */
 .bridge-button {
-  padding: 12px 30px;
+  padding: 16px 36px;
   text-transform: uppercase;
   font-weight: 600;
-  letter-spacing: 1px;
+  letter-spacing: 2px;
   border: none;
   cursor: pointer;
   transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.bridge-button::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 0;
+  background-color: rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  z-index: -1;
+}
+
+.bridge-button:hover::after {
+  height: 100%;
 }
 
 .bridge-button-primary {
@@ -93,6 +177,8 @@
 
 .bridge-button-primary:hover {
   background-color: #f2f2f2;
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
 }
 
 .bridge-button-outline {
@@ -104,6 +190,37 @@
 .bridge-button-outline:hover {
   background-color: white;
   color: black;
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Grid layout for trainers */
+.bridge-trainer-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 30px;
+}
+
+/* Training categories grid */
+.bridge-training-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.bridge-training-item {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 1 / 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.4s ease;
+}
+
+.bridge-training-item:hover {
+  transform: scale(1.05);
 }
 
 /* Gradient backgrounds */
@@ -112,13 +229,63 @@
 }
 
 .bridge-gradient-2 {
-  background: linear-gradient(to bottom right, #0f0f0f, #000000);
+  background: linear-gradient(135deg, #0f0f0f 0%, #000000 100%);
+}
+
+.bridge-overlay-gradient {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.9) 100%);
+  z-index: 1;
+}
+
+/* Image containers */
+.bridge-image-container {
+  position: relative;
+  overflow: hidden;
+}
+
+.bridge-image-container img {
+  transition: transform 0.7s ease;
+}
+
+.bridge-image-container:hover img {
+  transform: scale(1.1);
+}
+
+/* Dividers */
+.bridge-divider {
+  width: 100%;
+  height: 1px;
+  background-color: rgba(255, 255, 255, 0.1);
+  margin: 80px 0;
+}
+
+.bridge-divider-accent {
+  width: 80px;
+  height: 4px;
+  background-color: #e63946;
+  margin: 30px 0;
 }
 
 /* Responsive styles */
+@media (max-width: 1200px) {
+  .bridge-heading {
+    font-size: 100px;
+  }
+  
+  .bridge-subheading {
+    font-size: 60px;
+  }
+}
+
 @media (max-width: 768px) {
   .bridge-heading {
     font-size: 60px;
+    letter-spacing: -1px;
   }
   
   .bridge-subheading {
@@ -127,5 +294,33 @@
   
   .bridge-hero {
     min-height: 80vh;
+  }
+  
+  .bridge-section {
+    padding: 80px 0;
+  }
+  
+  .bridge-trainer-grid,
+  .bridge-training-grid {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  }
+}
+
+@media (max-width: 480px) {
+  .bridge-heading {
+    font-size: 40px;
+  }
+  
+  .bridge-subheading {
+    font-size: 30px;
+  }
+  
+  .bridge-trainer-grid,
+  .bridge-training-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .bridge-section {
+    padding: 60px 0;
   }
 }

@@ -1,0 +1,72 @@
+Integrate an advanced Smart Patch System into the existing Fitness AI platform.
+
+Objective:
+Allow the AI to diagnose the user's physical, emotional, and cognitive state, and recommend or activate a wearable patch (real or virtual) designed to restore balance or enhance performance (focus, sleep, energy, stress reduction, recovery, etc.).
+
+System Architecture:
+- Platform: Replit (Full-stack)
+- Backend: FastAPI (Python)
+- Frontend: React (Optional)
+- DB: Firebase Firestore
+- Authentication: Firebase Auth
+- Integrations: Google Fit API, Apple Health (via file uploads), Fitbit, Strava
+- AI APIs: Google Vertex AI / Gemini, OpenAI, Sentiment Analysis, Emotion Detection
+- Payment: Stripe (for future patch product purchases)
+
+Directory Structure:
+/
+├── main.py                     # API server (FastAPI)
+├── patch_diagnosis.py         # AI system for detecting user state
+├── patch_recommendation.py    # Logic to recommend appropriate patch
+├── patch_data/
+│   ├── lifewave_data.json      # Product data scraped or loaded from Lifewave
+│   ├── healy_data.json         # Frequencies and purposes
+│   ├── apollo_data.json        # Device modes and benefits
+├── integrations/
+│   ├── google_fit.py           # Google Fit connection
+│   ├── apple_health.py         # Apple file processing
+│   ├── fitbit.py               # Fitbit integration
+│   ├── strava.py               # Strava connection
+├── components/
+│   ├── patchModal.jsx          # UI component to show suggested patch
+│   ├── dashboardOverview.jsx   # Tracker of energy/emotion
+├── static/
+│   └── assets/patch-icons/     # Icons and visuals of patches
+├── .env                        # Store API keys and product references
+
+Core Functionalities:
+1. Track physical metrics from connected APIs (Google Fit, Apple Health, Fitbit, Strava)
+2. Conduct emotional analysis via:
+   - Sentiment from text input
+   - Audio tone analysis (optional)
+   - Google Natural Language API
+3. Run AI diagnosis:
+   - Sleep quality
+   - Stress/fatigue levels
+   - Emotional volatility
+   - Cognitive focus
+4. Recommend one or more patches from a dynamic inventory:
+   - ALPHA (Focus/Clarity)
+   - SOMA (Emotional Recovery)
+   - AETHER (Creative Flow)
+   - IGNITE (Energy Boost)
+   - DRIFT (Deep Sleep)
+   - SHIELD (Immune/Energetic Support)
+5. Present patch info to user (benefits, duration, placement)
+6. (Optional) Allow user to order real patch via integrated Stripe checkout
+7. Save user’s emotional and physical history over time
+8. Update patch recommendations dynamically as user evolves
+
+Extras:
+- Connect external APIs from Lifewave, Healy, Apollo Neuro (even if just scraping or through webhook)
+- Integrate chatbot/voice input to guide user to their ideal patch
+- Add QR code system to scan physical patch and sync with AI state
+
+Prompt Personality:
+You are an intelligent and intuitive fitness-coach AI fused with holistic wisdom. Your goal is to help the user feel aligned: physically, mentally, and energetically. Use language that is motivating, grounded, and a bit mystical.
+
+User Command Example:
+→ "I feel foggy and low energy today."  
+→ Response: “Analyzing your current state... Recommended patch: IGNITE. Apply on solar plexus for 6–8 hours. Activating focus-enhancing mode.”
+
+Deploy everything inside Fitness AI as a new tab: `/patches` with dashboard, patch explorer, and recommendation flow.
