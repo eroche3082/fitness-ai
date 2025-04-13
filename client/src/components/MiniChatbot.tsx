@@ -1,9 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { UserProfile, UserCategory, generateUserCode, determineUserCategory } from '../lib/userCodeGenerator';
+import { UserProfile, UserCategory } from '../shared/types';
 import userService from '../lib/userService';
-import { analyzeUserWithAI } from '../lib/vertexAIService';
 import { onboardingQuestions, processOnboardingAnswers } from '../lib/onboardingFlow';
 import AccessCodeScreen from './AccessCodeScreen';
+import EnlargedChatbot from './EnlargedChatbot';
 
 interface Question {
   id: number;
@@ -252,9 +252,24 @@ export default function MiniChatbot() {
   const inputRef = useRef<HTMLInputElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Toggle chat open/close
+  // State for enlarged chatbot
+  const [showEnlarged, setShowEnlarged] = useState(false);
+
+  // Toggle basic chat open/close
   const toggleChat = () => {
-    setIsOpen(!isOpen);
+    if (!showEnlarged) {
+      // Open regular chat
+      setIsOpen(!isOpen);
+    } else {
+      // Close enlarged chat
+      setShowEnlarged(false);
+    }
+  };
+  
+  // Open the enlarged chatbot
+  const openEnlargedChat = () => {
+    setIsOpen(false);
+    setShowEnlarged(true);
   };
 
   // Handle input changes

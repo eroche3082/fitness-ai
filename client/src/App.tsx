@@ -244,7 +244,7 @@ function App() {
               </div>
             )}
             
-            {/* Add the floating chatbot to all pages, according to MEGAPROMPT */}
+            {/* Add the floating chatbot to all pages with enlarged version for better user experience */}
             <MiniChatbot />
           </ChatProvider>
         </UserProvider>
