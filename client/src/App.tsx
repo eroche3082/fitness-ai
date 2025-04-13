@@ -12,6 +12,7 @@ import ApiStatusPage from "@/pages/api-status";
 import SystemAuditPage from "@/pages/system-audit";
 import FitnessApiPage from "@/pages/fitness-api";
 import ChatPage from "@/pages/chat";
+import DashboardPage from "@/pages/DashboardPage";
 import { UserProvider } from "./contexts/UserContext";
 import { ChatProvider } from "./contexts/ChatContext";
 import FitnessSystemInitializer from "./components/FitnessSystemInitializer";
@@ -160,6 +161,9 @@ function Router() {
       {/* Public routes */}
       <Route path="/landing" component={LandingPage} />
       <Route path="/bridge" component={BridgeLanding} />
+      {/* Dashboard route - publicly accessible with code */}
+      <Route path="/dashboard/:code" component={DashboardPage} />
+      <Route path="/dashboard" component={DashboardPage} />
       <Route path="/status/landing">
         {() => <StatusRoute path="landing" statusInfo="Landing page is fully operational" />}
       </Route>

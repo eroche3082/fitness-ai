@@ -510,8 +510,16 @@ export default function MiniChatbot() {
 
   // Handle login redirect
   const handleLoginRedirect = () => {
-    // In a real app, this would navigate to the login page
-    alert('Redirecting to login page...');
+    // Get user profile from localStorage
+    const userProfile = userService.getUserProfile();
+    
+    // If we have a user profile with a code, redirect to the dashboard with that code
+    if (userProfile && userProfile.uniqueCode) {
+      window.location.href = `/dashboard/${userProfile.uniqueCode}`;
+    } else {
+      // If no code found, redirect to the general dashboard page
+      window.location.href = '/dashboard';
+    }
   };
 
   // Render the appropriate input for the current question
