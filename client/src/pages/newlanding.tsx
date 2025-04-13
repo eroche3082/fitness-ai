@@ -84,43 +84,43 @@ export default function LandingPage() {
       <SidePanel isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
       {/* Header */}
-      <header className="bg-white py-4 border-b border-green-100 sticky top-0 z-30">
+      <header className="site-header py-4 sticky top-0 z-30">
         <div className="container mx-auto px-4 md:px-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center">
               <Button 
                 variant="ghost" 
                 size="icon" 
-                className="mr-2 md:hidden text-primary"
+                className="mr-2 md:hidden text-white"
                 onClick={() => setSidebarOpen(true)}
               >
                 <Menu className="h-6 w-6" />
               </Button>
               <div className="flex items-center gap-2">
                 <Activity className="h-6 w-6 text-primary" />
-                <span className="text-xl font-bold text-primary-dark">Fitness AI</span>
+                <span className="text-xl font-bold text-white">Fitness AI</span>
               </div>
             </div>
             
             <nav className="hidden md:flex items-center space-x-8">
-              <Button variant="link" className="text-dark-text hover:text-primary">Features</Button>
-              <Button variant="link" className="text-dark-text hover:text-primary">Integrations</Button>
-              <Button variant="link" className="text-dark-text hover:text-primary">Pricing</Button>
-              <Button variant="link" className="text-dark-text hover:text-primary">Support</Button>
+              <Button variant="link" className="text-white hover:text-primary-light">Features</Button>
+              <Button variant="link" className="text-white hover:text-primary-light">Integrations</Button>
+              <Button variant="link" className="text-white hover:text-primary-light">Pricing</Button>
+              <Button variant="link" className="text-white hover:text-primary-light">Support</Button>
             </nav>
 
             <div className="flex items-center gap-3">
               <Button
                 variant="outline"
                 size="sm"
-                className="hidden md:inline-flex outline-button"
+                className="hidden md:inline-flex border-white text-white hover:bg-white/10"
                 onClick={() => setShowLoginModal(true)}
               >
                 Log in
               </Button>
               <Button
                 size="sm"
-                className="primary-button"
+                className="bg-primary text-white hover:bg-primary-dark"
                 onClick={() => setShowSignupModal(true)}
               >
                 Sign up
@@ -130,7 +130,7 @@ export default function LandingPage() {
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="text-primary"
+                  className="text-white"
                   onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                 >
                   <Menu className="h-6 w-6" />
@@ -141,15 +141,15 @@ export default function LandingPage() {
           
           {/* Mobile Menu */}
           {isMobileMenuOpen && (
-            <div className="md:hidden mt-4 pb-4 border-t border-green-100 pt-4">
+            <div className="md:hidden mt-4 pb-4 border-t border-gray-700 pt-4">
               <nav className="flex flex-col space-y-4">
-                <Button variant="link" className="text-dark-text hover:text-primary justify-start px-0">Features</Button>
-                <Button variant="link" className="text-dark-text hover:text-primary justify-start px-0">Integrations</Button>
-                <Button variant="link" className="text-dark-text hover:text-primary justify-start px-0">Pricing</Button>
-                <Button variant="link" className="text-dark-text hover:text-primary justify-start px-0">Support</Button>
+                <Button variant="link" className="text-white hover:text-primary-light justify-start px-0">Features</Button>
+                <Button variant="link" className="text-white hover:text-primary-light justify-start px-0">Integrations</Button>
+                <Button variant="link" className="text-white hover:text-primary-light justify-start px-0">Pricing</Button>
+                <Button variant="link" className="text-white hover:text-primary-light justify-start px-0">Support</Button>
                 <Button
                   variant="outline"
-                  className="w-full mt-2 outline-button"
+                  className="w-full mt-2 text-white border-white hover:bg-white/10"
                   onClick={() => {
                     setShowLoginModal(true);
                     setIsMobileMenuOpen(false);
@@ -537,6 +537,159 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Pricing Plans */}
+      <section className="py-20 bg-gradient-bg">
+        <div className="container mx-auto px-4 md:px-6">
+          <div className="text-center mb-16">
+            <div className="inline-block px-4 py-1 rounded-full bg-green-100 text-primary text-sm font-medium mb-4">
+              <span className="flex items-center justify-center">
+                <Zap className="h-4 w-4 mr-2" />
+                Pricing Plans
+              </span>
+            </div>
+            <h2 className="text-3xl md:text-4xl font-bold text-dark-text mb-4">Choose Your Fitness Journey</h2>
+            <p className="text-xl text-light-text max-w-3xl mx-auto">
+              Select the perfect plan for your fitness goals and lifestyle.
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12">
+            {/* Basic Plan */}
+            <div className="pricing-card shadow-lg">
+              <div className="pricing-card-header">
+                <Badge variant="outline" className="mb-4">Basic</Badge>
+                <div className="flex items-end justify-center mb-2">
+                  <span className="text-4xl font-bold">$9</span>
+                  <span className="text-xl text-light-text">/month</span>
+                </div>
+                <p className="text-light-text">Perfect for fitness beginners</p>
+              </div>
+              <div className="pricing-card-content">
+                <ul className="pricing-feature-list">
+                  <li className="pricing-feature-item">
+                    <CheckCircle className="pricing-feature-icon h-5 w-5 flex-shrink-0" />
+                    <span>Basic workout plans</span>
+                  </li>
+                  <li className="pricing-feature-item">
+                    <CheckCircle className="pricing-feature-icon h-5 w-5 flex-shrink-0" />
+                    <span>AI-powered nutrition guidance</span>
+                  </li>
+                  <li className="pricing-feature-item">
+                    <CheckCircle className="pricing-feature-icon h-5 w-5 flex-shrink-0" />
+                    <span>Connect 2 fitness devices</span>
+                  </li>
+                  <li className="pricing-feature-item">
+                    <CheckCircle className="pricing-feature-icon h-5 w-5 flex-shrink-0" />
+                    <span>Weekly progress reports</span>
+                  </li>
+                  <li className="pricing-feature-item text-gray-400">
+                    <X className="h-5 w-5 flex-shrink-0 mr-2" />
+                    <span>Voice coaching</span>
+                  </li>
+                  <li className="pricing-feature-item text-gray-400">
+                    <X className="h-5 w-5 flex-shrink-0 mr-2" />
+                    <span>Advanced analytics</span>
+                  </li>
+                </ul>
+              </div>
+              <div className="pricing-card-footer">
+                <Button className="w-full bg-primary text-white hover:bg-primary-dark">Get Started</Button>
+              </div>
+            </div>
+            
+            {/* Pro Plan */}
+            <div className="pricing-card pricing-highlight shadow-xl scale-105 transform z-10">
+              <div className="pricing-card-header">
+                <Badge className="bg-white text-primary mb-4">Pro</Badge>
+                <div className="flex items-end justify-center mb-2">
+                  <span className="text-4xl font-bold">$19</span>
+                  <span className="text-xl text-white/70">/month</span>
+                </div>
+                <p className="text-white/80">Most popular for fitness enthusiasts</p>
+              </div>
+              <div className="pricing-card-content">
+                <ul className="pricing-feature-list">
+                  <li className="pricing-feature-item">
+                    <CheckCircle className="pricing-feature-icon h-5 w-5 flex-shrink-0" />
+                    <span>Advanced workout plans</span>
+                  </li>
+                  <li className="pricing-feature-item">
+                    <CheckCircle className="pricing-feature-icon h-5 w-5 flex-shrink-0" />
+                    <span>Personalized meal planning</span>
+                  </li>
+                  <li className="pricing-feature-item">
+                    <CheckCircle className="pricing-feature-icon h-5 w-5 flex-shrink-0" />
+                    <span>Connect 5 fitness devices</span>
+                  </li>
+                  <li className="pricing-feature-item">
+                    <CheckCircle className="pricing-feature-icon h-5 w-5 flex-shrink-0" />
+                    <span>Voice coaching with rep counting</span>
+                  </li>
+                  <li className="pricing-feature-item">
+                    <CheckCircle className="pricing-feature-icon h-5 w-5 flex-shrink-0" />
+                    <span>Detailed progress analytics</span>
+                  </li>
+                  <li className="pricing-feature-item">
+                    <CheckCircle className="pricing-feature-icon h-5 w-5 flex-shrink-0" />
+                    <span>Priority support</span>
+                  </li>
+                </ul>
+              </div>
+              <div className="pricing-card-footer border-t border-white/10">
+                <Button className="w-full bg-white text-primary hover:bg-white/90">Get Pro</Button>
+              </div>
+            </div>
+            
+            {/* Premium Plan */}
+            <div className="pricing-card shadow-lg">
+              <div className="pricing-card-header">
+                <Badge variant="outline" className="mb-4">Premium</Badge>
+                <div className="flex items-end justify-center mb-2">
+                  <span className="text-4xl font-bold">$29</span>
+                  <span className="text-xl text-light-text">/month</span>
+                </div>
+                <p className="text-light-text">For serious athletes and professionals</p>
+              </div>
+              <div className="pricing-card-content">
+                <ul className="pricing-feature-list">
+                  <li className="pricing-feature-item">
+                    <CheckCircle className="pricing-feature-icon h-5 w-5 flex-shrink-0" />
+                    <span>Elite workout plans</span>
+                  </li>
+                  <li className="pricing-feature-item">
+                    <CheckCircle className="pricing-feature-icon h-5 w-5 flex-shrink-0" />
+                    <span>Pro nutrition & recovery coaching</span>
+                  </li>
+                  <li className="pricing-feature-item">
+                    <CheckCircle className="pricing-feature-icon h-5 w-5 flex-shrink-0" />
+                    <span>Unlimited device connections</span>
+                  </li>
+                  <li className="pricing-feature-item">
+                    <CheckCircle className="pricing-feature-icon h-5 w-5 flex-shrink-0" />
+                    <span>Advanced voice coaching</span>
+                  </li>
+                  <li className="pricing-feature-item">
+                    <CheckCircle className="pricing-feature-icon h-5 w-5 flex-shrink-0" />
+                    <span>Predictive performance analytics</span>
+                  </li>
+                  <li className="pricing-feature-item">
+                    <CheckCircle className="pricing-feature-icon h-5 w-5 flex-shrink-0" />
+                    <span>1-on-1 expert consultations</span>
+                  </li>
+                </ul>
+              </div>
+              <div className="pricing-card-footer">
+                <Button className="w-full bg-primary text-white hover:bg-primary-dark">Get Premium</Button>
+              </div>
+            </div>
+          </div>
+          
+          <div className="text-center mt-12 text-light-text">
+            <p>All plans include a 14-day free trial. No credit card required to start.</p>
+          </div>
+        </div>
+      </section>
+
       {/* CTA Section */}
       <section className="py-20 fitness-header">
         <div className="container mx-auto px-4 md:px-6">
@@ -570,19 +723,19 @@ export default function LandingPage() {
       </section>
 
       {/* Footer */}
-      <footer className="bg-white py-12 border-t border-green-100">
+      <footer className="site-footer py-12 border-t border-gray-800">
         <div className="container mx-auto px-4 md:px-6">
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-8">
             <div className="col-span-2">
               <div className="flex items-center gap-2 mb-4">
                 <Activity className="h-6 w-6 text-primary" />
-                <span className="text-xl font-bold text-primary-dark">Fitness AI</span>
+                <span className="text-xl font-bold text-white">Fitness AI</span>
               </div>
-              <p className="text-light-text mb-4">
+              <p className="text-gray-400 mb-4">
                 Your AI-powered fitness companion for personalized workouts, nutrition, and health tracking.
               </p>
               <div className="flex space-x-4">
-                <a href="#" className="text-light-text hover:text-primary">
+                <a href="#" className="text-gray-400 hover:text-primary">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="24"
@@ -653,40 +806,40 @@ export default function LandingPage() {
             </div>
             
             <div>
-              <h3 className="font-semibold mb-4 text-primary-dark">Features</h3>
+              <h3 className="font-semibold mb-4 text-white">Features</h3>
               <ul className="space-y-2">
-                <li><a href="#" className="text-light-text hover:text-primary">Workouts</a></li>
-                <li><a href="#" className="text-light-text hover:text-primary">Nutrition</a></li>
-                <li><a href="#" className="text-light-text hover:text-primary">Health Tracking</a></li>
-                <li><a href="#" className="text-light-text hover:text-primary">Voice Coaching</a></li>
-                <li><a href="#" className="text-light-text hover:text-primary">Device Integration</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-primary">Workouts</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-primary">Nutrition</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-primary">Health Tracking</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-primary">Voice Coaching</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-primary">Device Integration</a></li>
               </ul>
             </div>
             
             <div>
-              <h3 className="font-semibold mb-4 text-primary-dark">Company</h3>
+              <h3 className="font-semibold mb-4 text-white">Company</h3>
               <ul className="space-y-2">
-                <li><a href="#" className="text-light-text hover:text-primary">About Us</a></li>
-                <li><a href="#" className="text-light-text hover:text-primary">Careers</a></li>
-                <li><a href="#" className="text-light-text hover:text-primary">Blog</a></li>
-                <li><a href="#" className="text-light-text hover:text-primary">Press</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-primary">About Us</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-primary">Careers</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-primary">Blog</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-primary">Press</a></li>
               </ul>
             </div>
             
             <div>
-              <h3 className="font-semibold mb-4 text-primary-dark">Support</h3>
+              <h3 className="font-semibold mb-4 text-white">Support</h3>
               <ul className="space-y-2">
-                <li><a href="#" className="text-light-text hover:text-primary">Help Center</a></li>
-                <li><a href="#" className="text-light-text hover:text-primary">Contact Us</a></li>
-                <li><a href="#" className="text-light-text hover:text-primary">Privacy Policy</a></li>
-                <li><a href="#" className="text-light-text hover:text-primary">Terms of Service</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-primary">Help Center</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-primary">Contact Us</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-primary">Privacy Policy</a></li>
+                <li><a href="#" className="text-gray-400 hover:text-primary">Terms of Service</a></li>
               </ul>
             </div>
             
             <div>
-              <h3 className="font-semibold mb-4 text-primary-dark">Get the App</h3>
+              <h3 className="font-semibold mb-4 text-white">Get the App</h3>
               <div className="space-y-2">
-                <Button variant="outline" className="w-full justify-start border-green-200 hover:bg-green-50">
+                <Button variant="outline" className="w-full justify-start border-white/30 bg-black/50 text-white hover:bg-white/10">
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     width="24"

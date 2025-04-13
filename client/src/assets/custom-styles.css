@@ -13,6 +13,10 @@
   --surface: #ffffff;
   --success: #4ade80;        /* Green 400 */
   --energy: #fbbf24;         /* Amber 400 */
+  --header-bg: #111111;      /* Near black for header */
+  --footer-bg: #111111;      /* Near black for footer */
+  --header-text: #ffffff;    /* White text for header */
+  --footer-text: #ffffff;    /* White text for footer */
 }
 
 /* General Styles */
@@ -57,6 +61,106 @@ body {
 .fitness-header {
   background: linear-gradient(120deg, var(--primary) 0%, var(--primary-dark) 100%);
   color: white;
+}
+
+.site-header {
+  background-color: var(--header-bg);
+  color: var(--header-text);
+}
+
+.site-footer {
+  background-color: var(--footer-bg);
+  color: var(--footer-text);
+}
+
+/* Pricing Cards */
+.pricing-card {
+  background-color: white;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.pricing-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  border-color: var(--primary);
+}
+
+.pricing-card-header {
+  padding: 2rem 1.5rem;
+  text-align: center;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.pricing-card-content {
+  padding: 1.5rem;
+  flex: 1;
+}
+
+.pricing-card-footer {
+  padding: 1.5rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.pricing-highlight {
+  background-color: var(--primary);
+  color: white;
+}
+
+.pricing-highlight .pricing-feature-icon {
+  color: white;
+}
+
+.pricing-feature-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.pricing-feature-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.pricing-feature-icon {
+  margin-right: 0.5rem;
+  color: var(--primary);
+}
+
+/* CTA button styles */
+.cta-button {
+  background-color: white;
+  color: var(--primary);
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.cta-button:hover {
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+
+.cta-button-secondary {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.cta-button-secondary:hover {
+  background-color: rgba(255, 255, 255, 0.3);
 }
 
 .fitness-card {
