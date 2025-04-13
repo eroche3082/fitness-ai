@@ -34,7 +34,8 @@ import {
   ArrowRight,
   Share2,
   Flame,
-  Sparkles
+  Sparkles,
+  X
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -208,35 +209,35 @@ export default function LandingPage() {
       <SidePanel isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
       
       {/* Top Navigation */}
-      <nav className="fitness-nav flex items-center justify-between p-4 bg-gradient-to-r from-primary/90 to-primary/80 text-primary-foreground sticky top-0 z-50 backdrop-blur">
+      <nav className="site-header flex items-center justify-between p-4 bg-white sticky top-0 z-50">
         <div className="flex items-center gap-2">
           <Button 
             variant="ghost" 
             size="icon" 
             onClick={() => setSidebarOpen(true)}
-            className="text-white hover:bg-white/10 mr-1"
+            className="text-primary-dark hover:bg-gray-100 mr-1"
           >
             <Menu className="h-5 w-5" />
           </Button>
         
           <div className="flex items-center gap-2">
-            <Activity className="h-6 w-6 text-white animate-pulse" />
-            <h1 className="text-xl font-bold text-white">Fitness AI</h1>
+            <Activity className="h-6 w-6 text-primary" />
+            <h1 className="text-xl font-bold text-primary-dark">Fitness AI</h1>
           </div>
         </div>
         
         <div className="hidden md:flex items-center gap-6 text-sm">
-          <a href="#features" className="text-white hover:text-white/80 transition-colors">Features</a>
-          <a href="#about" className="text-white hover:text-white/80 transition-colors">About</a>
-          <a href="#pricing" className="text-white hover:text-white/80 transition-colors">Pricing</a>
-          <a href="#contact" className="text-white hover:text-white/80 transition-colors">Contact</a>
+          <a href="#features" className="text-dark-text hover:text-primary transition-colors">Features</a>
+          <a href="#about" className="text-dark-text hover:text-primary transition-colors">About</a>
+          <a href="#pricing" className="text-dark-text hover:text-primary transition-colors">Pricing</a>
+          <a href="#contact" className="text-dark-text hover:text-primary transition-colors">Contact</a>
         </div>
         
         <div className="flex items-center gap-2">
           <Button 
             onClick={() => setShowLoginModal(true)} 
             variant="ghost"
-            className="text-white hover:bg-white/20"
+            className="text-primary-dark hover:bg-gray-100"
           >
             <LogIn className="h-4 w-4 mr-2" />
             Login
@@ -244,8 +245,7 @@ export default function LandingPage() {
           
           <Button 
             onClick={() => setShowSignupModal(true)} 
-            variant="secondary"
-            className="energy-button font-semibold shadow-md hover:shadow-lg"
+            className="primary-button font-medium"
           >
             <UserPlus className="h-4 w-4 mr-2" />
             Sign Up Free
@@ -261,16 +261,16 @@ export default function LandingPage() {
           </div>
         </div>
         
-        <div className="relative flex flex-col items-center justify-center px-6 py-32 md:py-40 lg:py-48 z-10 bg-gradient-to-b from-black/60 via-black/40 to-black/60">
-          <Badge variant="outline" className="mb-6 text-sm py-1 px-4 bg-white/10 backdrop-blur-sm border-white/20 text-white">
-            <span className="animate-pulse mr-2 text-primary">●</span> Fitness Intelligence Platform
+        <div className="relative flex flex-col items-center justify-center px-6 py-32 md:py-40 lg:py-48 z-10">
+          <Badge variant="outline" className="mb-6 text-sm py-1 px-4 bg-white/80 border-primary/20 text-primary-dark">
+            <span className="mr-2 text-primary">●</span> Fitness Intelligence Platform
           </Badge>
           
-          <h1 className="text-4xl md:text-6xl font-bold text-center mb-6 text-white shadow-text slide-in-left">
-            Transform Your Fitness <span className="bg-clip-text text-transparent bg-gradient-to-r from-orange-400 to-pink-500">Journey with AI</span>
+          <h1 className="text-4xl md:text-6xl font-bold text-center mb-6 text-primary-dark fade-in">
+            Transform Your Fitness <span className="text-primary">Journey</span>
           </h1>
           
-          <p className="text-xl text-center max-w-3xl mb-10 text-white/90 fade-in-up">
+          <p className="text-xl text-center max-w-3xl mb-10 text-dark-text fade-in-up">
             Use the power of artificial intelligence to optimize your workouts, track your progress, and achieve your health goals faster than ever before.
           </p>
           
@@ -278,7 +278,7 @@ export default function LandingPage() {
             <Button 
               size="lg" 
               onClick={() => setShowSignupModal(true)}
-              className="energy-button text-white font-semibold shadow-lg px-8 py-6 text-lg"
+              className="primary-button font-medium shadow-md px-8 py-6 text-lg"
             >
               <Zap className="mr-2 h-5 w-5" />
               Start Your Journey
@@ -288,56 +288,56 @@ export default function LandingPage() {
               size="lg" 
               variant="outline" 
               onClick={() => setLocation('/chat')}
-              className="border-white text-white hover:bg-white/20 px-8 py-6 text-lg"
+              className="outline-button px-8 py-6 text-lg"
             >
               <Activity className="mr-2 h-5 w-5" />
               Try AI Coach
             </Button>
           </div>
           
-          <div className="mt-16 grid grid-cols-3 gap-6 max-w-3xl w-full">
-            <div className="stat-card orange group hover-scale">
-              <div className="flex flex-col items-center text-center">
-                <Flame className="h-8 w-8 mb-2 text-orange-500" />
-                <h3 className="text-lg font-bold">800+</h3>
-                <p className="text-sm text-gray-500">Workouts</p>
+          <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-6 max-w-3xl w-full">
+            <div className="stat-card hover-scale">
+              <div className="stat-icon blue">
+                <Flame className="h-5 w-5" />
               </div>
+              <h3 className="text-xl font-bold text-dark-text">800+</h3>
+              <p className="text-sm text-light-text">Workouts</p>
             </div>
             
-            <div className="stat-card purple group hover-scale">
-              <div className="flex flex-col items-center text-center">
-                <Users className="h-8 w-8 mb-2 text-purple-500" />
-                <h3 className="text-lg font-bold">15K+</h3>
-                <p className="text-sm text-gray-500">Active Users</p>
+            <div className="stat-card hover-scale">
+              <div className="stat-icon coral">
+                <Users className="h-5 w-5" />
               </div>
+              <h3 className="text-xl font-bold text-dark-text">15K+</h3>
+              <p className="text-sm text-light-text">Active Users</p>
             </div>
             
-            <div className="stat-card blue group hover-scale">
-              <div className="flex flex-col items-center text-center">
-                <Sparkles className="h-8 w-8 mb-2 text-blue-500" />
-                <h3 className="text-lg font-bold">99%</h3>
-                <p className="text-sm text-gray-500">Success Rate</p>
+            <div className="stat-card hover-scale">
+              <div className="stat-icon blue">
+                <Sparkles className="h-5 w-5" />
               </div>
+              <h3 className="text-xl font-bold text-dark-text">99%</h3>
+              <p className="text-sm text-light-text">Success Rate</p>
             </div>
           </div>
           
           <div className="absolute bottom-5 animate-bounce">
-            <ArrowRight className="h-6 w-6 text-white/70 rotate-90" />
+            <ArrowRight className="h-6 w-6 text-primary-dark/70 rotate-90" />
           </div>
         </div>
       </div>
 
       {/* Features Section */}
-      <div className="py-16 px-6 bg-background" id="features">
-        <div className="text-center mb-12">
-          <Badge variant="outline" className="mb-4 text-sm py-1 px-4 bg-white/10 backdrop-blur-sm border-primary/20">
+      <div className="py-20 px-6 bg-gradient-bg" id="features">
+        <div className="text-center mb-16">
+          <Badge variant="outline" className="mb-4 text-sm py-1 px-4 bg-white/50 border-primary/20">
             <span className="mr-2 text-primary">●</span>Comprehensive Platform
           </Badge>
-          <h2 className="text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-primary to-primary/80">
+          <h2 className="text-4xl font-bold text-primary-dark mb-4">
             Key Features
           </h2>
-          <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">
-            Fitness AI brings together 20 powerful features to transform your fitness journey
+          <p className="mt-4 text-lg text-light-text max-w-2xl mx-auto">
+            Fitness AI brings together powerful features to transform your fitness journey
           </p>
         </div>
         
@@ -345,16 +345,16 @@ export default function LandingPage() {
           {features.map((feature, index) => (
             <Card 
               key={index} 
-              className="h-full group hover:shadow-md transition-all duration-300 hover:border-primary/50 overflow-hidden"
+              className="h-full bg-white hover:shadow-md transition-all duration-300 hover:border-primary/20 overflow-hidden"
             >
               <CardHeader className="flex flex-row items-center gap-3 pb-2">
                 <div className="rounded-full bg-primary/10 p-3 group-hover:bg-primary/20 transition-colors duration-300">
                   <feature.icon className="h-5 w-5 text-primary" />
                 </div>
-                <CardTitle className="text-xl">{feature.title}</CardTitle>
+                <CardTitle className="text-xl text-primary-dark">{feature.title}</CardTitle>
               </CardHeader>
               <CardContent>
-                <CardDescription className="text-base">{feature.description}</CardDescription>
+                <CardDescription className="text-sm text-light-text">{feature.description}</CardDescription>
               </CardContent>
             </Card>
           ))}

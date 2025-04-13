@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import minimalTheme from '../assets/minimal-theme.svg';
 
 interface Slide {
-  image: string;
+  image?: string; // Making this optional to allow using our minimal theme
   title: string;
   description: string;
 }
@@ -48,20 +49,20 @@ export function FitnessSlider({
   };
 
   return (
-    <div className="fitness-slider relative overflow-hidden rounded-2xl">
+    <div className="fitness-slider relative overflow-hidden rounded-lg">
       {slides.map((slide, index) => (
         <div 
           key={index} 
           className={`slide ${index === currentSlide ? 'active' : ''}`}
           style={{
-            backgroundImage: `url(${slide.image})`,
+            backgroundImage: `url(${minimalTheme})`,
             backgroundSize: 'cover',
             backgroundPosition: 'center'
           }}
         >
-          <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex flex-col justify-end p-6 md:p-8">
-            <h3 className="text-xl md:text-2xl font-bold text-white mb-2">{slide.title}</h3>
-            <p className="text-sm md:text-base text-white/80 max-w-md">{slide.description}</p>
+          <div className="absolute inset-0 flex flex-col justify-center items-center p-6 md:p-8 text-center">
+            <h3 className="text-xl md:text-2xl font-bold text-primary-dark mb-3">{slide.title}</h3>
+            <p className="text-sm md:text-base text-dark-text max-w-md">{slide.description}</p>
           </div>
         </div>
       ))}
@@ -71,7 +72,7 @@ export function FitnessSlider({
           <Button 
             variant="ghost" 
             size="icon" 
-            className="absolute top-1/2 left-2 transform -translate-y-1/2 bg-black/20 text-white hover:bg-black/40 rounded-full"
+            className="absolute top-1/2 left-2 transform -translate-y-1/2 bg-white/80 text-primary-dark hover:bg-white hover:text-primary rounded-full shadow-sm"
             onClick={prevSlide}
           >
             <ChevronLeft className="h-5 w-5" />
@@ -80,18 +81,18 @@ export function FitnessSlider({
           <Button 
             variant="ghost" 
             size="icon" 
-            className="absolute top-1/2 right-2 transform -translate-y-1/2 bg-black/20 text-white hover:bg-black/40 rounded-full"
+            className="absolute top-1/2 right-2 transform -translate-y-1/2 bg-white/80 text-primary-dark hover:bg-white hover:text-primary rounded-full shadow-sm"
             onClick={nextSlide}
           >
             <ChevronRight className="h-5 w-5" />
           </Button>
           
-          <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex gap-1">
+          <div className="absolute bottom-3 left-1/2 transform -translate-x-1/2 flex gap-1.5">
             {slides.map((_, index) => (
               <button
                 key={index}
-                className={`w-2 h-2 rounded-full transition-all ${
-                  index === currentSlide ? 'bg-white w-6' : 'bg-white/50'
+                className={`h-2 rounded-full transition-all ${
+                  index === currentSlide ? 'bg-primary w-6' : 'bg-primary/30 w-2'
                 }`}
                 onClick={() => goToSlide(index)}
               />
