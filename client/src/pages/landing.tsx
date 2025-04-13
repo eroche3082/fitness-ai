@@ -523,32 +523,25 @@ export default function LandingPage() {
       </div>
 
       {/* Call to Action Section */}
-      <div className="py-20 px-6 relative overflow-hidden" 
-        style={{
-          backgroundImage: `url(${patternSvg})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center'
-        }}>
-        <div className="absolute inset-0 bg-gradient-to-t from-primary/30 to-primary/5"></div>
-        
+      <div className="py-20 px-6 relative overflow-hidden bg-gradient-bg"> 
         <div className="relative max-w-4xl mx-auto text-center">
-          <Badge variant="outline" className="mb-4 text-sm py-1 px-4 bg-white/10 backdrop-blur-sm border-primary/20 inline-flex">
-            <span className="animate-pulse mr-2 text-primary">●</span>Start Today
+          <Badge variant="outline" className="mb-4 text-sm py-1 px-4 bg-white/50 border-primary/20 inline-flex">
+            <span className="mr-2 text-primary">●</span>Start Today
           </Badge>
           
-          <h2 className="text-4xl md:text-5xl font-bold mb-6">
+          <h2 className="text-4xl md:text-5xl font-bold mb-6 text-primary-dark">
             Ready to Revolutionize Your <span className="text-primary">Fitness Journey</span>?
           </h2>
           
-          <p className="text-xl mb-10 max-w-2xl mx-auto">
+          <p className="text-lg text-light-text mb-10 max-w-2xl mx-auto">
             Join thousands of users who have transformed their approach to health and fitness with our AI-powered platform.
           </p>
           
           <div className="flex flex-wrap gap-4 justify-center">
             <Button 
               size="lg" 
-              onClick={() => setShowLoginModal(true)}
-              className="glow-button bg-primary hover:bg-primary/90 text-white font-semibold shadow-lg px-8 py-6 text-lg hover-purple"
+              onClick={() => setShowSignupModal(true)}
+              className="primary-button px-8 py-6 text-lg"
             >
               Get Started Now
             </Button>
@@ -556,7 +549,7 @@ export default function LandingPage() {
               size="lg" 
               variant="outline" 
               onClick={() => window.location.href = "#features"}
-              className="border-primary text-primary hover-purple-text px-8 py-6 text-lg"
+              className="outline-button px-8 py-6 text-lg"
             >
               Explore Features
             </Button>
@@ -564,48 +557,54 @@ export default function LandingPage() {
           
           <div className="mt-12 flex justify-center items-center gap-8 flex-wrap">
             <div className="flex items-center gap-2">
-              <Trophy className="h-5 w-5 text-primary" />
-              <span className="text-sm font-medium">20+ AI Features</span>
+              <div className="stat-icon blue">
+                <Trophy className="h-4 w-4" />
+              </div>
+              <span className="text-sm font-medium text-dark-text">20+ AI Features</span>
             </div>
             <div className="flex items-center gap-2">
-              <Award className="h-5 w-5 text-primary" />
-              <span className="text-sm font-medium">4 Fitness Trackers</span>
+              <div className="stat-icon coral">
+                <Award className="h-4 w-4" />
+              </div>
+              <span className="text-sm font-medium text-dark-text">4 Fitness Trackers</span>
             </div>
             <div className="flex items-center gap-2">
-              <HeartIcon className="h-5 w-5 text-primary" />
-              <span className="text-sm font-medium">Real-time Analytics</span>
+              <div className="stat-icon blue">
+                <HeartIcon className="h-4 w-4" />
+              </div>
+              <span className="text-sm font-medium text-dark-text">Real-time Analytics</span>
             </div>
           </div>
         </div>
       </div>
 
       {/* Footer */}
-      <footer className="py-8 px-6 bg-black text-white">
+      <footer className="py-10 px-6 bg-white border-t border-gray-100">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col md:flex-row justify-between items-center mb-8">
             <div className="flex items-center gap-2 mb-4 md:mb-0">
               <Activity className="h-6 w-6 text-primary" />
-              <h3 className="text-xl font-bold text-white">Fitness AI</h3>
+              <h3 className="text-xl font-bold text-primary-dark">Fitness AI</h3>
             </div>
-            <div className="flex gap-6">
-              <a href="#" className="text-gray-400 hover:text-primary transition-colors">About</a>
-              <a href="#" className="text-gray-400 hover:text-primary transition-colors">Features</a>
-              <a href="#" className="text-gray-400 hover:text-primary transition-colors">Integrations</a>
-              <a href="#" className="text-gray-400 hover:text-primary transition-colors">Pricing</a>
+            <div className="flex flex-wrap gap-6">
+              <a href="#" className="text-light-text hover:text-primary transition-colors">About</a>
+              <a href="#features" className="text-light-text hover:text-primary transition-colors">Features</a>
+              <a href="#" className="text-light-text hover:text-primary transition-colors">Integrations</a>
+              <a href="#" className="text-light-text hover:text-primary transition-colors">Pricing</a>
             </div>
           </div>
           
-          <div className="h-px w-full bg-gray-800 my-6"></div>
+          <div className="h-px w-full bg-gray-100 my-6"></div>
           
           <div className="flex flex-col md:flex-row justify-between items-center">
-            <p className="text-sm text-gray-400 mb-4 md:mb-0">
+            <p className="text-sm text-light-text mb-4 md:mb-0">
               © 2025 Fitness AI. All rights reserved.
             </p>
-            <div className="flex gap-6">
-              <a href="#" className="text-sm text-gray-400 hover:text-primary transition-colors">Terms</a>
-              <a href="#" className="text-sm text-gray-400 hover:text-primary transition-colors">Privacy</a>
-              <a href="#" className="text-sm text-gray-400 hover:text-primary transition-colors">Support</a>
-              <a href="#" className="text-sm text-gray-400 hover:text-primary transition-colors">Contact</a>
+            <div className="flex flex-wrap gap-6">
+              <a href="#" className="text-sm text-light-text hover:text-primary transition-colors">Terms</a>
+              <a href="#" className="text-sm text-light-text hover:text-primary transition-colors">Privacy</a>
+              <a href="#" className="text-sm text-light-text hover:text-primary transition-colors">Support</a>
+              <a href="#" className="text-sm text-light-text hover:text-primary transition-colors">Contact</a>
             </div>
           </div>
         </div>
@@ -664,7 +663,7 @@ export default function LandingPage() {
                 
                 <Button 
                   type="submit" 
-                  className="w-full energy-button text-white h-12 text-base font-semibold"
+                  className="w-full primary-button h-12 text-base font-medium"
                 >
                   Login
                 </Button>
@@ -826,7 +825,7 @@ export default function LandingPage() {
                 
                 <Button 
                   type="submit" 
-                  className="w-full energy-button text-white h-12 text-base font-semibold"
+                  className="w-full primary-button h-12 text-base font-medium"
                 >
                   Create Account
                 </Button>

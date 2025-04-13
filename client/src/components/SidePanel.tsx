@@ -39,12 +39,12 @@ export function SidePanel({ isOpen, onClose }: SidePanelProps) {
 
   return (
     <>
-      <div className={`panel-overlay ${isOpen ? 'active' : ''}`} onClick={onClose}></div>
+      <div className={`side-panel-overlay ${isOpen ? 'open' : ''}`} onClick={onClose}></div>
       <div className={`side-panel ${isOpen ? 'open' : ''}`}>
-        <div className="flex justify-between items-center mb-8">
+        <div className="flex justify-between items-center p-4 border-b border-gray-100">
           <div className="flex items-center gap-2">
             <Activity className="h-6 w-6 text-primary" />
-            <h2 className="text-xl font-bold">Fitness AI</h2>
+            <h2 className="text-xl font-bold text-primary-dark">Fitness AI</h2>
           </div>
           <Button 
             variant="ghost" 
@@ -56,13 +56,13 @@ export function SidePanel({ isOpen, onClose }: SidePanelProps) {
           </Button>
         </div>
         
-        <nav className="flex-1">
-          <ul className="space-y-3">
+        <nav className="flex-1 p-4">
+          <ul className="space-y-1">
             {menuItems.map((item, index) => (
               <li key={index}>
                 <Button
                   variant="ghost"
-                  className="w-full justify-start gap-3 text-base font-medium py-3 hover-orange"
+                  className="w-full justify-start gap-3 text-base font-medium py-2 text-light-text hover:text-primary hover:bg-blue-50"
                   onClick={() => {
                     console.log(`Navigating to ${item.path}`);
                     onClose();
@@ -76,14 +76,14 @@ export function SidePanel({ isOpen, onClose }: SidePanelProps) {
           </ul>
         </nav>
         
-        <div className="mt-auto pt-6 border-t border-gray-200">
-          <div className="bg-gradient-to-r from-orange-100 to-red-100 p-4 rounded-lg">
-            <h3 className="font-semibold text-orange-700 mb-2">Pro Tip</h3>
-            <p className="text-sm text-gray-700">
-              Connect with Google Fit or Apple Health to automatically sync your fitness data.
+        <div className="mt-auto p-4 border-t border-gray-100">
+          <div className="bg-gradient-bg p-4 rounded-lg border border-blue-100">
+            <h3 className="font-medium text-primary-dark mb-2">Connect Your Devices</h3>
+            <p className="text-sm text-light-text mb-3">
+              Sync with Google Fit, Apple Health, Fitbit or Strava to track your fitness progress automatically.
             </p>
             <Button 
-              className="w-full mt-3 energy-button"
+              className="w-full primary-button"
               size="sm"
             >
               Connect Devices
