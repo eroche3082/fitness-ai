@@ -612,8 +612,8 @@ const FitnessRoutineSocialStudio: React.FC<FitnessRoutineSocialStudioProps> = ({
                   <PopoverContent className="w-auto p-0">
                     <Calendar
                       mode="single"
-                      selected={scheduledDate || undefined}
-                      onSelect={setScheduledDate}
+                      selected={scheduledDate}
+                      onSelect={(date) => date ? setScheduledDate(date) : setScheduledDate(null)}
                       initialFocus
                     />
                   </PopoverContent>

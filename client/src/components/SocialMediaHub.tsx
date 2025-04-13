@@ -275,8 +275,8 @@ const SocialMediaHub: React.FC<SocialMediaHubProps> = ({ userId }) => {
                   modifiers={{
                     scheduled: scheduledDates
                   }}
-                  modifiersStyles={{
-                    scheduled: { backgroundColor: '#0ea5e9', color: 'white', fontWeight: 'bold' }
+                  modifiersClassNames={{
+                    scheduled: "bg-blue-500 text-white font-bold"
                   }}
                 />
               </CardContent>

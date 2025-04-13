@@ -5,6 +5,8 @@ import userService from '../lib/userService';
 import { generateUniqueCode } from '../lib/userCodeGenerator';
 import JourneyTab from './JourneyTab';
 import FeaturesGrid from './FeaturesGrid';
+import FitnessRoutineSocialStudio from './FitnessRoutineSocialStudio';
+import SocialMediaHub from './SocialMediaHub';
 
 interface DashboardProps {
   userCode: string;
@@ -74,6 +76,10 @@ const Dashboard: React.FC<DashboardProps> = ({ userCode }) => {
         return renderPlanTab();
       case 'trackers':
         return renderTrackersTab();
+      case 'visualization':
+        return <FitnessRoutineSocialStudio userId={userId} />;
+      case 'social':
+        return <SocialMediaHub userId={userId} />;
       default:
         return renderJourneyTab();
     }
@@ -679,6 +685,26 @@ const Dashboard: React.FC<DashboardProps> = ({ userCode }) => {
             }`}
         >
           Fitness Trackers
+        </button>
+        <button
+          onClick={() => setActiveTab('visualization')}
+          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors 
+            ${activeTab === 'visualization'
+              ? 'bg-blue-600 text-white' 
+              : 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'
+            }`}
+        >
+          Visualization Wizard
+        </button>
+        <button
+          onClick={() => setActiveTab('social')}
+          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors 
+            ${activeTab === 'social'
+              ? 'bg-blue-600 text-white' 
+              : 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'
+            }`}
+        >
+          Social Media
         </button>
       </div>
       
