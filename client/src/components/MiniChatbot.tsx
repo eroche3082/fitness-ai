@@ -201,7 +201,7 @@ export default function MiniChatbot() {
       // Onboarding complete
       setOnboardingComplete(true);
       setMessages(prev => [...prev, { 
-        text: 'Thanks for completing the onboarding! Your personalized fitness plan is being created by Vertex Flash AI. You can now login to your dashboard.', 
+        text: 'Thanks for completing the onboarding! Your personalized fitness plan is being created by Fitness AI. You can now login to your dashboard.', 
         sender: 'bot' 
       }]);
 
@@ -348,7 +348,7 @@ export default function MiniChatbot() {
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
               </svg>
-              <span className="font-bold">Vertex Flash AI Assistant</span>
+              <span className="font-bold">Fitness AI Assistant</span>
             </div>
             <button onClick={toggleChat} className="text-white hover:text-gray-200">
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -394,7 +394,7 @@ export default function MiniChatbot() {
               </div>
             ) : (
               <div className="bg-[#131313] rounded-lg p-3 mb-3">
-                <h3 className="text-white text-lg mb-1">Welcome to Vertex Flash AI</h3>
+                <h3 className="text-white text-lg mb-1">Welcome to Fitness AI</h3>
                 <p className="text-gray-300 text-sm mb-2">
                   Step {currentStep} of 10: {getCurrentQuestion().text}
                 </p>
@@ -419,7 +419,7 @@ export default function MiniChatbot() {
                 <input
                   type="text"
                   className="flex-1 p-2 rounded-l-lg border border-gray-700 bg-black text-white"
-                  placeholder="Message Vertex Flash AI..."
+                  placeholder="Message Fitness AI..."
                   value={input}
                   onChange={handleInputChange}
                   onKeyPress={handleKeyPress}

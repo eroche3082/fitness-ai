@@ -1,7 +1,7 @@
-### AGENT: Fitness AI Platform with Vertex Flash
+### AGENT: Fitness AI Platform
 
 ✅ Chatbot active and single-instance
-✅ Interface ready for Vertex Flash AI via Vertex AI SDK
+✅ Interface ready for integration with Vertex AI SDK
 ✅ Onboarding flow (name, email, 10 questions) fully implemented
 ✅ UI structure prepared for dashboard personalization
 ❌ Backend integrations pending completion
