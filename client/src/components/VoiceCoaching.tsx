@@ -7,17 +7,92 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Mic, MicOff, Volume2, Play, Pause, SkipForward, Dumbbell, Activity, RefreshCw } from 'lucide-react';
+import { 
+  Mic, MicOff, Volume2, Play, Pause, SkipForward, Dumbbell, 
+  Activity, RefreshCw, BarChart, Timer, Award, Flame,
+  CheckCircle, ListChecks, Vibrate
+} from 'lucide-react';
 import { useUser } from '@/contexts/UserContext';
 import { apiRequest } from '@/lib/queryClient';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
-// Exercise types with metadata
+// Enhanced exercise types with metadata
 const exerciseTypes = [
-  { id: 'pushup', name: 'Push-ups', repGoal: 10, restTime: 60, icon: <Dumbbell className="h-5 w-5 text-green-500" /> },
-  { id: 'squat', name: 'Squats', repGoal: 15, restTime: 60, icon: <Dumbbell className="h-5 w-5 text-blue-500" /> },
-  { id: 'jumping_jack', name: 'Jumping Jacks', repGoal: 30, restTime: 30, icon: <Activity className="h-5 w-5 text-orange-500" /> },
-  { id: 'crunch', name: 'Crunches', repGoal: 20, restTime: 45, icon: <Dumbbell className="h-5 w-5 text-purple-500" /> },
-  { id: 'generic', name: 'Generic Exercise', repGoal: 12, restTime: 60, icon: <Activity className="h-5 w-5 text-gray-500" /> },
+  { 
+    id: 'pushup', 
+    name: 'Push-ups', 
+    repGoal: 10, 
+    restTime: 60, 
+    icon: <Dumbbell className="h-5 w-5 text-green-500" />,
+    description: 'Builds chest, shoulder, and tricep strength',
+    muscleGroups: ['Chest', 'Shoulders', 'Triceps'],
+    difficulty: 'Moderate',
+    formTips: [
+      'Keep your back straight',
+      'Lower chest to ground',
+      'Fully extend arms at top'
+    ]
+  },
+  { 
+    id: 'squat', 
+    name: 'Squats', 
+    repGoal: 15, 
+    restTime: 60, 
+    icon: <Dumbbell className="h-5 w-5 text-blue-500" />,
+    description: 'Strengthens lower body and core',
+    muscleGroups: ['Quadriceps', 'Hamstrings', 'Glutes'],
+    difficulty: 'Moderate',
+    formTips: [
+      'Keep weight in heels',
+      'Lower until thighs are parallel to floor',
+      'Keep chest up and back straight'
+    ]
+  },
+  { 
+    id: 'jumping_jack', 
+    name: 'Jumping Jacks', 
+    repGoal: 30, 
+    restTime: 30, 
+    icon: <Activity className="h-5 w-5 text-orange-500" />,
+    description: 'Full-body cardio exercise',
+    muscleGroups: ['Shoulders', 'Hips', 'Cardiovascular'],
+    difficulty: 'Easy',
+    formTips: [
+      'Fully extend arms and legs',
+      'Land softly on feet',
+      'Maintain consistent rhythm'
+    ]
+  },
+  { 
+    id: 'crunch', 
+    name: 'Crunches', 
+    repGoal: 20, 
+    restTime: 45, 
+    icon: <Dumbbell className="h-5 w-5 text-purple-500" />,
+    description: 'Targets abdominal muscles',
+    muscleGroups: ['Abs', 'Core'],
+    difficulty: 'Easy',
+    formTips: [
+      'Focus on contracting abs',
+      'Keep neck relaxed',
+      'Breathe out on the way up'
+    ]
+  },
+  { 
+    id: 'generic', 
+    name: 'Generic Exercise', 
+    repGoal: 12, 
+    restTime: 60, 
+    icon: <Activity className="h-5 w-5 text-gray-500" />,
+    description: 'Custom exercise for any movement',
+    muscleGroups: ['Full Body'],
+    difficulty: 'Varies',
+    formTips: [
+      'Focus on proper form',
+      'Maintain consistent pace',
+      'Complete full range of motion'
+    ]
+  },
 ];
 
 // Exercise set state
@@ -403,46 +478,197 @@ export default function VoiceCoaching() {
             
             {/* Rep Counter */}
             <div className="flex flex-col items-center space-y-2">
-              <div className="text-4xl font-bold">
-                {repCount} / {exerciseSets[currentSetIndex]?.repGoal || 0}
+              <div className="text-6xl font-bold text-primary">
+                {repCount} <span className="text-2xl text-muted-foreground">/ {exerciseSets[currentSetIndex]?.repGoal || 0}</span>
               </div>
               <div className="text-sm text-muted-foreground">Repetitions</div>
             </div>
             
             {/* Progress Bar */}
             <div className="space-y-2">
-              <Progress value={calculateProgress()} className="h-2" />
-              <div className="text-xs text-muted-foreground text-right">
-                {Math.round(calculateProgress())}% complete
+              <Progress value={calculateProgress()} className="h-3" 
+                       style={{
+                         background: calculateProgress() < 30 ? '#f3f4f6' : 
+                                    calculateProgress() < 70 ? '#dbeafe' : 
+                                    '#dcfce7'
+                       }}
+              />
+              <div className="flex justify-between text-xs">
+                <span>0</span>
+                <span className="font-medium">{Math.round(calculateProgress())}% complete</span>
+                <span>{exerciseSets[currentSetIndex]?.repGoal || 0}</span>
               </div>
             </div>
             
-            {/* Voice Message */}
-            <div className="rounded-md bg-muted p-3">
+            {/* Exercise Info Card */}
+            <div className="p-3 border rounded-md bg-card">
+              <div className="flex justify-between mb-2">
+                <h4 className="font-medium flex items-center gap-1">
+                  {exerciseTypes.find(ex => ex.id === selectedExercise)?.icon}
+                  {exerciseTypes.find(ex => ex.id === selectedExercise)?.name}
+                </h4>
+                <Badge variant={coachingState === 'recording' ? "destructive" : "outline"}>
+                  {coachingState === 'recording' ? 'Recording' : 
+                   coachingState === 'processing' ? 'Processing' : 
+                   coachingState === 'resting' ? 'Resting' : 'Ready'}
+                </Badge>
+              </div>
+              <p className="text-sm text-muted-foreground mb-2">
+                {exerciseTypes.find(ex => ex.id === selectedExercise)?.description}
+              </p>
+              <div className="text-xs space-y-1">
+                <div className="flex items-center gap-1">
+                  <Timer className="h-3 w-3" />
+                  <span>Rest between sets: {exerciseTypes.find(ex => ex.id === selectedExercise)?.restTime}s</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <Award className="h-3 w-3" />
+                  <span>Difficulty: {exerciseTypes.find(ex => ex.id === selectedExercise)?.difficulty}</span>
+                </div>
+                <div className="flex flex-wrap gap-1 mt-1">
+                  {exerciseTypes.find(ex => ex.id === selectedExercise)?.muscleGroups.map(muscle => (
+                    <Badge key={muscle} variant="secondary" className="text-xs py-0">
+                      {muscle}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            </div>
+            
+            {/* Voice Coach Message */}
+            <div className="rounded-md bg-primary/5 p-3 border border-primary/20">
+              <div className="flex items-center gap-2 mb-1">
+                <Volume2 className="h-4 w-4 text-primary" />
+                <span className="text-sm font-medium">Voice Coach Says:</span>
+              </div>
               <p className="text-sm italic">"{voiceMessage}"</p>
             </div>
             
             {/* Rest Timer */}
             {coachingState === 'resting' && (
-              <div className="flex flex-col items-center space-y-2 p-4 border rounded-md">
-                <div className="text-lg font-medium">Rest Period</div>
-                <div className="text-3xl font-bold">{restTimer}s</div>
-                <div className="text-sm text-muted-foreground">
+              <div className="flex flex-col items-center space-y-3 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-md">
+                <div className="flex items-center gap-2">
+                  <Timer className="h-5 w-5 text-blue-500" />
+                  <div className="text-lg font-medium text-blue-700 dark:text-blue-300">Rest Period</div>
+                </div>
+                
+                <div className="relative w-28 h-28 flex items-center justify-center">
+                  <svg className="w-full h-full" viewBox="0 0 100 100">
+                    <circle 
+                      cx="50" 
+                      cy="50" 
+                      r="45" 
+                      fill="none" 
+                      stroke="#e0e7ff" 
+                      strokeWidth="8" 
+                    />
+                    <circle 
+                      cx="50" 
+                      cy="50" 
+                      r="45" 
+                      fill="none" 
+                      stroke="#3b82f6" 
+                      strokeWidth="8" 
+                      strokeDasharray="283" 
+                      strokeDashoffset={283 * (1 - restTimer / exerciseSets[currentSetIndex - 1]?.restTime)} 
+                      strokeLinecap="round" 
+                      transform="rotate(-90 50 50)" 
+                    />
+                  </svg>
+                  <div className="absolute text-4xl font-bold text-blue-600 dark:text-blue-400">
+                    {restTimer}
+                  </div>
+                </div>
+                
+                <div className="text-sm text-blue-600 dark:text-blue-300">
                   Next set will begin after rest
                 </div>
+                
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="text-xs text-blue-500 flex items-center gap-1 bg-blue-100 dark:bg-blue-800/30 px-3 py-1 rounded-full">
+                        <Vibrate className="h-3 w-3" />
+                        <span>Recovery tips</span>
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <div className="space-y-1 max-w-xs">
+                        <p className="font-medium">Effective Rest Period Tips:</p>
+                        <ul className="text-xs space-y-1 list-disc pl-4">
+                          <li>Take deep breaths to stabilize heart rate</li>
+                          <li>Gently stretch the muscles you just worked</li>
+                          <li>Stay hydrated with small sips of water</li>
+                          <li>Maintain good posture while resting</li>
+                        </ul>
+                      </div>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               </div>
             )}
           </div>
         )}
         
         {coachingState === 'completed' && (
-          <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-md">
-            <h3 className="text-lg font-medium text-green-800 dark:text-green-300">Workout Complete!</h3>
-            <p className="text-sm text-green-600 dark:text-green-400">
-              Great job! You've completed all your sets.
-            </p>
-            <div className="mt-2">
-              <Button variant="outline" size="sm" onClick={resetWorkout}>
+          <div className="bg-green-50 dark:bg-green-900/20 p-6 rounded-md border border-green-200 dark:border-green-800">
+            <div className="flex flex-col items-center mb-4">
+              <div className="bg-green-100 dark:bg-green-800/50 rounded-full p-2 mb-2">
+                <CheckCircle className="h-8 w-8 text-green-600 dark:text-green-400" />
+              </div>
+              <h3 className="text-xl font-semibold text-green-800 dark:text-green-300">Workout Complete!</h3>
+              <p className="text-sm text-green-600 dark:text-green-400 text-center mt-1">
+                Great job! You've successfully completed all your sets.
+              </p>
+            </div>
+            
+            <div className="grid grid-cols-3 gap-3 mb-4">
+              <div className="bg-white dark:bg-green-800/20 rounded-md p-3 border border-green-100 dark:border-green-800 flex flex-col items-center">
+                <ListChecks className="h-5 w-5 text-green-500 mb-1" />
+                <div className="text-lg font-semibold">{exerciseSets.length}</div>
+                <div className="text-xs text-muted-foreground text-center">Sets Completed</div>
+              </div>
+              
+              <div className="bg-white dark:bg-green-800/20 rounded-md p-3 border border-green-100 dark:border-green-800 flex flex-col items-center">
+                <Flame className="h-5 w-5 text-orange-500 mb-1" />
+                <div className="text-lg font-semibold">
+                  {exerciseSets.reduce((total, set) => total + set.repsCompleted, 0)}
+                </div>
+                <div className="text-xs text-muted-foreground text-center">Total Reps</div>
+              </div>
+              
+              <div className="bg-white dark:bg-green-800/20 rounded-md p-3 border border-green-100 dark:border-green-800 flex flex-col items-center">
+                <BarChart className="h-5 w-5 text-blue-500 mb-1" />
+                <div className="text-lg font-semibold">
+                  {Math.round(exerciseSets.reduce((avg, set) => avg + (set.repsCompleted / set.repGoal * 100), 0) / exerciseSets.length)}%
+                </div>
+                <div className="text-xs text-muted-foreground text-center">Goal Achievement</div>
+              </div>
+            </div>
+            
+            <div className="bg-white dark:bg-green-800/10 rounded-md p-3 border border-green-100 dark:border-green-800 mb-4">
+              <h4 className="text-sm font-medium text-green-700 dark:text-green-300 mb-2">Workout Summary</h4>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span>Exercise Type:</span>
+                  <span className="font-medium">{exerciseTypes.find(ex => ex.id === selectedExercise)?.name}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Muscles Worked:</span>
+                  <span className="font-medium">{exerciseTypes.find(ex => ex.id === selectedExercise)?.muscleGroups.join(', ')}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Average Reps Per Set:</span>
+                  <span className="font-medium">
+                    {Math.round(exerciseSets.reduce((total, set) => total + set.repsCompleted, 0) / exerciseSets.length)}
+                  </span>
+                </div>
+              </div>
+            </div>
+            
+            <div className="flex gap-2 justify-center">
+              <Button variant="default" onClick={resetWorkout}>
+                <Play className="h-4 w-4 mr-2" />
                 Start New Workout
               </Button>
             </div>
