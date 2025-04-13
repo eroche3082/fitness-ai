@@ -176,6 +176,36 @@ export default function MiniChatbot() {
   const [isListening, setIsListening] = useState(false);
   const [workoutComplete, setWorkoutComplete] = useState(false);
   
+  // Speech synthesis
+  const speak = (text: string) => {
+    if ('speechSynthesis' in window) {
+      // Create a new speech synthesis utterance
+      const utterance = new SpeechSynthesisUtterance(text);
+      
+      // Configure voice settings
+      utterance.rate = 1.0;  // Speech rate
+      utterance.pitch = 1.0; // Speech pitch
+      utterance.volume = 1.0; // Speech volume
+      
+      // Select a voice if available
+      const voices = window.speechSynthesis.getVoices();
+      if (voices.length > 0) {
+        // Try to find a female English voice
+        const preferredVoice = voices.find(voice => 
+          voice.name.includes('Female') && voice.lang.includes('en')
+        );
+        if (preferredVoice) {
+          utterance.voice = preferredVoice;
+        }
+      }
+      
+      // Speak the text
+      window.speechSynthesis.speak(utterance);
+    } else {
+      console.log("Speech synthesis not supported in this browser");
+    }
+  };
+  
   // Refs
   const inputRef = useRef<HTMLInputElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -630,6 +660,15 @@ export default function MiniChatbot() {
                         <button 
                           onClick={() => {
                             setIsListening(false);
+                            
+                            // Stop any ongoing speech
+                            if ('speechSynthesis' in window) {
+                              window.speechSynthesis.cancel();
+                            }
+                            
+                            // Say goodbye
+                            speak("Workout stopped.");
+                            
                             // Simulate completing the set
                             if (currentSet < currentExercise.sets) {
                               setIsResting(true);
@@ -665,39 +704,76 @@ export default function MiniChatbot() {
                         <button 
                           onClick={() => {
                             setIsListening(true);
+                            
+                            // Speak initial instructions
+                            if (currentExercise) {
+                              speak(`Let's start with ${currentExercise.name}. Set ${currentSet} of ${currentExercise.sets}. ${currentExercise.instructions}`);
+                            }
+                            
                             // Simulate rep counting (in a real app, this would use voice recognition)
                             const repInterval = setInterval(() => {
                               setRepCount(prev => {
-                                if (prev >= currentExercise.reps) {
-                                  clearInterval(repInterval);
-                                  setIsListening(false);
+                                const newRepCount = prev + 1;
+                                
+                                // Speak the rep count
+                                if (currentExercise) {
+                                  speak(`${newRepCount}`);
                                   
-                                  if (currentSet < currentExercise.sets) {
-                                    setIsResting(true);
-                                    setRestTimeLeft(currentExercise.restTime);
-                                    
-                                    // Simulate rest timer
-                                    const timer = setInterval(() => {
-                                      setRestTimeLeft(prev => {
-                                        if (prev <= 1) {
-                                          clearInterval(timer);
-                                          setIsResting(false);
-                                          setCurrentSet(currentSet + 1);
-                                          setRepCount(0);
-                                          return 0;
-                                        }
-                                        return prev - 1;
-                                      });
-                                    }, 1000);
-                                  } else {
-                                    // Workout complete
-                                    setWorkoutComplete(true);
-                                    setCurrentExercise(null);
+                                  // For the last few reps, add encouragement
+                                  if (newRepCount >= currentExercise.reps - 2 && newRepCount < currentExercise.reps) {
+                                    setTimeout(() => speak("Almost there! Keep pushing!"), 800);
                                   }
-                                  
-                                  return currentExercise.reps;
+                                
+                                  // When all reps are completed
+                                  if (newRepCount >= currentExercise.reps) {
+                                    clearInterval(repInterval);
+                                    setIsListening(false);
+                                    
+                                    // Speak completion message
+                                    setTimeout(() => {
+                                      speak("Great job! Set completed.");
+                                      
+                                      if (currentSet < currentExercise.sets) {
+                                        setIsResting(true);
+                                        setRestTimeLeft(currentExercise.restTime);
+                                        speak(`Take a ${currentExercise.restTime} second rest.`);
+                                        
+                                        // Simulate rest timer
+                                        const timer = setInterval(() => {
+                                          setRestTimeLeft(prev => {
+                                            // Speak countdown at specific intervals
+                                            if (prev === 30 || prev === 20 || prev === 10 || prev === 5) {
+                                              speak(`${prev} seconds remaining.`);
+                                            } else if (prev === 3) {
+                                              speak("Get ready. 3 seconds left.");
+                                            }
+                                            
+                                            if (prev <= 1) {
+                                              clearInterval(timer);
+                                              setIsResting(false);
+                                              setCurrentSet(currentSet + 1);
+                                              setRepCount(0);
+                                              // Announce next set
+                                              setTimeout(() => {
+                                                speak(`Starting set ${currentSet + 1}. Get ready!`);
+                                              }, 500);
+                                              return 0;
+                                            }
+                                            return prev - 1;
+                                          });
+                                        }, 1000);
+                                      } else {
+                                        // Workout complete
+                                        speak("Congratulations! You've completed all sets of this exercise!");
+                                        setWorkoutComplete(true);
+                                        setCurrentExercise(null);
+                                      }
+                                    }, 500);
+                                    
+                                    return currentExercise.reps;
+                                  }
                                 }
-                                return prev + 1;
+                                return newRepCount;
                               });
                             }, 1500); // Count a rep every 1.5 seconds for demo purposes
                           }}
@@ -715,6 +791,14 @@ export default function MiniChatbot() {
                       
                       <button 
                         onClick={() => {
+                          // Cancel any ongoing speech
+                          if ('speechSynthesis' in window) {
+                            window.speechSynthesis.cancel();
+                          }
+                          
+                          // Announce exit
+                          speak("Exiting workout mode.");
+                          
                           setCurrentExercise(null);
                           setWorkoutComplete(false);
                         }}
@@ -814,7 +898,13 @@ export default function MiniChatbot() {
             <div className="p-3 border-t border-gray-800 bg-gray-900">
               <button
                 className="w-full p-2 bg-green-600 hover:bg-green-700 text-white rounded"
-                onClick={() => setActiveTab('chat')}
+                onClick={() => {
+                  // Cancel any ongoing speech when switching tabs
+                  if ('speechSynthesis' in window) {
+                    window.speechSynthesis.cancel();
+                  }
+                  setActiveTab('chat');
+                }}
               >
                 Return to Chat
               </button>
