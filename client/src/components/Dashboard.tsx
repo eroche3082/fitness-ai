@@ -80,6 +80,10 @@ const Dashboard: React.FC<DashboardProps> = ({ userCode }) => {
         return <FitnessRoutineSocialStudio userId={userId} />;
       case 'social':
         return <SocialMediaHub userId={userId} />;
+      case 'premium':
+        return renderPremiumTab();
+      case 'access':
+        return renderAccessCodeTab();
       default:
         return renderJourneyTab();
     }
