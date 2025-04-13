@@ -24,10 +24,10 @@ export default function LoginPage() {
       if (success) {
         setLocation('/dashboard');
       } else {
-        setError('Credenciales inválidas. Intenta con demo/demo123');
+        setError('Invalid credentials. Try with demo/demo123');
       }
     } catch (err) {
-      setError('Ocurrió un error al iniciar sesión');
+      setError('An error occurred while logging in');
     } finally {
       setIsLoading(false);
     }
@@ -43,7 +43,7 @@ export default function LoginPage() {
       if (success) {
         setLocation('/dashboard');
       } else {
-        setError('Error al utilizar cuenta demo');
+        setError('Error using demo account');
       }
       setIsLoading(false);
     }, 500);
@@ -74,8 +74,8 @@ export default function LoginPage() {
       <main className="container mx-auto px-4 py-24 flex items-center justify-center min-h-screen">
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold mb-2">Iniciar Sesión</h2>
-            <p className="text-gray-400">Accede a tu cuenta para continuar tu entrenamiento</p>
+            <h2 className="text-3xl font-bold mb-2">Login</h2>
+            <p className="text-gray-400">Access your account to continue your training</p>
           </div>
 
           <div className="bg-gray-900 p-8 rounded-lg shadow-lg border border-gray-800">
@@ -88,21 +88,21 @@ export default function LoginPage() {
 
               <div className="space-y-2">
                 <Label htmlFor="username" className="text-gray-300">
-                  Nombre de usuario
+                  Username
                 </Label>
                 <Input
                   id="username"
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
                   className="bg-gray-800 border-gray-700 text-white"
-                  placeholder="ejemplo: demo"
+                  placeholder="example: demo"
                   required
                 />
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="password" className="text-gray-300">
-                  Contraseña
+                  Password
                 </Label>
                 <Input
                   id="password"
@@ -110,7 +110,7 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="bg-gray-800 border-gray-700 text-white"
-                  placeholder="ejemplo: demo123"
+                  placeholder="example: demo123"
                   required
                 />
               </div>
@@ -126,11 +126,11 @@ export default function LoginPage() {
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
-                    Iniciando sesión...
+                    Logging in...
                   </span>
                 ) : (
                   <span className="flex items-center justify-center">
-                    Iniciar Sesión
+                    Login
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </span>
                 )}
@@ -138,14 +138,14 @@ export default function LoginPage() {
             </form>
 
             <div className="mt-6 pt-6 border-t border-gray-800 text-center">
-              <p className="text-gray-400 mb-4">¿No tienes una cuenta? Prueba la demo</p>
+              <p className="text-gray-400 mb-4">Don't have an account? Try the demo</p>
               <Button
                 variant="outline"
                 onClick={handleDemoLogin}
                 disabled={isLoading}
                 className="w-full border-green-500 text-green-500 hover:bg-green-500 hover:text-black"
               >
-                Usar Cuenta Demo
+                Use Demo Account
               </Button>
             </div>
           </div>
@@ -155,7 +155,7 @@ export default function LoginPage() {
               onClick={() => setLocation('/bridge')}
               className="text-green-500 hover:text-green-400 font-medium"
             >
-              ← Volver a la página principal
+              ← Back to Home Page
             </button>
           </div>
         </div>
