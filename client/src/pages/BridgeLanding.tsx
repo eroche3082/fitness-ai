@@ -183,7 +183,12 @@ export default function BridgeLanding() {
           </div>
           
           {/* Trainer 3 */}
-          <div className="relative group h-96 bg-gray-900">
+          <div className="relative group h-96">
+            <div className="absolute inset-0" style={{ 
+              backgroundImage: `url(${trainer3})`, 
+              backgroundSize: 'cover',
+              backgroundPosition: 'center'
+            }}></div>
             <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black opacity-60"></div>
             <div className="absolute left-0 bottom-0 transform origin-bottom-left rotate-90 z-10">
               <div className="whitespace-nowrap text-white text-2xl uppercase tracking-wider font-bold py-4 px-6">
@@ -214,7 +219,13 @@ export default function BridgeLanding() {
       {/* Training Power Section */}
       <section className="bg-black">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-0">
-          <div className="relative h-72 md:h-96 bg-gradient-to-br from-gray-900 to-black overflow-hidden">
+          <div className="relative h-72 md:h-96 overflow-hidden">
+            <div className="absolute inset-0" style={{ 
+              backgroundImage: `url(${training1})`, 
+              backgroundSize: 'cover',
+              backgroundPosition: 'center'
+            }}></div>
+            <div className="absolute inset-0 bg-gradient-to-br from-transparent to-black opacity-70"></div>
             <div className="absolute top-0 left-0 p-6 z-10">
               <div className="text-white">
                 <h3 className="text-xl font-bold uppercase leading-tight">TRAINING</h3>
@@ -245,7 +256,13 @@ export default function BridgeLanding() {
               </a>
             </div>
           </div>
-          <div className="relative h-72 md:h-96 bg-gradient-to-br from-gray-800 to-black overflow-hidden">
+          <div className="relative h-72 md:h-96 overflow-hidden">
+            <div className="absolute inset-0" style={{ 
+              backgroundImage: `url(${training2})`, 
+              backgroundSize: 'cover',
+              backgroundPosition: 'center'
+            }}></div>
+            <div className="absolute inset-0 bg-gradient-to-br from-transparent to-black opacity-70"></div>
             {/* Vertical rotated text for CARDIO & CONDITIONING */}
             <div className="absolute right-[-70px] top-1/2 transform -translate-y-1/2 rotate-90 z-10">
               <div className="whitespace-nowrap text-white text-lg uppercase tracking-wider font-medium py-4">
@@ -270,7 +287,13 @@ export default function BridgeLanding() {
               </a>
             </div>
           </div>
-          <div className="relative h-72 md:h-96 bg-gradient-to-br from-gray-900 to-black overflow-hidden">
+          <div className="relative h-72 md:h-96 overflow-hidden">
+            <div className="absolute inset-0" style={{ 
+              backgroundImage: `url(${training3})`, 
+              backgroundSize: 'cover',
+              backgroundPosition: 'center'
+            }}></div>
+            <div className="absolute inset-0 bg-gradient-to-br from-transparent to-black opacity-70"></div>
             {/* Vertical rotated text for MADISON FRONING */}
             <div className="absolute right-[-50px] top-1/2 transform -translate-y-1/2 rotate-90 z-10">
               <div className="whitespace-nowrap text-white text-lg uppercase tracking-wider font-medium py-4">
@@ -297,17 +320,35 @@ export default function BridgeLanding() {
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-0">
-          <div className="relative h-72 md:h-96 bg-gradient-to-br from-gray-800 to-black">
+          <div className="relative h-72 md:h-96 overflow-hidden">
+            <div className="absolute inset-0" style={{ 
+              backgroundImage: `url(${training4})`, 
+              backgroundSize: 'cover',
+              backgroundPosition: 'center'
+            }}></div>
+            <div className="absolute inset-0 bg-gradient-to-br from-transparent to-black opacity-70"></div>
             <div className="absolute bottom-4 left-4 text-white">
               <h3 className="text-lg font-bold uppercase">Strength</h3>
             </div>
           </div>
-          <div className="relative h-72 md:h-96 bg-gradient-to-br from-gray-900 to-black">
+          <div className="relative h-72 md:h-96 overflow-hidden">
+            <div className="absolute inset-0" style={{ 
+              backgroundImage: `url(${training5})`, 
+              backgroundSize: 'cover',
+              backgroundPosition: 'center'
+            }}></div>
+            <div className="absolute inset-0 bg-gradient-to-br from-transparent to-black opacity-70"></div>
             <div className="absolute bottom-4 left-4 text-white">
               <h3 className="text-lg font-bold uppercase">Mobility</h3>
             </div>
           </div>
-          <div className="relative h-72 md:h-96 bg-gradient-to-br from-gray-800 to-black">
+          <div className="relative h-72 md:h-96 overflow-hidden">
+            <div className="absolute inset-0" style={{ 
+              backgroundImage: `url(${training6})`, 
+              backgroundSize: 'cover',
+              backgroundPosition: 'center'
+            }}></div>
+            <div className="absolute inset-0 bg-gradient-to-br from-transparent to-black opacity-70"></div>
             <div className="absolute bottom-4 left-4 text-white">
               <h3 className="text-lg font-bold uppercase">Recovery</h3>
             </div>
