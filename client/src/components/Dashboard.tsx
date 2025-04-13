@@ -20,6 +20,7 @@ const Dashboard: React.FC<DashboardProps> = ({ userCode }) => {
     caloriesBurned: 0,
     currentStreak: 0,
   });
+  const [userId, setUserId] = useState("1"); // Default user ID
   
   useEffect(() => {
     // Get user profile from service
