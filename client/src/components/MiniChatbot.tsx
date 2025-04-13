@@ -176,30 +176,67 @@ export default function MiniChatbot() {
   const [isListening, setIsListening] = useState(false);
   const [workoutComplete, setWorkoutComplete] = useState(false);
   
-  // Speech synthesis
+  // Voice state
+  const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
+  const [preferredVoice, setPreferredVoice] = useState<SpeechSynthesisVoice | null>(null);
+  
+  // Initialize speech synthesis API
+  useEffect(() => {
+    if ('speechSynthesis' in window) {
+      // Function to handle voices when they're loaded
+      const handleVoicesChanged = () => {
+        const availableVoices = window.speechSynthesis.getVoices();
+        if (availableVoices.length > 0) {
+          setVoices(availableVoices);
+          
+          // Try to find a female English voice, or fall back to any voice
+          const femaleEnglishVoice = availableVoices.find(voice => 
+            voice.name.includes('Female') && voice.lang.includes('en')
+          );
+          const anyEnglishVoice = availableVoices.find(voice => 
+            voice.lang.includes('en')
+          );
+          
+          setPreferredVoice(femaleEnglishVoice || anyEnglishVoice || availableVoices[0]);
+          console.log("Voice initialized:", femaleEnglishVoice?.name || anyEnglishVoice?.name || availableVoices[0].name);
+        }
+      };
+      
+      // Chrome loads voices asynchronously
+      window.speechSynthesis.onvoiceschanged = handleVoicesChanged;
+      
+      // Try to get voices right away (Firefox and some other browsers load voices synchronously)
+      handleVoicesChanged();
+      
+      return () => {
+        window.speechSynthesis.onvoiceschanged = null;
+      };
+    }
+  }, []);
+  
+  // Speech synthesis function
   const speak = (text: string) => {
     if ('speechSynthesis' in window) {
+      // Cancel any ongoing speech
+      window.speechSynthesis.cancel();
+      
       // Create a new speech synthesis utterance
       const utterance = new SpeechSynthesisUtterance(text);
       
       // Configure voice settings
-      utterance.rate = 1.0;  // Speech rate
-      utterance.pitch = 1.0; // Speech pitch
+      utterance.rate = 1.0;   // Speech rate
+      utterance.pitch = 1.0;  // Speech pitch
       utterance.volume = 1.0; // Speech volume
       
-      // Select a voice if available
-      const voices = window.speechSynthesis.getVoices();
-      if (voices.length > 0) {
-        // Try to find a female English voice
-        const preferredVoice = voices.find(voice => 
-          voice.name.includes('Female') && voice.lang.includes('en')
-        );
-        if (preferredVoice) {
-          utterance.voice = preferredVoice;
-        }
+      // Set voice if we have a preferred one
+      if (preferredVoice) {
+        utterance.voice = preferredVoice;
       }
       
-      // Speak the text
+      // Debug log
+      console.log("Speaking:", text);
+      
+      // Start speaking
       window.speechSynthesis.speak(utterance);
     } else {
       console.log("Speech synthesis not supported in this browser");
@@ -508,25 +545,54 @@ export default function MiniChatbot() {
           <div className="flex flex-wrap border-b border-gray-800">
             <button 
               className={`flex-1 py-2 px-2 ${activeTab === 'chat' ? 'bg-white text-green-700 font-medium' : 'text-gray-300 bg-gray-900 hover:bg-gray-800'}`}
-              onClick={() => setActiveTab('chat')}
+              onClick={() => {
+                // Cancel any speech when changing tabs
+                if ('speechSynthesis' in window) {
+                  window.speechSynthesis.cancel();
+                }
+                setActiveTab('chat');
+              }}
             >
               Chat
             </button>
             <button 
               className={`flex-1 py-2 px-2 ${activeTab === 'workout' ? 'bg-white text-green-700 font-medium' : 'text-gray-300 bg-gray-900 hover:bg-gray-800'}`}
-              onClick={() => setActiveTab('workout')}
+              onClick={() => {
+                // Cancel any speech when changing tabs
+                if ('speechSynthesis' in window) {
+                  window.speechSynthesis.cancel();
+                }
+                setActiveTab('workout');
+                
+                // Welcome message when entering workout tab
+                setTimeout(() => {
+                  speak("Welcome to your voice-guided workout. Select an exercise to begin.");
+                }, 300);
+              }}
             >
               Workout
             </button>
             <button 
               className={`flex-1 py-2 px-2 ${activeTab === 'qr' ? 'bg-white text-green-700 font-medium' : 'text-gray-300 bg-gray-900 hover:bg-gray-800'}`}
-              onClick={() => setActiveTab('qr')}
+              onClick={() => {
+                // Cancel any speech when changing tabs
+                if ('speechSynthesis' in window) {
+                  window.speechSynthesis.cancel();
+                }
+                setActiveTab('qr');
+              }}
             >
               QR Code
             </button>
             <button 
               className={`flex-1 py-2 px-2 ${activeTab === 'ar' ? 'bg-white text-green-700 font-medium' : 'text-gray-300 bg-gray-900 hover:bg-gray-800'}`}
-              onClick={() => setActiveTab('ar')}
+              onClick={() => {
+                // Cancel any speech when changing tabs
+                if ('speechSynthesis' in window) {
+                  window.speechSynthesis.cancel();
+                }
+                setActiveTab('ar');
+              }}
             >
               AR/VR
             </button>
