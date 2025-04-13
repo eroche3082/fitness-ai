@@ -35,7 +35,8 @@ import {
   Share2,
   Flame,
   Sparkles,
-  X
+  X,
+  Check
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -558,175 +559,214 @@ export default function LandingPage() {
       <section className="py-20 bg-white">
         <div className="container mx-auto px-4 md:px-6">
           <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-4xl font-bold text-primary-dark mb-4">Choose Your Fitness Journey</h2>
+            <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-4">Choose Your Fitness Journey</h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
               Select the perfect plan for your fitness goals and lifestyle.
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 lg:gap-0 max-w-5xl mx-auto relative">
+            {/* Background line */}
+            <div className="absolute hidden md:block top-1/2 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-green-200 to-transparent z-0"></div>
+            
             {/* Basic Plan */}
-            <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100 hover:shadow-xl transition-all">
-              <div className="p-8 text-center border-b border-gray-100">
-                <h3 className="text-xl font-bold text-gray-800 mb-2">Basic</h3>
-                <div className="flex items-end justify-center mb-4">
-                  <span className="text-4xl font-bold text-primary">$9</span>
+            <div className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200 z-10 pt-8 pb-6 px-6">
+              <div className="text-center mb-6">
+                <h3 className="text-lg font-bold text-gray-800 mb-4">Basic</h3>
+                <div className="flex items-end justify-center mb-2">
+                  <span className="text-4xl font-bold text-gray-800">$9</span>
                   <span className="text-gray-500 ml-1">/month</span>
                 </div>
-                <p className="text-gray-600">Perfect for fitness beginners</p>
+                <p className="text-gray-600 text-sm">Perfect for fitness beginners</p>
               </div>
-              <div className="p-8">
-                <ul className="space-y-4">
-                  <li className="flex items-start">
-                    <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 mr-3 flex-shrink-0" />
-                    <span>Basic workout plans</span>
-                  </li>
-                  <li className="flex items-start">
-                    <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 mr-3 flex-shrink-0" />
-                    <span>AI-powered nutrition guidance</span>
-                  </li>
-                  <li className="flex items-start">
-                    <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 mr-3 flex-shrink-0" />
-                    <span>Connect 2 fitness devices</span>
-                  </li>
-                  <li className="flex items-start">
-                    <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 mr-3 flex-shrink-0" />
-                    <span>Weekly progress reports</span>
-                  </li>
-                  <li className="flex items-start text-gray-400">
-                    <X className="h-5 w-5 mt-0.5 mr-3 flex-shrink-0" />
-                    <span>Voice coaching</span>
-                  </li>
-                  <li className="flex items-start text-gray-400">
-                    <X className="h-5 w-5 mt-0.5 mr-3 flex-shrink-0" />
-                    <span>Advanced analytics</span>
-                  </li>
-                </ul>
-              </div>
-              <div className="px-8 pb-8">
-                <Button className="w-full bg-primary text-white font-medium py-3">Get Started</Button>
+              
+              <ul className="space-y-3 mb-8">
+                <li className="flex items-center">
+                  <div className="w-5 h-5 flex-shrink-0 rounded-full flex items-center justify-center bg-[#D1FAE5] mr-3">
+                    <Check className="h-3 w-3 text-[var(--fitness-dark-green)]" />
+                  </div>
+                  <span className="text-sm">Basic workout plans</span>
+                </li>
+                <li className="flex items-center">
+                  <div className="w-5 h-5 flex-shrink-0 rounded-full flex items-center justify-center bg-[#D1FAE5] mr-3">
+                    <Check className="h-3 w-3 text-[var(--fitness-dark-green)]" />
+                  </div>
+                  <span className="text-sm">AI-powered nutrition guidance</span>
+                </li>
+                <li className="flex items-center">
+                  <div className="w-5 h-5 flex-shrink-0 rounded-full flex items-center justify-center bg-[#D1FAE5] mr-3">
+                    <Check className="h-3 w-3 text-[var(--fitness-dark-green)]" />
+                  </div>
+                  <span className="text-sm">Connect 2 fitness devices</span>
+                </li>
+                <li className="flex items-center">
+                  <div className="w-5 h-5 flex-shrink-0 rounded-full flex items-center justify-center bg-[#D1FAE5] mr-3">
+                    <Check className="h-3 w-3 text-[var(--fitness-dark-green)]" />
+                  </div>
+                  <span className="text-sm">Weekly progress reports</span>
+                </li>
+                <li className="flex items-center text-gray-400">
+                  <div className="w-5 h-5 flex-shrink-0 rounded-full flex items-center justify-center mr-3">
+                    <X className="h-3 w-3" />
+                  </div>
+                  <span className="text-sm">Voice coaching</span>
+                </li>
+                <li className="flex items-center text-gray-400">
+                  <div className="w-5 h-5 flex-shrink-0 rounded-full flex items-center justify-center mr-3">
+                    <X className="h-3 w-3" />
+                  </div>
+                  <span className="text-sm">Advanced analytics</span>
+                </li>
+              </ul>
+              
+              <div className="mt-auto">
+                <Button variant="outline" className="w-full border-[var(--fitness-dark-green)] text-[var(--fitness-dark-green)] hover:bg-green-50 py-1.5">Get Started</Button>
               </div>
             </div>
             
             {/* Pro Plan */}
-            <div className="bg-gradient-to-br from-primary to-primary-dark rounded-xl shadow-xl overflow-hidden border border-primary transform scale-105 z-10">
-              <div className="p-8 text-center border-b border-white/10">
-                <h3 className="text-xl font-bold text-white mb-2">Pro</h3>
-                <div className="flex items-end justify-center mb-4">
-                  <span className="text-4xl font-bold text-white">$19</span>
-                  <span className="text-white/70 ml-1">/month</span>
+            <div className="bg-white rounded-lg shadow-xl overflow-hidden border border-[var(--fitness-dark-green)] z-20 transform scale-105 relative">
+              <div className="pt-8 pb-6 px-8">
+                <div className="text-center mb-6">
+                  <h3 className="text-lg font-bold text-gray-800 mb-4">Pro</h3>
+                  <div className="flex items-end justify-center mb-2">
+                    <span className="text-4xl font-bold text-[var(--fitness-dark-green)]">$19</span>
+                    <span className="text-gray-500 ml-1">/month</span>
+                  </div>
+                  <p className="text-gray-600 text-sm">Most popular for fitness enthusiasts</p>
                 </div>
-                <p className="text-white/80">Most popular for fitness enthusiasts</p>
-              </div>
-              <div className="p-8">
-                <ul className="space-y-4 text-white">
-                  <li className="flex items-start">
-                    <CheckCircle className="h-5 w-5 text-white mt-0.5 mr-3 flex-shrink-0" />
-                    <span>Advanced workout plans</span>
+                
+                <ul className="space-y-3 mb-8">
+                  <li className="flex items-center">
+                    <div className="w-5 h-5 flex-shrink-0 rounded-full flex items-center justify-center bg-[#D1FAE5] mr-3">
+                      <Check className="h-3 w-3 text-[var(--fitness-dark-green)]" />
+                    </div>
+                    <span className="text-sm">Advanced workout plans</span>
                   </li>
-                  <li className="flex items-start">
-                    <CheckCircle className="h-5 w-5 text-white mt-0.5 mr-3 flex-shrink-0" />
-                    <span>Personalized meal planning</span>
+                  <li className="flex items-center">
+                    <div className="w-5 h-5 flex-shrink-0 rounded-full flex items-center justify-center bg-[#D1FAE5] mr-3">
+                      <Check className="h-3 w-3 text-[var(--fitness-dark-green)]" />
+                    </div>
+                    <span className="text-sm">Personalized meal planning</span>
                   </li>
-                  <li className="flex items-start">
-                    <CheckCircle className="h-5 w-5 text-white mt-0.5 mr-3 flex-shrink-0" />
-                    <span>Connect 5 fitness devices</span>
+                  <li className="flex items-center">
+                    <div className="w-5 h-5 flex-shrink-0 rounded-full flex items-center justify-center bg-[#D1FAE5] mr-3">
+                      <Check className="h-3 w-3 text-[var(--fitness-dark-green)]" />
+                    </div>
+                    <span className="text-sm">Connect 5 fitness devices</span>
                   </li>
-                  <li className="flex items-start">
-                    <CheckCircle className="h-5 w-5 text-white mt-0.5 mr-3 flex-shrink-0" />
-                    <span>Voice coaching with rep counting</span>
+                  <li className="flex items-center">
+                    <div className="w-5 h-5 flex-shrink-0 rounded-full flex items-center justify-center bg-[#D1FAE5] mr-3">
+                      <Check className="h-3 w-3 text-[var(--fitness-dark-green)]" />
+                    </div>
+                    <span className="text-sm">Voice coaching with rep counting</span>
                   </li>
-                  <li className="flex items-start">
-                    <CheckCircle className="h-5 w-5 text-white mt-0.5 mr-3 flex-shrink-0" />
-                    <span>Detailed progress analytics</span>
+                  <li className="flex items-center">
+                    <div className="w-5 h-5 flex-shrink-0 rounded-full flex items-center justify-center bg-[#D1FAE5] mr-3">
+                      <Check className="h-3 w-3 text-[var(--fitness-dark-green)]" />
+                    </div>
+                    <span className="text-sm">Detailed progress analytics</span>
                   </li>
-                  <li className="flex items-start">
-                    <CheckCircle className="h-5 w-5 text-white mt-0.5 mr-3 flex-shrink-0" />
-                    <span>Priority support</span>
+                  <li className="flex items-center">
+                    <div className="w-5 h-5 flex-shrink-0 rounded-full flex items-center justify-center bg-[#D1FAE5] mr-3">
+                      <Check className="h-3 w-3 text-[var(--fitness-dark-green)]" />
+                    </div>
+                    <span className="text-sm">Priority support</span>
                   </li>
                 </ul>
-              </div>
-              <div className="px-8 pb-8">
-                <Button className="w-full bg-white text-primary hover:bg-white/90 font-medium py-3">Get Pro</Button>
+                
+                <div className="mt-auto">
+                  <Button className="w-full bg-[var(--fitness-dark-green)] text-white hover:bg-[#1bb04e] py-1.5">Get Pro</Button>
+                </div>
               </div>
             </div>
             
             {/* Premium Plan */}
-            <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100 hover:shadow-xl transition-all">
-              <div className="p-8 text-center border-b border-gray-100">
-                <h3 className="text-xl font-bold text-gray-800 mb-2">Premium</h3>
-                <div className="flex items-end justify-center mb-4">
-                  <span className="text-4xl font-bold text-primary">$29</span>
+            <div className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200 z-10 pt-8 pb-6 px-6">
+              <div className="text-center mb-6">
+                <h3 className="text-lg font-bold text-gray-800 mb-4">Premium</h3>
+                <div className="flex items-end justify-center mb-2">
+                  <span className="text-4xl font-bold text-gray-800">$29</span>
                   <span className="text-gray-500 ml-1">/month</span>
                 </div>
-                <p className="text-gray-600">For serious athletes and professionals</p>
+                <p className="text-gray-600 text-sm">For serious athletes and professionals</p>
               </div>
-              <div className="p-8">
-                <ul className="space-y-4">
-                  <li className="flex items-start">
-                    <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 mr-3 flex-shrink-0" />
-                    <span>Elite workout plans</span>
-                  </li>
-                  <li className="flex items-start">
-                    <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 mr-3 flex-shrink-0" />
-                    <span>Pro nutrition & recovery coaching</span>
-                  </li>
-                  <li className="flex items-start">
-                    <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 mr-3 flex-shrink-0" />
-                    <span>Unlimited device connections</span>
-                  </li>
-                  <li className="flex items-start">
-                    <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 mr-3 flex-shrink-0" />
-                    <span>Advanced voice coaching</span>
-                  </li>
-                  <li className="flex items-start">
-                    <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 mr-3 flex-shrink-0" />
-                    <span>Predictive performance analytics</span>
-                  </li>
-                  <li className="flex items-start">
-                    <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 mr-3 flex-shrink-0" />
-                    <span>1-on-1 expert consultations</span>
-                  </li>
-                </ul>
-              </div>
-              <div className="px-8 pb-8">
-                <Button className="w-full bg-primary text-white font-medium py-3">Get Premium</Button>
+              
+              <ul className="space-y-3 mb-8">
+                <li className="flex items-center">
+                  <div className="w-5 h-5 flex-shrink-0 rounded-full flex items-center justify-center bg-[#D1FAE5] mr-3">
+                    <Check className="h-3 w-3 text-[var(--fitness-dark-green)]" />
+                  </div>
+                  <span className="text-sm">Elite workout plans</span>
+                </li>
+                <li className="flex items-center">
+                  <div className="w-5 h-5 flex-shrink-0 rounded-full flex items-center justify-center bg-[#D1FAE5] mr-3">
+                    <Check className="h-3 w-3 text-[var(--fitness-dark-green)]" />
+                  </div>
+                  <span className="text-sm">Pro nutrition & recovery coaching</span>
+                </li>
+                <li className="flex items-center">
+                  <div className="w-5 h-5 flex-shrink-0 rounded-full flex items-center justify-center bg-[#D1FAE5] mr-3">
+                    <Check className="h-3 w-3 text-[var(--fitness-dark-green)]" />
+                  </div>
+                  <span className="text-sm">Unlimited device connections</span>
+                </li>
+                <li className="flex items-center">
+                  <div className="w-5 h-5 flex-shrink-0 rounded-full flex items-center justify-center bg-[#D1FAE5] mr-3">
+                    <Check className="h-3 w-3 text-[var(--fitness-dark-green)]" />
+                  </div>
+                  <span className="text-sm">Advanced voice coaching</span>
+                </li>
+                <li className="flex items-center">
+                  <div className="w-5 h-5 flex-shrink-0 rounded-full flex items-center justify-center bg-[#D1FAE5] mr-3">
+                    <Check className="h-3 w-3 text-[var(--fitness-dark-green)]" />
+                  </div>
+                  <span className="text-sm">Predictive performance analytics</span>
+                </li>
+                <li className="flex items-center">
+                  <div className="w-5 h-5 flex-shrink-0 rounded-full flex items-center justify-center bg-[#D1FAE5] mr-3">
+                    <Check className="h-3 w-3 text-[var(--fitness-dark-green)]" />
+                  </div>
+                  <span className="text-sm">1-on-1 expert consultations</span>
+                </li>
+              </ul>
+              
+              <div className="mt-auto">
+                <Button variant="outline" className="w-full border-[var(--fitness-dark-green)] text-[var(--fitness-dark-green)] hover:bg-green-50 py-1.5">Get Premium</Button>
               </div>
             </div>
           </div>
           
-          <div className="text-center mt-10 text-gray-500">
+          <div className="text-center mt-12 text-gray-500 text-sm">
             <p>All plans include a 14-day free trial. No credit card required to start.</p>
           </div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-br from-primary to-primary-dark">
+      <section className="py-20 bg-[var(--fitness-bg-green)]">
         <div className="container mx-auto px-4 md:px-6">
           <div className="max-w-3xl mx-auto text-center">
             <h2 className="text-3xl md:text-4xl font-bold mb-6 text-white">Start Your Fitness Transformation Today</h2>
-            <p className="text-xl mb-8 text-white/90">
-              Join thousands of users who have already revolutionized their approach to fitness with our AI-powered platform.
+            <p className="text-lg mb-8 text-white/90">
+              Join thousands of users who have already revolutionized their approach to fitness with<br className="hidden md:block" /> our AI-powered platform.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button 
-                size="lg" 
-                className="bg-white text-primary-dark hover:bg-white/90 font-medium py-6 px-8 text-lg"
+                className="bg-white text-[var(--fitness-dark-green)] hover:bg-white/95 font-medium py-2 px-6 rounded-full text-sm flex items-center"
                 onClick={() => setShowSignupModal(true)}
               >
                 Start For Free
-                <ArrowRight className="ml-2 h-5 w-5" />
+                <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
               <Button 
                 variant="outline" 
-                size="lg"
-                className="border-white text-white hover:bg-white/10 py-6 px-8 text-lg"
+                className="border-white text-white hover:bg-white/10 py-2 px-6 rounded-full text-sm"
               >
                 View Pricing
               </Button>
             </div>
-            <p className="text-white/80 mt-6">
+            <p className="text-white/80 mt-6 text-sm">
               No credit card required. Free 14-day trial.
             </p>
           </div>

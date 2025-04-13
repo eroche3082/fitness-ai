@@ -2,6 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --fitness-green: #4ade80;
+  --fitness-dark-green: #22c55e;
+  --fitness-light-green: #86efac;
+  --fitness-bg-green: #65D580;
+}
+
 @layer base {
   * {
     @apply border-border;
