@@ -455,6 +455,176 @@ export default function BridgeLanding() {
         </div>
       </section>
 
+      {/* Membership Plans Section */}
+      <section className="py-24 bg-gradient-to-b from-black to-gray-900">
+        <div className="container mx-auto px-4 md:px-6">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl md:text-5xl font-bold mb-4 animate-fade-in-up">Choose Your <span className="text-green-500">Fitness Journey</span></h2>
+            <p className="text-xl text-gray-300 max-w-3xl mx-auto animate-fade-in-up animation-delay-300">
+              Unlock your potential with our personalized AI-powered fitness plans. Select the membership that fits your goals and lifestyle.
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {/* Starter Plan */}
+            <div className="bg-gray-800 rounded-lg overflow-hidden transform transition-all duration-300 hover:scale-105 hover:shadow-xl border border-gray-700">
+              <div className="p-8">
+                <h3 className="text-2xl font-bold mb-2">Starter</h3>
+                <div className="text-4xl font-bold mb-4">
+                  <span className="text-green-500">$0</span>
+                  <span className="text-sm text-gray-400">/month</span>
+                </div>
+                <p className="text-gray-300 mb-6">
+                  Begin your fitness journey with basic tracking and AI guidance
+                </p>
+                <ul className="mb-8 space-y-2">
+                  <li className="flex items-center">
+                    <svg className="h-5 w-5 mr-2 text-green-500" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" stroke="currentColor">
+                      <path d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    Basic workout tracking
+                  </li>
+                  <li className="flex items-center">
+                    <svg className="h-5 w-5 mr-2 text-green-500" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" stroke="currentColor">
+                      <path d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    AI workout suggestions
+                  </li>
+                  <li className="flex items-center">
+                    <svg className="h-5 w-5 mr-2 text-green-500" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" stroke="currentColor">
+                      <path d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    Access to community forums
+                  </li>
+                  <li className="flex items-center text-gray-500">
+                    <svg className="h-5 w-5 mr-2 text-gray-500" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" stroke="currentColor">
+                      <path d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                    No nutrition tracking
+                  </li>
+                  <li className="flex items-center text-gray-500">
+                    <svg className="h-5 w-5 mr-2 text-gray-500" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" stroke="currentColor">
+                      <path d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                    No AI voice coaching
+                  </li>
+                </ul>
+                <Link to="/signup">
+                  <Button className="w-full py-3 bg-gray-700 hover:bg-gray-600 text-white">
+                    Get Started Free
+                  </Button>
+                </Link>
+              </div>
+            </div>
+            
+            {/* Pro Plan */}
+            <div className="bg-gray-800 rounded-lg overflow-hidden shadow-lg transform transition-all duration-300 hover:scale-105 hover:shadow-xl relative border-2 border-green-500">
+              <div className="absolute top-0 right-0 bg-green-500 text-black font-bold py-1 px-4 text-sm">
+                MOST POPULAR
+              </div>
+              <div className="p-8">
+                <h3 className="text-2xl font-bold mb-2">Pro</h3>
+                <div className="text-4xl font-bold mb-4">
+                  <span className="text-green-500">$19.99</span>
+                  <span className="text-sm text-gray-400">/month</span>
+                </div>
+                <p className="text-gray-300 mb-6">
+                  Elevate your fitness with smart features and personalized guidance
+                </p>
+                <ul className="mb-8 space-y-2">
+                  <li className="flex items-center">
+                    <svg className="h-5 w-5 mr-2 text-green-500" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" stroke="currentColor">
+                      <path d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    Full access to smart workouts
+                  </li>
+                  <li className="flex items-center">
+                    <svg className="h-5 w-5 mr-2 text-green-500" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" stroke="currentColor">
+                      <path d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    Nutrition tracking & meal planning
+                  </li>
+                  <li className="flex items-center">
+                    <svg className="h-5 w-5 mr-2 text-green-500" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" stroke="currentColor">
+                      <path d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    Advanced fitness metrics
+                  </li>
+                  <li className="flex items-center">
+                    <svg className="h-5 w-5 mr-2 text-green-500" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" stroke="currentColor">
+                      <path d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    Recovery recommendations
+                  </li>
+                  <li className="flex items-center text-gray-500">
+                    <svg className="h-5 w-5 mr-2 text-gray-500" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" stroke="currentColor">
+                      <path d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                    No wearable patch sync
+                  </li>
+                </ul>
+                <Link to="/checkout">
+                  <Button className="w-full py-3 bg-green-500 hover:bg-green-600 text-black">
+                    Choose Pro
+                  </Button>
+                </Link>
+              </div>
+            </div>
+            
+            {/* Elite Plan */}
+            <div className="bg-gray-800 rounded-lg overflow-hidden transform transition-all duration-300 hover:scale-105 hover:shadow-xl border border-gray-700">
+              <div className="p-8">
+                <h3 className="text-2xl font-bold mb-2">Elite</h3>
+                <div className="text-4xl font-bold mb-4">
+                  <span className="text-green-500">$49.99</span>
+                  <span className="text-sm text-gray-400">/month</span>
+                </div>
+                <p className="text-gray-300 mb-6">
+                  Ultimate fitness experience with bleeding-edge technology and AI coaching
+                </p>
+                <ul className="mb-8 space-y-2">
+                  <li className="flex items-center">
+                    <svg className="h-5 w-5 mr-2 text-green-500" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" stroke="currentColor">
+                      <path d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    Everything in Pro plan
+                  </li>
+                  <li className="flex items-center">
+                    <svg className="h-5 w-5 mr-2 text-green-500" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" stroke="currentColor">
+                      <path d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    Wearable patch sync
+                  </li>
+                  <li className="flex items-center">
+                    <svg className="h-5 w-5 mr-2 text-green-500" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" stroke="currentColor">
+                      <path d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    Biometric feedback analysis
+                  </li>
+                  <li className="flex items-center">
+                    <svg className="h-5 w-5 mr-2 text-green-500" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" stroke="currentColor">
+                      <path d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    AI voice coaching
+                  </li>
+                  <li className="flex items-center">
+                    <svg className="h-5 w-5 mr-2 text-green-500" fill="none" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" stroke="currentColor">
+                      <path d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    Priority support
+                  </li>
+                </ul>
+                <Link to="/checkout?plan=elite">
+                  <Button className="w-full py-3 bg-gray-700 hover:bg-gray-600 text-white">
+                    Choose Elite
+                  </Button>
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Footer */}
       <footer className="bg-black text-white pt-16 pb-8">
         <div className="container mx-auto px-4 md:px-6">
