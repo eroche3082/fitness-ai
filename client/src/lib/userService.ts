@@ -1,118 +1,159 @@
-import { UserProfile, UserCategory, generateUserCode } from './userCodeGenerator';
+// userService.ts
+// This service handles user profiles, leads, and code validation
 
-// Interface for lead information
+import { UserProfile, generateUserCode, UserCategory } from './userCodeGenerator';
+
+// Define LeadInfo interface
 export interface LeadInfo {
+  id: string;
   name: string;
   email: string;
+  phone?: string;
   uniqueCode: string;
-  category: UserCategory;
+  category: string;
   date: string;
   source: string;
-  preferences: Record<string, any>;
 }
 
-// Keys for localStorage
-const USER_PROFILE_KEY = 'fitness_ai_user_profile';
-const LEADS_KEY = 'fitness_ai_leads';
+// Simple in-memory storage for demo purposes
+let storedLeads: LeadInfo[] = [
+  {
+    id: '1',
+    name: 'John Smith',
+    email: 'john@example.com',
+    phone: '555-123-4567',
+    uniqueCode: 'FIT-BEG-1234',
+    category: 'BEG',
+    date: '2025-04-10T14:30:00.000Z',
+    source: 'Website'
+  },
+  {
+    id: '2',
+    name: 'Sarah Jones',
+    email: 'sarah@example.com',
+    uniqueCode: 'FIT-ADV-5678',
+    category: 'ADV',
+    date: '2025-04-11T09:15:00.000Z',
+    source: 'Mobile App'
+  },
+  {
+    id: '3',
+    name: 'Alex Wong',
+    email: 'alex@example.com',
+    phone: '555-987-6543',
+    uniqueCode: 'FIT-INT-9012',
+    category: 'INT',
+    date: '2025-04-12T16:45:00.000Z',
+    source: 'Partner Referral'
+  }
+];
 
-// UserService for managing user data and leads
+// Store the current user profile
+let currentUserProfile: UserProfile | null = null;
+
 const userService = {
-  // Store a new lead
+  // Lead Management
   saveLead: (leadInfo: LeadInfo): void => {
-    // Get existing leads or initialize empty array
-    const existingLeads = userService.getLeads();
+    // Check if lead already exists by email
+    const existingLeadIndex = storedLeads.findIndex(lead => lead.email === leadInfo.email);
     
-    // Add new lead to array
-    existingLeads.push(leadInfo);
-    
-    // Save to localStorage
-    localStorage.setItem(LEADS_KEY, JSON.stringify(existingLeads));
-    
-    console.log('Lead saved:', leadInfo);
-  },
-  
-  // Get all leads
-  getLeads: (): LeadInfo[] => {
-    const leadsJson = localStorage.getItem(LEADS_KEY);
-    return leadsJson ? JSON.parse(leadsJson) : [];
-  },
-  
-  // Save user profile
-  saveUserProfile: (profile: UserProfile): void => {
-    // Ensure code is generated if not present
-    if (!profile.uniqueCode && profile.category) {
-      profile.uniqueCode = generateUserCode(profile.category);
+    if (existingLeadIndex >= 0) {
+      // Update existing lead
+      storedLeads[existingLeadIndex] = {
+        ...storedLeads[existingLeadIndex],
+        ...leadInfo,
+        date: new Date().toISOString() // Update timestamp
+      };
+    } else {
+      // Create new lead
+      storedLeads.push({
+        ...leadInfo,
+        id: String(storedLeads.length + 1),
+        date: new Date().toISOString()
+      });
     }
-    
-    // Save to localStorage
-    localStorage.setItem(USER_PROFILE_KEY, JSON.stringify(profile));
-    
-    console.log('User profile saved:', profile);
   },
   
-  // Get user profile
+  getLeads: (): LeadInfo[] => {
+    return [...storedLeads]; // Return a copy to avoid direct mutations
+  },
+  
+  // User Profile Management
+  saveUserProfile: (profile: UserProfile): void => {
+    // In a real app, this would save to a database and might link to a user account
+    currentUserProfile = { ...profile };
+    
+    // Also create a lead record for this user
+    const leadInfo: LeadInfo = {
+      id: String(storedLeads.length + 1),
+      name: profile.name,
+      email: profile.email,
+      uniqueCode: profile.uniqueCode,
+      category: profile.category,
+      date: new Date().toISOString(),
+      source: 'Assessment'
+    };
+    
+    userService.saveLead(leadInfo);
+  },
+  
   getUserProfile: (): UserProfile | null => {
-    const profileJson = localStorage.getItem(USER_PROFILE_KEY);
-    return profileJson ? JSON.parse(profileJson) : null;
+    // In a real app, this would fetch from a database or API
+    return currentUserProfile ? { ...currentUserProfile } : null;
   },
   
-  // Clear user profile
   clearUserProfile: (): void => {
-    localStorage.removeItem(USER_PROFILE_KEY);
-    console.log('User profile cleared');
+    currentUserProfile = null;
   },
   
-  // Validate access code
-  validateCode: async (code: string): Promise<{ valid: boolean; profile?: UserProfile }> => {
-    // In a real app, this would be an API call to validate on server
-    // For now, we simulate with localStorage
+  // Access Code Validation
+  validateCode: async (code: string): Promise<{ valid: boolean; userProfile?: UserProfile }> => {
+    // In a real app, this would validate against a database
+    // For demo purposes, check against stored leads
     
-    // Check if the code exists in any lead
-    const leads = userService.getLeads();
-    const matchedLead = leads.find(lead => lead.uniqueCode === code);
+    // Simulate network delay
+    await new Promise(resolve => setTimeout(resolve, 500));
     
-    if (matchedLead) {
-      // If code matches, create a user profile from the lead
-      const profile: UserProfile = {
-        name: matchedLead.name,
-        email: matchedLead.email,
-        uniqueCode: matchedLead.uniqueCode,
-        category: matchedLead.category,
-        preferences: matchedLead.preferences
+    const matchingLead = storedLeads.find(lead => lead.uniqueCode === code);
+    
+    if (matchingLead) {
+      // Create a user profile from the lead
+      const userProfile: UserProfile = {
+        name: matchingLead.name,
+        email: matchingLead.email,
+        uniqueCode: matchingLead.uniqueCode,
+        category: matchingLead.category as UserCategory,
+        onboardingCompleted: true,
+        fitnessGoals: ['Strength', 'Endurance'],
+        preferredActivities: ['Running', 'Weight Training']
       };
       
-      // Store the profile
-      userService.saveUserProfile(profile);
+      // Store the current user
+      currentUserProfile = userProfile;
       
-      return { valid: true, profile };
+      return {
+        valid: true,
+        userProfile
+      };
     }
     
-    // Simulate server delay
-    await new Promise(resolve => setTimeout(resolve, 800));
-    
-    // Code not found
-    return { valid: false };
+    return {
+      valid: false
+    };
   },
   
-  // Update user profile with partial data
+  // Update user profile
   updateUserProfile: (updates: Partial<UserProfile>): UserProfile | null => {
-    const currentProfile = userService.getUserProfile();
-    
-    if (!currentProfile) {
-      console.error('Cannot update: No user profile found');
+    if (!currentUserProfile) {
       return null;
     }
     
-    // Merge updates with current profile
-    const updatedProfile = {
-      ...currentProfile,
+    currentUserProfile = {
+      ...currentUserProfile,
       ...updates
     };
     
-    // Save updated profile
-    userService.saveUserProfile(updatedProfile);
-    
-    return updatedProfile;
+    return { ...currentUserProfile };
   }
 };
 
