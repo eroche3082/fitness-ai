@@ -38,15 +38,23 @@ export default function LoginPage() {
     setPassword('demo123');
     setIsLoading(true);
     
+    // Short timeout to ensure the state updates before login attempt
     setTimeout(() => {
-      const success = login('demo', 'demo123');
-      if (success) {
-        setLocation('/dashboard');
-      } else {
-        setError('Error using demo account');
+      try {
+        const success = login('demo', 'demo123');
+        if (success) {
+          setLocation('/dashboard');
+        } else {
+          setError('Error using demo account. Please try again.');
+          console.error('Demo login failed');
+        }
+      } catch (err) {
+        setError('An unexpected error occurred with the demo account');
+        console.error('Demo login error:', err);
+      } finally {
+        setIsLoading(false);
       }
-      setIsLoading(false);
-    }, 500);
+    }, 300);
   };
 
   return (

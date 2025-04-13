@@ -235,11 +235,18 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   
   const login = (username: string, password: string): boolean => {
-    if ((username === 'admin' && password === 'admin123456') || 
-        (username === 'demo' && password === 'demo123')) {
+    // Check if it's the admin account
+    if (username === 'admin' && password === 'admin123456') {
       setIsAuthenticated(true);
       return true;
     }
+    
+    // Check if it's the demo account (case insensitive username for better UX)
+    if (username.toLowerCase() === 'demo' && password === 'demo123') {
+      setIsAuthenticated(true);
+      return true;
+    }
+    
     return false;
   };
   
