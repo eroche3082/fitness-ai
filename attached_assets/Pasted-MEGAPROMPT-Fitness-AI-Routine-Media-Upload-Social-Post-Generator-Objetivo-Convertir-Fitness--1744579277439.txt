@@ -1,0 +1,136 @@
+MEGAPROMPT — Fitness AI: Routine + Media Upload + Social Post Generator
+Objetivo:
+Convertir Fitness AI en una plataforma integral donde el usuario:
+
+Siga rutinas personalizadas
+
+Se grabe realizando ejercicios (video/selfie)
+
+Genere automáticamente contenido viral para redes sociales
+
+Publique o programe sus posts directamente desde su dashboard
+
+1. NUEVO COMPONENTE: FitnessRoutineSocialStudio.tsx
+UI Inputs:
+Selecciona rutina: Cardio / Strength / Flexibility / HIIT / Custom
+
+Nivel: Beginner / Intermediate / Pro
+
+Botón: Start Routine + Record Video
+
+Opción: Subir Video/Imagen o Grabar en vivo (modo selfie o landscape)
+
+Texto opcional: ¿Qué quieres que diga tu post?
+
+Selección de red: Instagram, TikTok, Facebook, YouTube Shorts
+
+Selección: Reel / Story / Post
+
+Picker de fecha/hora para programación
+
+Genera:
+Video preview (con filtro, música o frame)
+
+Caption con motivación, detalles de la rutina y hashtags
+
+Posteo listo para compartir, copiar o guardar
+
+2. VERTEX AI INTEGRATION — Generador de contenido social fitness
+Archivo: generateFitnessPost.ts
+
+ts
+Copiar
+Editar
+import { GoogleGenerativeAI } from "@google/generative-ai";
+
+export async function generateFitnessPost({ routineType, tone, notes, platform }) {
+  const genAI = new GoogleGenerativeAI(process.env.VERTEX_API_KEY);
+  const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+
+  const prompt = `
+    Create a viral ${platform} post for a ${routineType} workout.
+    Style: ${tone} (energetic, inspiring, educational, bold).
+    User Notes: ${notes || "None"}.
+    Return: caption, 10 hashtags, call-to-action, and suggested video idea.
+  `;
+
+  const result = await model.generateContent(prompt);
+  return result.response.text();
+}
+3. SUBIDA DE MEDIA — Firebase Storage
+Ruta de almacenamiento:
+fitness_users/{userId}/media/{file}
+
+Archivo: uploadWorkoutMedia.ts
+
+ts
+Copiar
+Editar
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { storage } from "../firebaseConfig";
+
+export async function uploadWorkoutMedia(file, userId) {
+  const path = `fitness_users/${userId}/media/${file.name}`;
+  const fileRef = ref(storage, path);
+  await uploadBytes(fileRef, file);
+  return await getDownloadURL(fileRef);
+}
+4. FIRESTORE — Guardar Post
+Colección: fitness_posts
+
+ts
+Copiar
+Editar
+{
+  userId: string,
+  routineType: string,
+  fitnessLevel: string,
+  mediaUrl: string,
+  caption: string,
+  hashtags: string[],
+  platform: string[],
+  postType: "Reel" | "Story" | "Post",
+  tone: string,
+  createdAt: Timestamp,
+  scheduledAt: Timestamp,
+  status: "Draft" | "Scheduled" | "Posted"
+}
+5. SOCIAL MEDIA HUB en el Dashboard
+Nuevo tab: Social Media Studio
+
+Muestra:
+
+Videos subidos y generados
+
+Posts creados
+
+Calendario con programación
+
+Botón para publicar o exportar
+
+Análisis (likes simulados, alcance estimado, viralidad)
+
+6. Admin Panel Opcional
+Visualización de posts por usuario
+
+Total de publicaciones creadas
+
+Actividad mensual
+
+Ranking por engagement (opcional)
+
+Botón de “Generate Email Recap” al finalizar rutina
+
+Resumen de Tareas
+ Crear UI de grabación + upload
+
+ Implementar generador con Vertex AI
+
+ Guardar en Firestore + Firebase Storage
+
+ Mostrar preview + scheduling
+
+ Agregar nuevo Tab “Social Studio” en el dashboard
+
+ Activar el Admin Panel de tracking (opcional)
+

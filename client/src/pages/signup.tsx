@@ -32,13 +32,13 @@ export default function SignUpPage() {
 
     // Validations
     if (formData.password !== formData.confirmPassword) {
-      setError('Las contraseñas no coinciden');
+      setError('Passwords do not match');
       setIsLoading(false);
       return;
     }
 
     if (formData.password.length < 6) {
-      setError('La contraseña debe tener al menos 6 caracteres');
+      setError('Password must be at least 6 characters');
       setIsLoading(false);
       return;
     }
@@ -56,7 +56,7 @@ export default function SignUpPage() {
         setLocation('/dashboard');
       }, 2000);
     } catch (err) {
-      setError('Ocurrió un error al registrar tu cuenta');
+      setError('An error occurred while registering your account');
     } finally {
       setIsLoading(false);
     }
@@ -92,9 +92,9 @@ export default function SignUpPage() {
                 <CheckCircle className="h-16 w-16 text-green-500" />
               </div>
             </div>
-            <h2 className="text-3xl font-bold mb-4">¡Registro Exitoso!</h2>
+            <h2 className="text-3xl font-bold mb-4">Registration Successful!</h2>
             <p className="text-gray-400 mb-8">
-              Tu cuenta ha sido creada correctamente. Estás siendo redirigido al dashboard...
+              Your account has been created successfully. You are being redirected to the dashboard...
             </p>
             <div className="flex justify-center">
               <div className="animate-spin h-8 w-8 border-4 border-green-500 border-t-transparent rounded-full"></div>
@@ -130,8 +130,8 @@ export default function SignUpPage() {
       <main className="container mx-auto px-4 py-24 flex items-center justify-center min-h-screen">
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold mb-2">Crea tu cuenta</h2>
-            <p className="text-gray-400">Únete a Fitness AI y comienza tu transformación</p>
+            <h2 className="text-3xl font-bold mb-2">Create Your Account</h2>
+            <p className="text-gray-400">Join Fitness AI and start your transformation</p>
           </div>
 
           <div className="bg-gray-900 p-8 rounded-lg shadow-lg border border-gray-800">
@@ -144,7 +144,7 @@ export default function SignUpPage() {
 
               <div className="space-y-2">
                 <Label htmlFor="name" className="text-gray-300">
-                  Nombre completo
+                  Full Name
                 </Label>
                 <Input
                   id="name"
@@ -152,14 +152,14 @@ export default function SignUpPage() {
                   value={formData.name}
                   onChange={handleChange}
                   className="bg-gray-800 border-gray-700 text-white"
-                  placeholder="Juan Pérez"
+                  placeholder="John Doe"
                   required
                 />
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="email" className="text-gray-300">
-                  Correo electrónico
+                  Email
                 </Label>
                 <Input
                   id="email"
@@ -168,14 +168,14 @@ export default function SignUpPage() {
                   value={formData.email}
                   onChange={handleChange}
                   className="bg-gray-800 border-gray-700 text-white"
-                  placeholder="ejemplo@correo.com"
+                  placeholder="example@email.com"
                   required
                 />
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="username" className="text-gray-300">
-                  Nombre de usuario
+                  Username
                 </Label>
                 <Input
                   id="username"
@@ -183,14 +183,14 @@ export default function SignUpPage() {
                   value={formData.username}
                   onChange={handleChange}
                   className="bg-gray-800 border-gray-700 text-white"
-                  placeholder="usuario123"
+                  placeholder="username123"
                   required
                 />
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="password" className="text-gray-300">
-                  Contraseña
+                  Password
                 </Label>
                 <Input
                   id="password"
@@ -199,14 +199,14 @@ export default function SignUpPage() {
                   value={formData.password}
                   onChange={handleChange}
                   className="bg-gray-800 border-gray-700 text-white"
-                  placeholder="Mínimo 6 caracteres"
+                  placeholder="Minimum 6 characters"
                   required
                 />
               </div>
 
               <div className="space-y-2">
                 <Label htmlFor="confirmPassword" className="text-gray-300">
-                  Confirmar contraseña
+                  Confirm Password
                 </Label>
                 <Input
                   id="confirmPassword"
@@ -215,7 +215,7 @@ export default function SignUpPage() {
                   value={formData.confirmPassword}
                   onChange={handleChange}
                   className="bg-gray-800 border-gray-700 text-white"
-                  placeholder="Repite tu contraseña"
+                  placeholder="Repeat your password"
                   required
                 />
               </div>

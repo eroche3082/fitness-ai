@@ -1,0 +1,95 @@
+MEGAPROMPT — FITNESS AI EMAIL SUMMARY
+Objetivo:
+Enviar automáticamente al usuario un correo de resumen luego de completar su rutina. El email incluye:
+
+Saludo personalizado
+
+Detalles de la rutina completada
+
+Código de acceso
+
+Imagen o video adjunto (si se grabó)
+
+Post social generado por Vertex AI
+
+Enlace para acceder al Dashboard y compartir en redes sociales
+
+1. TEMPLATE HTML (editable desde SendGrid o Firebase Email)
+html
+Copiar
+Editar
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body { font-family: Arial, sans-serif; background: #f4f4f4; padding: 20px; }
+    .container { background: #ffffff; padding: 30px; border-radius: 10px; max-width: 600px; margin: auto; }
+    .code-box { background: #222; color: #0f0; padding: 15px; border-radius: 5px; font-weight: bold; text-align: center; }
+    .btn { display: inline-block; background-color: #00cc66; color: #fff; padding: 10px 20px; text-decoration: none; border-radius: 5px; margin-top: 20px; }
+    .footer { font-size: 12px; color: #999; text-align: center; margin-top: 30px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Hi {{userName}},</h2>
+    <p>Congrats on completing your <strong>{{routineType}}</strong> workout!</p>
+    
+    <p>Here's your personalized summary:</p>
+    <ul>
+      <li><strong>Level:</strong> {{fitnessLevel}}</li>
+      <li><strong>Duration:</strong> {{routineDuration}} minutes</li>
+      <li><strong>Calories Burned:</strong> {{estimatedCalories}} kcal</li>
+    </ul>
+
+    <h3>Your Unique Access Code:</h3>
+    <div class="code-box">{{accessCode}}</div>
+
+    <h3>Your Generated Post:</h3>
+    <blockquote>{{caption}}</blockquote>
+    <p>Hashtags: {{hashtags}}</p>
+
+    {{#if mediaUrl}}
+    <img src="{{mediaUrl}}" alt="Workout Image/Video Preview" style="width: 100%; border-radius: 8px; margin-top: 20px;">
+    {{/if}}
+
+    <a href="{{dashboardUrl}}" class="btn">View Your Fitness Dashboard</a>
+
+    <div class="footer">
+      Powered by Fitness AI • Your AI Personal Trainer<br>
+      If you did not complete this session, ignore this email.
+    </div>
+  </div>
+</body>
+</html>
+2. VARIABLES AUTOMÁTICAS PARA RELLENAR:
+{{userName}} → nombre del usuario
+
+{{routineType}} → tipo de rutina (e.g. Cardio)
+
+{{fitnessLevel}} → nivel del usuario
+
+{{routineDuration}} → duración en minutos
+
+{{estimatedCalories}} → calorías estimadas
+
+{{accessCode}} → código único (ej. FIT-BEGINNER-2565)
+
+{{caption}} → texto generado por Vertex
+
+{{hashtags}} → lista de hashtags sugeridos
+
+{{mediaUrl}} → link de Firebase Storage
+
+{{dashboardUrl}} → URL directa al dashboard personalizado
+
+3. INTEGRACIÓN RECOMENDADA
+Puedes enviarlo vía:
+
+SendGrid (desde servidor o trigger de Firebase)
+
+Firebase Email Extensions (Cloud Functions)
+
+EmailJS si usas frontend directamente
+
+Se activa tras completar la última pregunta del chatbot
+
