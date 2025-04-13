@@ -39,6 +39,12 @@ export interface UserProfile {
   preferredActivities: string[];
   dateCreated: string;
   lastLogin: string;
+  unlockedLevels: string[];
+  premiumFeatures: string[];
+  stripePaymentId?: string;
+  referredBy?: string;
+  referralCount?: number;
+  paymentStatus: 'free' | 'paid' | 'trial';
 }
 
 /**

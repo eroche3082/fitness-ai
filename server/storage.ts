@@ -15,8 +15,18 @@ export interface IStorage {
   // User operations
   getUser(id: number): Promise<User & { profile?: any } | undefined>;
   getUserByUsername(username: string): Promise<User & { profile?: any } | undefined>;
+  getUserByAccessCode(accessCode: string): Promise<User & { profile?: any } | undefined>;
+  getUserById(id: string): Promise<User & { profile?: any } | undefined>;
   createUser(user: InsertUser): Promise<User>;
-  updateUser(id: number, data: Partial<InsertUser> & { profile?: any }): Promise<User & { profile?: any } | undefined>;
+  updateUser(id: number | string, data: Partial<InsertUser> & { 
+    profile?: any, 
+    unlockedLevels?: string[], 
+    premiumFeatures?: string[],
+    paymentStatus?: string,
+    stripePaymentId?: string,
+    referredBy?: string,
+    referralCount?: number
+  }): Promise<User & { profile?: any } | undefined>;
   
   // Conversation operations
   getConversation(id: number): Promise<Conversation | undefined>;
@@ -37,6 +47,15 @@ export interface IStorage {
   getProgressByUserId(userId: number): Promise<Progress[]>;
   getProgressByUserIdAndType(userId: number, type: string): Promise<Progress[]>;
   createProgress(progress: InsertProgress): Promise<Progress>;
+  
+  // Access code operations
+  getAccessCodeActivity(accessCode: string): Promise<any>;
+  recordAccessCodeActivity(accessCode: string, activity: {
+    type: string,
+    level?: string,
+    payment?: string,
+    referredBy?: string
+  }): Promise<any>;
 }
 
 export class MemStorage implements IStorage {
@@ -45,6 +64,7 @@ export class MemStorage implements IStorage {
   private messages: Map<number, Message>;
   private workouts: Map<number, Workout>;
   private progresses: Map<number, Progress>;
+  private accessCodeActivities: Map<string, any[]>;
   
   private userId: number = 1;
   private conversationId: number = 1;
@@ -58,6 +78,7 @@ export class MemStorage implements IStorage {
     this.messages = new Map();
     this.workouts = new Map();
     this.progresses = new Map();
+    this.accessCodeActivities = new Map();
     
     // Create a default user for testing
     const defaultUser: User = {
@@ -76,8 +97,14 @@ export class MemStorage implements IStorage {
     const userWithProfile = defaultUser as any;
     userWithProfile.profile = {
       language: 'en',
-      onboardingCompleted: false,
-      onboardingStep: 1
+      onboardingCompleted: true,
+      onboardingStep: 10,
+      uniqueCode: 'FIT-BEG-2565',
+      category: 'BEG',
+      unlockedLevels: ['level-1', 'level-2', 'level-3'],
+      premiumFeatures: [],
+      paymentStatus: 'free',
+      referralCount: 0
     };
     
     this.users.set(1, userWithProfile);
@@ -206,6 +233,46 @@ export class MemStorage implements IStorage {
     const progress: Progress = { ...insertProgress, id };
     this.progresses.set(id, progress);
     return progress;
+  }
+  
+  // Access code operations
+  async getUserByAccessCode(accessCode: string): Promise<User & { profile?: any } | undefined> {
+    // Find the user with the matching access code
+    return Array.from(this.users.values()).find(
+      (user: any) => user.profile?.uniqueCode === accessCode
+    );
+  }
+  
+  async getUserById(id: string): Promise<User & { profile?: any } | undefined> {
+    // Convert string id to number
+    const numId = parseInt(id, 10);
+    return this.users.get(numId);
+  }
+  
+  async getAccessCodeActivity(accessCode: string): Promise<any> {
+    // Return access code activities or create a new array
+    return this.accessCodeActivities.get(accessCode) || [];
+  }
+  
+  async recordAccessCodeActivity(accessCode: string, activity: {
+    type: string,
+    level?: string,
+    payment?: string,
+    referredBy?: string
+  }): Promise<any> {
+    // Get existing activities or create a new array
+    const activities = await this.getAccessCodeActivity(accessCode);
+    
+    // Add the new activity with timestamp
+    const newActivity = {
+      ...activity,
+      timestamp: new Date(),
+    };
+    
+    activities.push(newActivity);
+    this.accessCodeActivities.set(accessCode, activities);
+    
+    return newActivity;
   }
 }
 
