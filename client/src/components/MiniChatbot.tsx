@@ -7,6 +7,11 @@ interface Question {
   options?: { value: string; label: string }[];
 }
 
+interface Message {
+  text: string;
+  sender: 'user' | 'bot';
+}
+
 // Definir las 10 preguntas para el onboarding
 const questions: Question[] = [
   { id: 1, text: "What's your name?", type: 'text' },
@@ -108,14 +113,14 @@ const questions: Question[] = [
 ];
 
 export default function MiniChatbot() {
-  // State
+  // States
   const [isOpen, setIsOpen] = useState(false);
   const [input, setInput] = useState('');
   const [currentStep, setCurrentStep] = useState(1);
   const [answers, setAnswers] = useState<Record<number, any>>({});
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
   const [activeTab, setActiveTab] = useState<'chat' | 'qr' | 'ar'>('chat');
-  const [messages, setMessages] = useState([
+  const [messages, setMessages] = useState<Message[]>([
     { text: 'Welcome to Fitness AI!', sender: 'bot' },
     { text: `Step 1 of 10: ${questions[0].text}`, sender: 'bot' }
   ]);
@@ -125,18 +130,22 @@ export default function MiniChatbot() {
   const inputRef = useRef<HTMLInputElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
+  // Toggle chat open/close
   const toggleChat = () => {
     setIsOpen(!isOpen);
   };
 
+  // Handle input changes
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInput(e.target.value);
   };
 
+  // Scroll to bottom of messages
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  // Auto-scroll when messages change
   useEffect(() => {
     if (isOpen && inputRef.current) {
       inputRef.current.focus();
@@ -144,10 +153,12 @@ export default function MiniChatbot() {
     scrollToBottom();
   }, [isOpen, messages, currentStep]);
 
+  // Get current question
   const getCurrentQuestion = () => {
     return questions[currentStep - 1] || questions[0];
   };
 
+  // Handle option selection
   const handleOptionSelect = (value: string) => {
     const question = getCurrentQuestion();
     
@@ -165,6 +176,7 @@ export default function MiniChatbot() {
     }
   };
 
+  // Save answer
   const saveAnswer = (answer: any) => {
     setAnswers({
       ...answers,
@@ -178,6 +190,7 @@ export default function MiniChatbot() {
     setMessages(prev => [...prev, { text: formattedAnswer, sender: 'user' }]);
   };
 
+  // Handle multi-select submit
   const handleMultiSelectSubmit = () => {
     if (selectedOptions.length > 0) {
       saveAnswer(selectedOptions);
@@ -186,6 +199,7 @@ export default function MiniChatbot() {
     }
   };
 
+  // Go to next step
   const goToNextStep = () => {
     if (currentStep < questions.length) {
       // Move to next question
@@ -215,6 +229,7 @@ export default function MiniChatbot() {
     }
   };
 
+  // Go to previous step
   const goToPreviousStep = () => {
     if (currentStep > 1) {
       const prevStep = currentStep - 1;
@@ -228,6 +243,7 @@ export default function MiniChatbot() {
     }
   };
 
+  // Send message
   const sendMessage = () => {
     if (input.trim() === '') return;
     
@@ -243,6 +259,7 @@ export default function MiniChatbot() {
     }
   };
 
+  // Handle key press (Enter to send)
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       sendMessage();
@@ -260,16 +277,16 @@ export default function MiniChatbot() {
         text: 'Your profile has been saved! Click the button below to log in to your dashboard.', 
         sender: 'bot' 
       }]);
-      
-      // In a real app, this could redirect to login
     }, 1000);
   };
 
+  // Handle login redirect
   const handleLoginRedirect = () => {
     // In a real app, this would navigate to the login page
     alert('Redirecting to login page...');
   };
 
+  // Render the appropriate input for the current question
   const renderQuestionInput = () => {
     const question = getCurrentQuestion();
     
@@ -335,6 +352,7 @@ export default function MiniChatbot() {
 
   return (
     <div className="fixed bottom-4 right-4 z-50">
+      {/* Chat icon button when closed */}
       {!isOpen ? (
         <button 
           onClick={toggleChat}
@@ -345,6 +363,7 @@ export default function MiniChatbot() {
           </svg>
         </button>
       ) : (
+        /* Chat window when open */
         <div className="w-[350px] h-[500px] bg-black rounded-lg shadow-xl flex flex-col border border-green-600">
           {/* Chat header */}
           <div className="bg-green-600 p-3 rounded-t-lg flex justify-between items-center">
