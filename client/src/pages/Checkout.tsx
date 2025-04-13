@@ -117,7 +117,7 @@ export default function Checkout() {
       apiRequest("POST", "/api/create-payment-intent", { 
         amount: planDetails.amount,
         plan: planDetails.name
-      }, undefined)
+      })
         .then((res) => res.json())
         .then((data) => {
           if (data.clientSecret) {

@@ -48,7 +48,7 @@ export default function ChatBot() {
     {
       id: '1',
       role: 'assistant',
-      content: 'Hello! I'm your Fitness AI assistant. How can I help with your fitness journey today?',
+      content: "Hello! I'm your Fitness AI assistant. How can I help with your fitness journey today?",
       timestamp: new Date()
     }
   ]);
@@ -89,8 +89,8 @@ export default function ChatBot() {
       ];
 
       // Call Gemini API (or whatever backend AI service we've set up)
-      const response = await apiRequest('POST', '/api/chat', { messages: messagesToSend });
-      const data = await response.json();
+      const response = await apiRequest('POST', '/api/chat', { messages: messagesToSend }, undefined);
+      const data = typeof response === 'object' ? response : await response.json();
 
       if (data.content) {
         const aiResponse: Message = {

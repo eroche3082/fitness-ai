@@ -283,7 +283,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     console.warn("⚠️ Stripe payment integration not configured. Missing STRIPE_SECRET_KEY");
   } else {
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-      apiVersion: "2023-10-16",
+      apiVersion: "2025-03-31.basil" as any,
     });
 
     // Create Payment Intent for one-time payments
@@ -445,7 +445,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             active: subscription.status === "active",
             plan: subscription.metadata.plan || "pro",
             status: subscription.status,
-            currentPeriodEnd: new Date(subscription.current_period_end * 1000).toISOString()
+            currentPeriodEnd: new Date((subscription as any).current_period_end * 1000).toISOString()
           });
         } catch (err) {
           // If subscription not found in Stripe
