@@ -108,16 +108,20 @@ const questions: Question[] = [
 ];
 
 export default function MiniChatbot() {
+  // State
   const [isOpen, setIsOpen] = useState(false);
   const [input, setInput] = useState('');
   const [currentStep, setCurrentStep] = useState(1);
   const [answers, setAnswers] = useState<Record<number, any>>({});
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
+  const [activeTab, setActiveTab] = useState<'chat' | 'qr' | 'ar'>('chat');
   const [messages, setMessages] = useState([
-    { text: 'Welcome to Vertex Flash AI!', sender: 'bot' },
+    { text: 'Welcome to Fitness AI!', sender: 'bot' },
     { text: `Step 1 of 10: ${questions[0].text}`, sender: 'bot' }
   ]);
   const [onboardingComplete, setOnboardingComplete] = useState(false);
+  
+  // Refs
   const inputRef = useRef<HTMLInputElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -360,82 +364,154 @@ export default function MiniChatbot() {
           
           {/* Tab navigation */}
           <div className="flex border-b border-gray-800">
-            <button className="flex-1 py-2 px-4 bg-white text-green-700 font-medium">Chat</button>
-            <button className="flex-1 py-2 px-4 text-gray-300 bg-gray-900">QR Code</button>
-            <button className="flex-1 py-2 px-4 text-gray-300 bg-gray-900">AR/VR</button>
+            <button 
+              className={`flex-1 py-2 px-4 ${activeTab === 'chat' ? 'bg-white text-green-700 font-medium' : 'text-gray-300 bg-gray-900 hover:bg-gray-800'}`}
+              onClick={() => setActiveTab('chat')}
+            >
+              Chat
+            </button>
+            <button 
+              className={`flex-1 py-2 px-4 ${activeTab === 'qr' ? 'bg-white text-green-700 font-medium' : 'text-gray-300 bg-gray-900 hover:bg-gray-800'}`}
+              onClick={() => setActiveTab('qr')}
+            >
+              QR Code
+            </button>
+            <button 
+              className={`flex-1 py-2 px-4 ${activeTab === 'ar' ? 'bg-white text-green-700 font-medium' : 'text-gray-300 bg-gray-900 hover:bg-gray-800'}`}
+              onClick={() => setActiveTab('ar')}
+            >
+              AR/VR
+            </button>
           </div>
           
-          {/* Chat messages */}
-          <div className="flex-1 overflow-y-auto p-3 bg-black">
-            <div className="space-y-3">
-              {messages.map((msg, index) => (
-                <div key={index} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
-                  <div className={`max-w-[85%] p-2 rounded-lg ${
-                    msg.sender === 'user' ? 'bg-green-600 text-white' : 'bg-gray-800 text-white'
-                  }`}>
-                    {msg.text}
+          {/* Tab Content */}
+          {activeTab === 'chat' && (
+            // Chat messages
+            <div className="flex-1 overflow-y-auto p-3 bg-black">
+              <div className="space-y-3">
+                {messages.map((msg, index) => (
+                  <div key={index} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
+                    <div className={`max-w-[85%] p-2 rounded-lg ${
+                      msg.sender === 'user' ? 'bg-green-600 text-white' : 'bg-gray-800 text-white'
+                    }`}>
+                      {msg.text}
+                    </div>
                   </div>
-                </div>
-              ))}
-              <div ref={messagesEndRef} />
+                ))}
+                <div ref={messagesEndRef} />
+              </div>
             </div>
-          </div>
+          )}
           
-          {/* Onboarding input box */}
-          <div className="p-3 border-t border-gray-800 bg-gray-900">
-            {onboardingComplete ? (
-              <div className="bg-[#131313] rounded-lg p-3">
-                <button
-                  className="w-full p-2 bg-green-600 hover:bg-green-700 text-white rounded"
-                  onClick={handleLoginRedirect}
-                >
-                  Login to Dashboard
+          {activeTab === 'qr' && (
+            // QR Code content
+            <div className="flex-1 overflow-y-auto p-3 bg-black flex flex-col items-center justify-center">
+              <div className="bg-white p-4 rounded-lg mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" width="180" height="180" viewBox="0 0 29 29">
+                  <path d="M4 4h1v1H4zm1 0h1v1H5zm1 0h1v1H6zm1 0h1v1H7zm1 0h1v1H8zm2 0h1v1h-1zm2 0h1v1h-1zm1 0h1v1h-1zm1 0h1v1h-1zm3 0h1v1h-1zm1 0h1v1h-1zm1 0h1v1h-1zm1 0h1v1h-1zm1 0h1v1h-1zM4 5h1v1H4zm4 0h1v1H8zm2 0h1v1h-1zm1 0h1v1h-1zm1 0h1v1h-1zm2 0h1v1h-1zm5 0h1v1h-1zm4 0h1v1h-1zM4 6h1v1H4zm2 0h1v1H6zm1 0h1v1H7zm1 0h1v1H8zm2 0h1v1h-1zm1 0h1v1h-1zm1 0h1v1h-1zm1 0h1v1h-1zm2 0h1v1h-1zm2 0h1v1h-1zm1 0h1v1h-1zm1 0h1v1h-1zm1 0h1v1h-1zm1 0h1v1h-1zM4 7h1v1H4zm2 0h1v1H6zm1 0h1v1H7zm1 0h1v1H8zm2 0h1v1h-1zm1 0h1v1h-1zm3 0h1v1h-1zm1 0h1v1h-1zm1 0h1v1h-1zm2 0h1v1h-1zm1 0h1v1h-1zm1 0h1v1h-1zm1 0h1v1h-1zM4 8h1v1H4zm2 0h1v1H6zm1 0h1v1H7zm1 0h1v1H8zm2 0h1v1h-1zm2 0h1v1h-1zm1 0h1v1h-1zm1 0h1v1h-1zm1 0h1v1h-1zm4 0h1v1h-1zm1 0h1v1h-1zm1 0h1v1h-1zM4 9h1v1H4zm4 0h1v1H8zm2 0h1v1h-1zm1 0h1v1h-1zm1 0h1v1h-1zm1 0h1v1h-1zm1 0h1v1h-1zm1 0h1v1h-1zm4 0h1v1h-1zm1 0h1v1h-1zm1 0h1v1h-1zm1 0h1v1h-1zM4 10h1v1H4zm1 0h1v1H5zm1 0h1v1H6zm1 0h1v1H7zm1 0h1v1H8zm1 0h1v1H9zm1 0h1v1h-1zm1 0h1v1h-1zm1 0h1v1h-1zm1 0h1v1h-1zm1 0h1v1h-1zm1 0h1v1h-1zm1 0h1v1h-1zm1 0h1v1h-1zm1 0h1v1h-1zm1 0h1v1h-1zm1 0h1v1h-1zm1 0h1v1h-1zm1 0h1v1h-1zm1 0h1v1h-1zm0 1h1v1h-1zm-3 1h1v1h-1zm-2 1h1v1h-1zm-9 0h1v1h-1zm-5 1h1v1H4zm1 0h1v1H5zm1 0h1v1H6zm1 0h1v1H7zm1 0h1v1H8zm1 0h1v1H9zm1 0h1v1h-1zm1 0h1v1h-1zm1 0h1v1h-1zm1 0h1v1h-1zm1 0h1v1h-1zm1 0h1v1h-1zm1 0h1v1h-1zm1 0h1v1h-1zm1 0h1v1h-1zm4 0h1v1h-1zm1 0h1v1h-1zm1 0h1v1h-1zm1 1h1v1h-1zm-1 1h1v1h-1zm-5 0h1v1h-1zm-10 0h1v1h-1zm-3 0h1v1H9zm-1 0h1v1H8zm-2 0h1v1H6zm-2 0h1v1H4zm8 1h1v1h-1zm4 0h1v1h-1zm3 0h1v1h-1zm-15 1h1v1H4zm4 0h1v1H8zm1 0h1v1H9zm2 0h1v1h-1zm3 0h1v1h-1zm3 0h1v1h-1zm6 0h1v1h-1zM4 20h1v1H4zm2 0h1v1H6zm1 0h1v1H7zm1 0h1v1H8zm1 0h1v1H9zm2 0h1v1h-1zm1 0h1v1h-1zm1 0h1v1h-1zm2 0h1v1h-1zm1 0h1v1h-1zm1 0h1v1h-1zm3 0h1v1h-1zm1 0h1v1h-1zm1 0h1v1h-1zm1 0h1v1h-1zM4 21h1v1H4zm4 0h1v1H8zm2 0h1v1h-1zm1 0h1v1h-1zm2 0h1v1h-1zm1 0h1v1h-1zm1 0h1v1h-1zm1 0h1v1h-1zm1 0h1v1h-1zm1 0h1v1h-1zm1 0h1v1h-1zm3 0h1v1h-1zm1 0h1v1h-1zM4 22h1v1H4zm2 0h1v1H6zm1 0h1v1H7zm1 0h1v1H8zm2 0h1v1h-1zm4 0h1v1h-1zm1 0h1v1h-1zm2 0h1v1h-1zm1 0h1v1h-1zm4 0h1v1h-1zm1 0h1v1h-1zM4 23h1v1H4zm2 0h1v1H6zm1 0h1v1H7zm1 0h1v1H8zm2 0h1v1h-1zm1 0h1v1h-1zm1 0h1v1h-1zm3 0h1v1h-1zm1 0h1v1h-1zm1 0h1v1h-1zm2 0h1v1h-1zm1 0h1v1h-1zm3 0h1v1h-1zM4 24h1v1H4zm4 0h1v1H8zm2 0h1v1h-1zm1 0h1v1h-1zm1 0h1v1h-1zm3 0h1v1h-1zm2 0h1v1h-1zm1 0h1v1h-1zm1 0h1v1h-1zm1 0h1v1h-1zm1 0h1v1h-1zm1 0h1v1h-1zM4 25h1v1H4zm1 0h1v1H5zm1 0h1v1H6zm1 0h1v1H7zm1 0h1v1H8zm1 0h1v1H9zm1 0h1v1h-1zm2 0h1v1h-1zm3 0h1v1h-1zm1 0h1v1h-1zm1 0h1v1h-1zm1 0h1v1h-1zm2 0h1v1h-1zm1 0h1v1h-1zm1 0h1v1h-1z" fill="currentColor"/>
+                </svg>
+              </div>
+              <div className="text-center text-white">
+                <h4 className="text-lg font-bold mb-2">Download Fitness AI App</h4>
+                <p className="text-sm text-gray-300 mb-4">Scan this QR code with your phone's camera to download our mobile app</p>
+                <button className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded">
+                  Share QR Code
                 </button>
               </div>
-            ) : (
-              <div className="bg-[#131313] rounded-lg p-3 mb-3">
-                <h3 className="text-white text-lg mb-1">Welcome to Fitness AI</h3>
-                <p className="text-gray-300 text-sm mb-2">
-                  Step {currentStep} of 10: {getCurrentQuestion().text}
-                </p>
-                
-                {renderQuestionInput()}
-                
-                {currentStep > 1 && (
-                  <div className="mt-3 flex justify-start">
-                    <button 
-                      className="bg-gray-700 text-white px-3 py-1 rounded text-sm"
-                      onClick={goToPreviousStep}
-                    >
-                      Back
-                    </button>
-                  </div>
-                )}
+            </div>
+          )}
+          
+          {activeTab === 'ar' && (
+            // AR/VR content
+            <div className="flex-1 overflow-y-auto p-3 bg-black flex flex-col items-center justify-center">
+              <div className="mb-4 bg-gray-800 p-2 rounded-lg">
+                <svg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" className="text-green-500 mx-auto">
+                  <path d="M3 12a9 9 0 1 0 18 0 9 9 0 0 0-18 0M4 12a8 8 0 1 1 16 0M12 2v2M12 20v2M2 12h2M20 12h2"/>
+                  <path d="M8 12a4 4 0 1 0 8 0 4 4 0 0 0-8 0M9.5 9.5l5 5M9.5 14.5l5-5"/>
+                </svg>
               </div>
-            )}
-            
-            {!onboardingComplete && (getCurrentQuestion().type === 'text' || getCurrentQuestion().type === 'email') && (
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  className="flex-1 p-2 rounded-l-lg border border-gray-700 bg-black text-white"
-                  placeholder="Message Fitness AI..."
-                  value={input}
-                  onChange={handleInputChange}
-                  onKeyPress={handleKeyPress}
-                />
-                <button 
-                  className="bg-green-600 hover:bg-green-700 text-white p-2 rounded-r-lg"
-                  onClick={sendMessage}
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                    <line x1="22" y1="2" x2="11" y2="13"></line>
-                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-                  </svg>
+              <div className="text-center text-white">
+                <h4 className="text-lg font-bold mb-2">AR Workout Experience</h4>
+                <p className="text-sm text-gray-300 mb-4">Experience personalized workouts in augmented reality with a virtual trainer</p>
+                <button className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded mb-2 w-full">
+                  Launch AR Workout
+                </button>
+                <button className="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded w-full">
+                  View VR Gym Tour
                 </button>
               </div>
-            )}
-          </div>
+            </div>
+          )}
+          
+          {/* Onboarding input box - only show for chat tab */}
+          {activeTab === 'chat' && (
+            <div className="p-3 border-t border-gray-800 bg-gray-900">
+              {onboardingComplete ? (
+                <div className="bg-[#131313] rounded-lg p-3">
+                  <button
+                    className="w-full p-2 bg-green-600 hover:bg-green-700 text-white rounded"
+                    onClick={handleLoginRedirect}
+                  >
+                    Login to Dashboard
+                  </button>
+                </div>
+              ) : (
+                <div className="bg-[#131313] rounded-lg p-3 mb-3">
+                  <h3 className="text-white text-lg mb-1">Welcome to Fitness AI</h3>
+                  <p className="text-gray-300 text-sm mb-2">
+                    Step {currentStep} of 10: {getCurrentQuestion().text}
+                  </p>
+                  
+                  {renderQuestionInput()}
+                  
+                  {currentStep > 1 && (
+                    <div className="mt-3 flex justify-start">
+                      <button 
+                        className="bg-gray-700 text-white px-3 py-1 rounded text-sm"
+                        onClick={goToPreviousStep}
+                      >
+                        Back
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+              
+              {!onboardingComplete && (getCurrentQuestion().type === 'text' || getCurrentQuestion().type === 'email') && (
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    className="flex-1 p-2 rounded-l-lg border border-gray-700 bg-black text-white"
+                    placeholder="Message Fitness AI..."
+                    value={input}
+                    onChange={handleInputChange}
+                    onKeyPress={handleKeyPress}
+                  />
+                  <button 
+                    className="bg-green-600 hover:bg-green-700 text-white p-2 rounded-r-lg"
+                    onClick={sendMessage}
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <line x1="22" y1="2" x2="11" y2="13"></line>
+                      <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                    </svg>
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+          
+          {/* Footer for QR and AR tabs */}
+          {activeTab !== 'chat' && (
+            <div className="p-3 border-t border-gray-800 bg-gray-900">
+              <button
+                className="w-full p-2 bg-green-600 hover:bg-green-700 text-white rounded"
+                onClick={() => setActiveTab('chat')}
+              >
+                Return to Chat
+              </button>
+            </div>
+          )}
         </div>
       )}
     </div>
