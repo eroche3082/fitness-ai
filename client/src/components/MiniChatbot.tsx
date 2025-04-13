@@ -12,6 +12,15 @@ interface Message {
   sender: 'user' | 'bot';
 }
 
+// Workout exercise interface
+interface Exercise {
+  name: string;
+  reps: number;
+  sets: number;
+  restTime: number; // in seconds
+  instructions: string;
+}
+
 // Definir las 10 preguntas para el onboarding
 const questions: Question[] = [
   { id: 1, text: "What's your name?", type: 'text' },
@@ -112,6 +121,38 @@ const questions: Question[] = [
   },
 ];
 
+// Sample workout exercises
+const exerciseList: Exercise[] = [
+  {
+    name: "Push-ups",
+    reps: 10,
+    sets: 3,
+    restTime: 60,
+    instructions: "Keep your body straight, lower yourself until your chest nearly touches the floor, then push back up."
+  },
+  {
+    name: "Squats",
+    reps: 15,
+    sets: 3,
+    restTime: 60,
+    instructions: "Stand with feet shoulder-width apart, lower your body as if sitting in a chair, then return to standing."
+  },
+  {
+    name: "Lunges",
+    reps: 10,
+    sets: 3,
+    restTime: 45,
+    instructions: "Take a step forward, lower your body until both knees are bent at 90-degree angles, then push back to start."
+  },
+  {
+    name: "Plank",
+    reps: 1,
+    sets: 3,
+    restTime: 45,
+    instructions: "Hold position for 30 seconds, keeping your body in a straight line from head to heels."
+  }
+];
+
 export default function MiniChatbot() {
   // States
   const [isOpen, setIsOpen] = useState(false);
@@ -119,12 +160,21 @@ export default function MiniChatbot() {
   const [currentStep, setCurrentStep] = useState(1);
   const [answers, setAnswers] = useState<Record<number, any>>({});
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
-  const [activeTab, setActiveTab] = useState<'chat' | 'qr' | 'ar'>('chat');
+  const [activeTab, setActiveTab] = useState<'chat' | 'qr' | 'ar' | 'workout'>('chat');
   const [messages, setMessages] = useState<Message[]>([
     { text: 'Welcome to Fitness AI!', sender: 'bot' },
     { text: `Step 1 of 10: ${questions[0].text}`, sender: 'bot' }
   ]);
   const [onboardingComplete, setOnboardingComplete] = useState(false);
+  
+  // Workout-specific states
+  const [currentExercise, setCurrentExercise] = useState<Exercise | null>(null);
+  const [currentSet, setCurrentSet] = useState(1);
+  const [repCount, setRepCount] = useState(0);
+  const [isResting, setIsResting] = useState(false);
+  const [restTimeLeft, setRestTimeLeft] = useState(0);
+  const [isListening, setIsListening] = useState(false);
+  const [workoutComplete, setWorkoutComplete] = useState(false);
   
   // Refs
   const inputRef = useRef<HTMLInputElement>(null);
@@ -190,6 +240,25 @@ export default function MiniChatbot() {
     setMessages(prev => [...prev, { text: formattedAnswer, sender: 'user' }]);
   };
 
+  // Generate unique code based on user answers
+  const generateUniqueCode = (): string => {
+    // Get user's fitness level from answers (question 3)
+    const fitnessLevel = answers[3] || 'beginner';
+    
+    // Generate random 4-digit number
+    const randomNum = Math.floor(1000 + Math.random() * 9000);
+    
+    // Create code pattern: FIT-[LEVEL]-[RANDOM]
+    let levelCode = 'BEG'; // Default
+    
+    if (typeof fitnessLevel === 'string') {
+      if (fitnessLevel.includes('intermediate')) levelCode = 'INT';
+      else if (fitnessLevel.includes('advanced')) levelCode = 'ADV';
+    }
+    
+    return `FIT-${levelCode}-${randomNum}`;
+  };
+
   // Handle multi-select submit
   const handleMultiSelectSubmit = () => {
     if (selectedOptions.length > 0) {
@@ -218,14 +287,38 @@ export default function MiniChatbot() {
     } else {
       // Onboarding complete
       setOnboardingComplete(true);
+      
+      // Generate unique code
+      const userCode = generateUniqueCode();
+      
+      // Show loading message
       setMessages(prev => [...prev, { 
-        text: 'Thanks for completing the onboarding! Your personalized fitness plan is being created by Fitness AI. You can now login to your dashboard.', 
+        text: 'Thanks for completing the onboarding! Analyzing your responses...', 
         sender: 'bot' 
       }]);
-
-      // Save answers to database (In a real app, this would be an API call)
-      console.log('Onboarding answers:', answers);
-      saveToDatabase(answers);
+      
+      // Simulate AI analysis (In a real app, this would call Vertex AI)
+      setTimeout(() => {
+        setMessages(prev => [...prev, {
+          text: 'Loading your personalized dashboard...',
+          sender: 'bot'
+        }]);
+        
+        // Simulate completion and show code
+        setTimeout(() => {
+          setMessages(prev => [...prev, {
+            text: `Your unique access code is: ${userCode}\n\nYou can use this code to unlock your personalized fitness dashboard. Scan the QR code or click the button below to access your dashboard.`,
+            sender: 'bot'
+          }]);
+          
+          // Save answers to database with the generated code
+          saveToDatabase({
+            ...answers,
+            uniqueCode: userCode,
+            timestamp: new Date().toISOString()
+          });
+        }, 1000);
+      }, 1500);
     }
   };
 
@@ -382,21 +475,27 @@ export default function MiniChatbot() {
           </div>
           
           {/* Tab navigation */}
-          <div className="flex border-b border-gray-800">
+          <div className="flex flex-wrap border-b border-gray-800">
             <button 
-              className={`flex-1 py-2 px-4 ${activeTab === 'chat' ? 'bg-white text-green-700 font-medium' : 'text-gray-300 bg-gray-900 hover:bg-gray-800'}`}
+              className={`flex-1 py-2 px-2 ${activeTab === 'chat' ? 'bg-white text-green-700 font-medium' : 'text-gray-300 bg-gray-900 hover:bg-gray-800'}`}
               onClick={() => setActiveTab('chat')}
             >
               Chat
             </button>
             <button 
-              className={`flex-1 py-2 px-4 ${activeTab === 'qr' ? 'bg-white text-green-700 font-medium' : 'text-gray-300 bg-gray-900 hover:bg-gray-800'}`}
+              className={`flex-1 py-2 px-2 ${activeTab === 'workout' ? 'bg-white text-green-700 font-medium' : 'text-gray-300 bg-gray-900 hover:bg-gray-800'}`}
+              onClick={() => setActiveTab('workout')}
+            >
+              Workout
+            </button>
+            <button 
+              className={`flex-1 py-2 px-2 ${activeTab === 'qr' ? 'bg-white text-green-700 font-medium' : 'text-gray-300 bg-gray-900 hover:bg-gray-800'}`}
               onClick={() => setActiveTab('qr')}
             >
               QR Code
             </button>
             <button 
-              className={`flex-1 py-2 px-4 ${activeTab === 'ar' ? 'bg-white text-green-700 font-medium' : 'text-gray-300 bg-gray-900 hover:bg-gray-800'}`}
+              className={`flex-1 py-2 px-2 ${activeTab === 'ar' ? 'bg-white text-green-700 font-medium' : 'text-gray-300 bg-gray-900 hover:bg-gray-800'}`}
               onClick={() => setActiveTab('ar')}
             >
               AR/VR
@@ -437,6 +536,196 @@ export default function MiniChatbot() {
                   Share QR Code
                 </button>
               </div>
+            </div>
+          )}
+          
+          {activeTab === 'workout' && (
+            // Voice Coach with Rep Counter
+            <div className="flex-1 overflow-y-auto p-3 bg-black flex flex-col">
+              <div className="text-center mb-4">
+                <h3 className="text-lg text-white font-bold">Voice Coached Workout</h3>
+                <p className="text-sm text-gray-300">Follow along with voice instructions and automatic rep counting</p>
+              </div>
+              
+              {!currentExercise && !workoutComplete ? (
+                // Exercise selection
+                <div className="flex-1 flex flex-col justify-center">
+                  <h4 className="text-white text-center mb-4">Select a workout to begin</h4>
+                  <div className="space-y-2">
+                    {exerciseList.map((exercise, index) => (
+                      <button
+                        key={index}
+                        onClick={() => {
+                          setCurrentExercise(exercise);
+                          setCurrentSet(1);
+                          setRepCount(0);
+                          setIsResting(false);
+                          setWorkoutComplete(false);
+                        }}
+                        className="w-full p-3 bg-gray-800 hover:bg-gray-700 text-white text-left rounded flex justify-between items-center"
+                      >
+                        <span>{exercise.name}</span>
+                        <span>{exercise.sets} sets × {exercise.reps} reps</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ) : workoutComplete ? (
+                // Workout complete screen
+                <div className="flex-1 flex flex-col items-center justify-center">
+                  <div className="bg-green-800 rounded-full p-4 mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white">
+                      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                      <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                    </svg>
+                  </div>
+                  <h3 className="text-xl text-white font-bold mb-2">Workout Complete!</h3>
+                  <p className="text-gray-300 mb-6 text-center">Great job! You've finished your workout session.</p>
+                  <button 
+                    onClick={() => {
+                      setCurrentExercise(null);
+                      setWorkoutComplete(false);
+                    }}
+                    className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
+                  >
+                    Start New Workout
+                  </button>
+                </div>
+              ) : isResting ? (
+                // Rest timer screen
+                <div className="flex-1 flex flex-col items-center justify-center">
+                  <div className="mb-4 text-white text-center">
+                    <h3 className="text-xl font-bold mb-2">Rest Time</h3>
+                    <p className="text-5xl font-bold">{restTimeLeft}s</p>
+                    <p className="mt-2 text-gray-300">Next: Set {currentSet + 1} of {currentExercise.sets}</p>
+                  </div>
+                  <button 
+                    onClick={() => {
+                      setIsResting(false);
+                      setCurrentSet(currentSet + 1);
+                      setRepCount(0);
+                    }}
+                    className="bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded"
+                  >
+                    Skip Rest
+                  </button>
+                </div>
+              ) : (
+                // Active exercise screen
+                <div className="flex-1 flex flex-col">
+                  <div className="mb-4">
+                    <h3 className="text-xl text-white font-bold">{currentExercise.name}</h3>
+                    <p className="text-sm text-gray-300">{currentExercise.instructions}</p>
+                  </div>
+                  
+                  <div className="flex-1 flex flex-col items-center justify-center">
+                    <div className="relative mb-8">
+                      <div className="text-7xl font-bold text-white mb-2 text-center">{repCount}</div>
+                      <div className="text-gray-400 text-center">of {currentExercise.reps} reps</div>
+                      <div className="text-sm text-green-500 mt-2 text-center">Set {currentSet} of {currentExercise.sets}</div>
+                    </div>
+                    
+                    <div className="space-y-3 w-full">
+                      {isListening ? (
+                        <button 
+                          onClick={() => {
+                            setIsListening(false);
+                            // Simulate completing the set
+                            if (currentSet < currentExercise.sets) {
+                              setIsResting(true);
+                              setRestTimeLeft(currentExercise.restTime);
+                              // Simulate rest timer (in a real app, this would be a proper interval)
+                              const timer = setInterval(() => {
+                                setRestTimeLeft(prev => {
+                                  if (prev <= 1) {
+                                    clearInterval(timer);
+                                    setIsResting(false);
+                                    setCurrentSet(currentSet + 1);
+                                    setRepCount(0);
+                                    return 0;
+                                  }
+                                  return prev - 1;
+                                });
+                              }, 1000);
+                            } else {
+                              // Workout complete
+                              setWorkoutComplete(true);
+                              setCurrentExercise(null);
+                            }
+                          }}
+                          className="w-full p-3 bg-red-600 hover:bg-red-700 text-white rounded flex items-center justify-center gap-2"
+                        >
+                          <span>Stop Listening</span>
+                          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <rect x="6" y="4" width="4" height="16"/>
+                            <rect x="14" y="4" width="4" height="16"/>
+                          </svg>
+                        </button>
+                      ) : (
+                        <button 
+                          onClick={() => {
+                            setIsListening(true);
+                            // Simulate rep counting (in a real app, this would use voice recognition)
+                            const repInterval = setInterval(() => {
+                              setRepCount(prev => {
+                                if (prev >= currentExercise.reps) {
+                                  clearInterval(repInterval);
+                                  setIsListening(false);
+                                  
+                                  if (currentSet < currentExercise.sets) {
+                                    setIsResting(true);
+                                    setRestTimeLeft(currentExercise.restTime);
+                                    
+                                    // Simulate rest timer
+                                    const timer = setInterval(() => {
+                                      setRestTimeLeft(prev => {
+                                        if (prev <= 1) {
+                                          clearInterval(timer);
+                                          setIsResting(false);
+                                          setCurrentSet(currentSet + 1);
+                                          setRepCount(0);
+                                          return 0;
+                                        }
+                                        return prev - 1;
+                                      });
+                                    }, 1000);
+                                  } else {
+                                    // Workout complete
+                                    setWorkoutComplete(true);
+                                    setCurrentExercise(null);
+                                  }
+                                  
+                                  return currentExercise.reps;
+                                }
+                                return prev + 1;
+                              });
+                            }, 1500); // Count a rep every 1.5 seconds for demo purposes
+                          }}
+                          className="w-full p-3 bg-green-600 hover:bg-green-700 text-white rounded flex items-center justify-center gap-2"
+                        >
+                          <span>Start Voice Counting</span>
+                          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                            <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                            <line x1="12" y1="19" x2="12" y2="23"/>
+                            <line x1="8" y1="23" x2="16" y2="23"/>
+                          </svg>
+                        </button>
+                      )}
+                      
+                      <button 
+                        onClick={() => {
+                          setCurrentExercise(null);
+                          setWorkoutComplete(false);
+                        }}
+                        className="w-full p-3 bg-gray-700 hover:bg-gray-600 text-white rounded"
+                      >
+                        Exit Workout
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           )}
           
