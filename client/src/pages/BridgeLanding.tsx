@@ -15,6 +15,19 @@ import {
   BarChart2,
   Play,
 } from 'lucide-react';
+import {
+  heroBackground,
+  logoWhite,
+  trainer1,
+  trainer2,
+  trainer3,
+  training1,
+  training2,
+  training3,
+  training4,
+  training5,
+  training6
+} from '../assets/images';
 
 export default function BridgeLanding() {
   return (
@@ -48,12 +61,9 @@ export default function BridgeLanding() {
       {/* Hero Section */}
       <section className="bridge-hero min-h-screen flex items-center pt-20 relative bg-black">
         <div className="absolute inset-0 z-0 bg-black opacity-70"></div>
-        <div className="absolute inset-0 z-[-1]">
-          <img 
-            src="https://bridge504.qodeinteractive.com/wp-content/uploads/2024/01/h1-rev-img-1.jpg" 
-            alt="Hero background"
-            className="w-full h-full object-cover object-center"
-          />
+        <div className="absolute inset-0 z-[-1] bg-black">
+          {/* Fallback color is black if image fails to load */}
+          <div className="w-full h-full bg-gradient-to-b from-black to-gray-900"></div>
         </div>
         <div className="container mx-auto px-4 md:px-6 relative z-10">
           <div className="max-w-4xl">
