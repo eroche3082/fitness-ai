@@ -5,63 +5,63 @@ import { Activity, Dumbbell, Heart, Activity as ActivityIcon, Clock, Calendar, A
 
 const programs = [
   {
-    title: "Principiante Total",
-    category: "Principiante",
+    title: "Total Beginner",
+    category: "Beginner",
     level: "BEG",
-    duration: "8 semanas",
-    frequency: "3-4 días/semana",
-    description: "Programa ideal para quienes se inician en el fitness, enfocado en construir una base sólida de fuerza y resistencia.",
+    duration: "8 weeks",
+    frequency: "3-4 days/week",
+    description: "Ideal program for those new to fitness, focused on building a solid foundation of strength and endurance.",
     features: [
-      "Rutinas de bajo impacto",
-      "Introducción a ejercicios básicos",
-      "Guía completa de nutrición",
-      "Plan de progresión gradual"
+      "Low impact routines",
+      "Introduction to basic exercises",
+      "Complete nutrition guide",
+      "Gradual progression plan"
     ],
     color: "blue"
   },
   {
-    title: "Acondicionamiento Intermedio",
-    category: "Intermedio",
+    title: "Intermediate Conditioning",
+    category: "Intermediate",
     level: "INT",
-    duration: "12 semanas",
-    frequency: "4-5 días/semana",
-    description: "Diseñado para personas con experiencia previa en entrenamiento que buscan mejorar su rendimiento y composición corporal.",
+    duration: "12 weeks",
+    frequency: "4-5 days/week",
+    description: "Designed for people with previous training experience looking to improve their performance and body composition.",
     features: [
-      "Entrenamiento por intervalos",
-      "Rutinas de fuerza progresivas",
-      "Plan nutricional personalizado",
-      "Seguimiento de progreso semanal"
+      "Interval training",
+      "Progressive strength routines",
+      "Personalized nutrition plan",
+      "Weekly progress tracking"
     ],
     color: "green",
     featured: true
   },
   {
     title: "Elite Performance",
-    category: "Avanzado",
+    category: "Advanced",
     level: "ADV",
-    duration: "16 semanas",
-    frequency: "5-6 días/semana",
-    description: "Programa de alta intensidad para atletas experimentados que buscan maximizar su rendimiento y superar plateaus.",
+    duration: "16 weeks",
+    frequency: "5-6 days/week",
+    description: "High-intensity program for experienced athletes looking to maximize performance and break through plateaus.",
     features: [
-      "Periodización avanzada",
-      "Entrenamiento de alta intensidad",
-      "Estrategias de recuperación",
-      "Optimización nutricional"
+      "Advanced periodization",
+      "High-intensity training",
+      "Recovery strategies",
+      "Nutritional optimization"
     ],
     color: "purple"
   },
   {
-    title: "Transformación Completa",
-    category: "Todos los niveles",
+    title: "Complete Transformation",
+    category: "All levels",
     level: "ALL",
-    duration: "12 semanas",
-    frequency: "5 días/semana",
-    description: "Programa integral que combina entrenamiento, nutrición y mindfulness para una transformación física y mental.",
+    duration: "12 weeks",
+    frequency: "5 days/week",
+    description: "Comprehensive program that combines training, nutrition, and mindfulness for a physical and mental transformation.",
     features: [
-      "Entrenamiento multidisciplinario",
-      "Plan nutricional detallado",
-      "Técnicas de mindfulness",
-      "Asesoramiento personalizado"
+      "Multidisciplinary training",
+      "Detailed nutrition plan",
+      "Mindfulness techniques",
+      "Personalized guidance"
     ],
     color: "amber"
   }
@@ -153,9 +153,9 @@ export default function ProgramsPage() {
           <div className="absolute inset-0 bg-gradient-to-b from-green-500/20 to-transparent"></div>
           <div className="container mx-auto px-4 md:px-6 relative z-10">
             <div className="max-w-3xl mx-auto text-center">
-              <h1 className="text-4xl md:text-6xl font-bold mb-6">Nuestros Programas</h1>
+              <h1 className="text-4xl md:text-6xl font-bold mb-6">Our Programs</h1>
               <p className="text-xl text-gray-300 mb-8">
-                Descubre entrenamientos personalizados adaptados a tu nivel, objetivos y estilo de vida. Impulsados por IA para maximizar tus resultados.
+                Discover personalized workouts adapted to your level, goals, and lifestyle. Powered by AI to maximize your results.
               </p>
             </div>
           </div>
@@ -208,7 +208,7 @@ export default function ProgramsPage() {
                       onClick={() => setLocation('/signup')}
                       className="w-full bg-gray-800 hover:bg-gray-700 text-white"
                     >
-                      Comenzar Programa
+                      Start Program
                       <ArrowRight className="ml-2 h-4 w-4" />
                     </Button>
                   </div>
@@ -222,9 +222,9 @@ export default function ProgramsPage() {
         <section className="py-20 bg-gray-900">
           <div className="container mx-auto px-4 md:px-6">
             <div className="max-w-3xl mx-auto text-center mb-16">
-              <h2 className="text-3xl font-bold mb-4">Cómo Funciona</h2>
+              <h2 className="text-3xl font-bold mb-4">How It Works</h2>
               <p className="text-lg text-gray-300">
-                Nuestro sistema utiliza inteligencia artificial para personalizar cada programa a tus necesidades específicas
+                Our system uses artificial intelligence to customize each program to your specific needs
               </p>
             </div>
 
@@ -233,9 +233,9 @@ export default function ProgramsPage() {
                 <div className="w-16 h-16 rounded-full bg-green-500/20 flex items-center justify-center mx-auto mb-6">
                   <span className="text-2xl font-bold text-green-500">1</span>
                 </div>
-                <h3 className="text-xl font-bold mb-2">Evaluación Inicial</h3>
+                <h3 className="text-xl font-bold mb-2">Initial Assessment</h3>
                 <p className="text-gray-300">
-                  Completa un cuestionario detallado sobre tu nivel, objetivos y preferencias de entrenamiento.
+                  Complete a detailed questionnaire about your level, goals, and training preferences.
                 </p>
               </div>
               
@@ -243,9 +243,9 @@ export default function ProgramsPage() {
                 <div className="w-16 h-16 rounded-full bg-green-500/20 flex items-center justify-center mx-auto mb-6">
                   <span className="text-2xl font-bold text-green-500">2</span>
                 </div>
-                <h3 className="text-xl font-bold mb-2">Análisis de IA</h3>
+                <h3 className="text-xl font-bold mb-2">AI Analysis</h3>
                 <p className="text-gray-300">
-                  Nuestro algoritmo analiza tus datos para crear un programa adaptado a tu perfil único.
+                  Our algorithm analyzes your data to create a program tailored to your unique profile.
                 </p>
               </div>
               
@@ -253,9 +253,9 @@ export default function ProgramsPage() {
                 <div className="w-16 h-16 rounded-full bg-green-500/20 flex items-center justify-center mx-auto mb-6">
                   <span className="text-2xl font-bold text-green-500">3</span>
                 </div>
-                <h3 className="text-xl font-bold mb-2">Entrenamiento Adaptativo</h3>
+                <h3 className="text-xl font-bold mb-2">Adaptive Training</h3>
                 <p className="text-gray-300">
-                  Tu programa evoluciona en tiempo real basado en tu progreso y retroalimentación.
+                  Your program evolves in real-time based on your progress and feedback.
                 </p>
               </div>
             </div>
@@ -266,9 +266,9 @@ export default function ProgramsPage() {
         <section className="py-20">
           <div className="container mx-auto px-4 md:px-6">
             <div className="max-w-3xl mx-auto text-center mb-16">
-              <h2 className="text-3xl font-bold mb-4">Lo Que Dicen Nuestros Usuarios</h2>
+              <h2 className="text-3xl font-bold mb-4">What Our Users Say</h2>
               <p className="text-lg text-gray-300">
-                Historias reales de personas que han transformado su condición física con nuestros programas
+                Real stories from people who have transformed their fitness with our programs
               </p>
             </div>
 
@@ -277,12 +277,12 @@ export default function ProgramsPage() {
                 <div className="flex items-center mb-4">
                   <div className="w-10 h-10 rounded-full bg-green-500 mr-3"></div>
                   <div>
-                    <h4 className="font-bold">Carlos Rodríguez</h4>
-                    <p className="text-sm text-gray-400">Programa Intermedio</p>
+                    <h4 className="font-bold">Carl Rodriguez</h4>
+                    <p className="text-sm text-gray-400">Intermediate Program</p>
                   </div>
                 </div>
                 <p className="text-gray-300">
-                  "Después de 12 semanas con el programa, he perdido 8kg y aumentado significativamente mi fuerza. La personalización es increíble."
+                  "After 12 weeks with the program, I've lost 18lbs and significantly increased my strength. The personalization is incredible."
                 </p>
               </div>
               
@@ -290,12 +290,12 @@ export default function ProgramsPage() {
                 <div className="flex items-center mb-4">
                   <div className="w-10 h-10 rounded-full bg-purple-500 mr-3"></div>
                   <div>
-                    <h4 className="font-bold">María Gómez</h4>
-                    <p className="text-sm text-gray-400">Transformación Completa</p>
+                    <h4 className="font-bold">Mary Gomez</h4>
+                    <p className="text-sm text-gray-400">Complete Transformation</p>
                   </div>
                 </div>
                 <p className="text-gray-300">
-                  "No solo cambié físicamente, sino también mentalmente. El enfoque holístico de este programa ha transformado mi relación con el fitness."
+                  "I didn't just change physically, but mentally too. The holistic approach of this program has transformed my relationship with fitness."
                 </p>
               </div>
               
@@ -303,12 +303,12 @@ export default function ProgramsPage() {
                 <div className="flex items-center mb-4">
                   <div className="w-10 h-10 rounded-full bg-blue-500 mr-3"></div>
                   <div>
-                    <h4 className="font-bold">Javier López</h4>
+                    <h4 className="font-bold">James Lopez</h4>
                     <p className="text-sm text-gray-400">Elite Performance</p>
                   </div>
                 </div>
                 <p className="text-gray-300">
-                  "Como atleta experimentado, estaba escéptico. Pero este programa ha elevado mi rendimiento a niveles que no creía posibles."
+                  "As an experienced athlete, I was skeptical. But this program has elevated my performance to levels I didn't think were possible."
                 </p>
               </div>
             </div>
@@ -318,16 +318,16 @@ export default function ProgramsPage() {
         {/* CTA Section */}
         <section className="py-20 bg-green-500 text-black">
           <div className="container mx-auto px-4 md:px-6 text-center">
-            <h2 className="text-3xl font-bold mb-4">Comienza tu transformación hoy</h2>
+            <h2 className="text-3xl font-bold mb-4">Start Your Transformation Today</h2>
             <p className="text-xl mb-8 max-w-2xl mx-auto">
-              Únete a nuestra comunidad y descubre cómo nuestros programas personalizados pueden ayudarte a alcanzar tus objetivos.
+              Join our community and discover how our personalized programs can help you reach your goals.
             </p>
             <Button
               onClick={() => setLocation('/signup')}
               size="lg"
               className="bg-black text-white hover:bg-gray-800"
             >
-              Registrarse ahora
+              Sign Up Now
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </div>
@@ -397,7 +397,7 @@ export default function ProgramsPage() {
           </div>
           
           <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400 text-sm">
-            <p>&copy; 2025 Fitness AI. Todos los derechos reservados.</p>
+            <p>&copy; 2025 Fitness AI. All rights reserved.</p>
           </div>
         </div>
       </footer>
