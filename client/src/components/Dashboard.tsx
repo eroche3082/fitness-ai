@@ -7,6 +7,8 @@ import JourneyTab from './JourneyTab';
 import FeaturesGrid from './FeaturesGrid';
 import FitnessRoutineSocialStudio from './FitnessRoutineSocialStudio';
 import SocialMediaHub from './SocialMediaHub';
+import PremiumLevels from './PremiumLevels';
+import AccessCodeQR from './AccessCodeQR';
 
 interface DashboardProps {
   userCode: string;
@@ -710,11 +712,68 @@ const Dashboard: React.FC<DashboardProps> = ({ userCode }) => {
         >
           Social Media
         </button>
+        <button
+          onClick={() => setActiveTab('premium')}
+          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors 
+            ${activeTab === 'premium'
+              ? 'bg-blue-600 text-white' 
+              : 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'
+            }`}
+        >
+          Premium Features
+        </button>
+        <button
+          onClick={() => setActiveTab('access')}
+          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors 
+            ${activeTab === 'access'
+              ? 'bg-blue-600 text-white' 
+              : 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'
+            }`}
+        >
+          Access Code
+        </button>
       </div>
       
       {/* Tab content */}
       {renderTabContent()}
     </div>
+  );
+};
+
+// Premium tab content
+const renderPremiumTab = () => {
+  if (!userProfile) return null;
+  
+  const handleLevelUnlock = (levelId: string) => {
+    // Handle level unlock - this would update the user's profile after payment
+    console.log(`Unlocking level: ${levelId}`);
+    
+    // In a real app, we would call an API to process the payment and update the user's profile
+    if (userProfile) {
+      const updatedUserProfile = {
+        ...userProfile,
+        unlockedLevels: [...(userProfile.unlockedLevels || []), levelId],
+        paymentStatus: 'paid',
+      };
+      
+      setUserProfile(updatedUserProfile);
+    }
+  };
+  
+  return (
+    <PremiumLevels 
+      userProfile={userProfile} 
+      onLevelUnlock={handleLevelUnlock} 
+    />
+  );
+};
+
+// Access Code tab content
+const renderAccessCodeTab = () => {
+  if (!userProfile) return null;
+  
+  return (
+    <AccessCodeQR userProfile={userProfile} />
   );
 };
 
