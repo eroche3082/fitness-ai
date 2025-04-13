@@ -115,12 +115,8 @@ export default function BridgeLanding() {
       <section className="bg-black">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-0">
           {/* Trainer 1 */}
-          <div className="relative group">
-            <img 
-              src="https://bridge504.qodeinteractive.com/wp-content/uploads/2024/01/h1-img-1.jpg" 
-              alt="Trainer 1" 
-              className="w-full h-full object-cover"
-            />
+          <div className="relative group h-96 bg-gray-900">
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black opacity-60"></div>
             <div className="absolute left-0 bottom-0 transform origin-bottom-left rotate-90 z-10">
               <div className="whitespace-nowrap text-white text-2xl uppercase tracking-wider font-bold py-4 px-6">
                 CROSSFIT COACH
@@ -146,12 +142,8 @@ export default function BridgeLanding() {
           </div>
           
           {/* Trainer 2 */}
-          <div className="relative group">
-            <img 
-              src="https://bridge504.qodeinteractive.com/wp-content/uploads/2024/01/h1-img-2.jpg" 
-              alt="Trainer 2" 
-              className="w-full h-full object-cover"
-            />
+          <div className="relative group h-96 bg-gray-800">
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black opacity-60"></div>
             <div className="absolute left-0 bottom-0 transform origin-bottom-left rotate-90 z-10">
               <div className="whitespace-nowrap text-white text-2xl uppercase tracking-wider font-bold py-4 px-6">
                 CARDIO & CONDITIONING
@@ -177,12 +169,8 @@ export default function BridgeLanding() {
           </div>
           
           {/* Trainer 3 */}
-          <div className="relative group">
-            <img 
-              src="https://bridge504.qodeinteractive.com/wp-content/uploads/2024/01/h1-img-3.jpg" 
-              alt="Trainer 3" 
-              className="w-full h-full object-cover"
-            />
+          <div className="relative group h-96 bg-gray-900">
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black opacity-60"></div>
             <div className="absolute left-0 bottom-0 transform origin-bottom-left rotate-90 z-10">
               <div className="whitespace-nowrap text-white text-2xl uppercase tracking-wider font-bold py-4 px-6">
                 MADISON FRONING
@@ -212,12 +200,7 @@ export default function BridgeLanding() {
       {/* Training Power Section */}
       <section className="bg-black">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-0">
-          <div className="relative h-72 md:h-auto">
-            <img 
-              src="https://bridge504.qodeinteractive.com/wp-content/uploads/2024/01/h1-img-4.jpg" 
-              alt="Training Power" 
-              className="w-full h-full object-cover"
-            />
+          <div className="relative h-72 md:h-96 bg-gradient-to-br from-gray-900 to-black">
             <div className="absolute top-0 left-0 p-6 bg-black bg-opacity-80">
               <div className="text-white">
                 <h3 className="text-xl font-bold uppercase leading-tight">TRAINING</h3>
@@ -225,42 +208,37 @@ export default function BridgeLanding() {
               </div>
             </div>
           </div>
-          <div className="relative h-72 md:h-auto">
-            <img 
-              src="https://bridge504.qodeinteractive.com/wp-content/uploads/2024/01/h1-img-5.jpg" 
-              alt="Training Session" 
-              className="w-full h-full object-cover"
-            />
+          <div className="relative h-72 md:h-96 bg-gradient-to-br from-gray-800 to-black">
+            <div className="absolute bottom-4 left-4 text-white">
+              <h3 className="text-lg font-bold uppercase">Strength</h3>
+            </div>
           </div>
-          <div className="relative h-72 md:h-auto">
-            <img 
-              src="https://bridge504.qodeinteractive.com/wp-content/uploads/2024/01/h1-img-6.jpg" 
-              alt="Post Workout" 
-              className="w-full h-full object-cover"
-            />
+          <div className="relative h-72 md:h-96 bg-gradient-to-br from-gray-900 to-black">
+            <div className="absolute bottom-4 left-4 text-white">
+              <h3 className="text-lg font-bold uppercase">Endurance</h3>
+            </div>
           </div>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-0">
-          <div className="relative h-72 md:h-auto">
-            <img 
-              src="https://bridge504.qodeinteractive.com/wp-content/uploads/2024/01/h1-img-7.jpg" 
-              alt="Training Pose" 
-              className="w-full h-full object-cover"
-            />
+          <div className="relative h-72 md:h-96 bg-gradient-to-br from-gray-800 to-black">
+            <div className="absolute bottom-4 left-4 text-white">
+              <h3 className="text-lg font-bold uppercase">Mobility</h3>
+            </div>
           </div>
-          <div className="relative h-72 md:h-auto">
-            <img 
-              src="https://bridge504.qodeinteractive.com/wp-content/uploads/2024/01/h1-img-8.jpg" 
-              alt="Running Track" 
-              className="w-full h-full object-cover"
-            />
+          <div className="relative h-72 md:h-96 bg-gradient-to-br from-gray-900 to-black">
+            <div className="absolute bottom-4 left-4 text-white">
+              <h3 className="text-lg font-bold uppercase">Cardio</h3>
+            </div>
           </div>
-          <div className="relative h-72 md:h-auto">
-            <img 
-              src="https://bridge504.qodeinteractive.com/wp-content/uploads/2024/01/h1-img-9.jpg" 
-              alt="Box Jump" 
-              className="w-full h-full object-cover"
-            />
+          <div className="relative h-72 md:h-96 bg-gradient-to-br from-gray-800 to-black">
+            <div className="absolute bottom-4 left-4 text-white">
+              <h3 className="text-lg font-bold uppercase">Recovery</h3>
+            </div>
+            <div className="absolute top-4 right-4">
+              <div className="bg-white text-black p-2 rounded-full">
+                <Play className="h-6 w-6" />
+              </div>
+            </div>
           </div>
         </div>
       </section>
