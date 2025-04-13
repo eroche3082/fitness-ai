@@ -20,6 +20,7 @@ import SignupPage from "./pages/signup";
 import AboutPage from "./pages/about";
 import ProgramsPage from "./pages/programs";
 import ContactPage from "./pages/contact";
+import FeaturesPage from "./pages/features";
 import { UserProvider } from "./contexts/UserContext";
 import { ChatProvider } from "./contexts/ChatContext";
 import FitnessSystemInitializer from "./components/FitnessSystemInitializer";
@@ -167,6 +168,7 @@ function Router() {
       '/about',
       '/programs',
       '/contact',
+      '/features',
       '/access'
     ];
     const isPublicRoute = publicRoutes.includes(location) || 
@@ -189,6 +191,7 @@ function Router() {
       <Route path="/about" component={AboutPage} />
       <Route path="/programs" component={ProgramsPage} />
       <Route path="/contact" component={ContactPage} />
+      <Route path="/features" component={FeaturesPage} />
       
       {/* New Routes - User Journey */}
       <Route path="/access" component={AccessCodePage} />

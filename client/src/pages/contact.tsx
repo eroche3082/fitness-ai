@@ -242,17 +242,17 @@ export default function ContactPage() {
               {/* Contact Info */}
               <div>
                 <div className="bg-gray-900 p-8 rounded-lg border border-gray-800 mb-8">
-                  <h2 className="text-2xl font-bold mb-6">Información de Contacto</h2>
+                  <h2 className="text-2xl font-bold mb-6">Contact Information</h2>
                   <div className="space-y-6">
                     <div className="flex items-start">
                       <div className="w-10 h-10 rounded-full bg-green-500/20 flex items-center justify-center mr-4 flex-shrink-0">
                         <MapPin className="h-5 w-5 text-green-500" />
                       </div>
                       <div>
-                        <h3 className="font-bold mb-1">Dirección</h3>
+                        <h3 className="font-bold mb-1">Address</h3>
                         <p className="text-gray-300">
-                          Avenida de la Innovación, 123<br />
-                          28021 Madrid, España
+                          123 Innovation Avenue<br />
+                          New York, NY 10001
                         </p>
                       </div>
                     </div>
@@ -262,10 +262,10 @@ export default function ContactPage() {
                         <Phone className="h-5 w-5 text-green-500" />
                       </div>
                       <div>
-                        <h3 className="font-bold mb-1">Teléfono</h3>
+                        <h3 className="font-bold mb-1">Phone</h3>
                         <p className="text-gray-300">
-                          +34 911 234 567<br />
-                          Lun-Vie: 9:00 - 18:00
+                          +1 (800) 123-4567<br />
+                          Mon-Fri: 9:00 AM - 6:00 PM
                         </p>
                       </div>
                     </div>
@@ -278,7 +278,7 @@ export default function ContactPage() {
                         <h3 className="font-bold mb-1">Email</h3>
                         <p className="text-gray-300">
                           info@fitnessai.com<br />
-                          soporte@fitnessai.com
+                          support@fitnessai.com
                         </p>
                       </div>
                     </div>
@@ -286,19 +286,19 @@ export default function ContactPage() {
                 </div>
                 
                 <div className="bg-gray-900 p-8 rounded-lg border border-gray-800">
-                  <h2 className="text-2xl font-bold mb-6">Horario de Atención</h2>
+                  <h2 className="text-2xl font-bold mb-6">Service Hours</h2>
                   <div className="space-y-3">
                     <div className="flex justify-between border-b border-gray-800 pb-2">
-                      <span>Lunes - Viernes</span>
-                      <span>9:00 - 18:00</span>
+                      <span>Monday - Friday</span>
+                      <span>9:00 AM - 6:00 PM</span>
                     </div>
                     <div className="flex justify-between border-b border-gray-800 pb-2">
-                      <span>Sábado</span>
-                      <span>10:00 - 14:00</span>
+                      <span>Saturday</span>
+                      <span>10:00 AM - 2:00 PM</span>
                     </div>
                     <div className="flex justify-between">
-                      <span>Domingo</span>
-                      <span>Cerrado</span>
+                      <span>Sunday</span>
+                      <span>Closed</span>
                     </div>
                   </div>
                 </div>
@@ -311,38 +311,38 @@ export default function ContactPage() {
         <section className="py-20 bg-gray-900">
           <div className="container mx-auto px-4 md:px-6">
             <div className="max-w-3xl mx-auto text-center mb-16">
-              <h2 className="text-3xl font-bold mb-4">Preguntas Frecuentes</h2>
+              <h2 className="text-3xl font-bold mb-4">Frequently Asked Questions</h2>
               <p className="text-lg text-gray-300">
-                Respuestas a las preguntas más comunes sobre nuestros servicios
+                Answers to the most common questions about our services
               </p>
             </div>
 
             <div className="max-w-3xl mx-auto space-y-6">
               <div className="bg-gray-800 p-6 rounded-lg">
-                <h3 className="text-xl font-bold mb-2">¿Cómo puedo comenzar con Fitness AI?</h3>
+                <h3 className="text-xl font-bold mb-2">How do I get started with Fitness AI?</h3>
                 <p className="text-gray-300">
-                  Simplemente regístrate en nuestra plataforma, completa el cuestionario inicial de evaluación, y nuestro sistema generará automáticamente un programa personalizado para ti.
+                  Simply register on our platform, complete the initial assessment questionnaire, and our system will automatically generate a personalized program for you.
                 </p>
               </div>
               
               <div className="bg-gray-800 p-6 rounded-lg">
-                <h3 className="text-xl font-bold mb-2">¿Puedo cambiar de programa una vez iniciado?</h3>
+                <h3 className="text-xl font-bold mb-2">Can I change programs once I've started?</h3>
                 <p className="text-gray-300">
-                  Sí, puedes cambiar de programa en cualquier momento desde tu panel de control. Sin embargo, recomendamos completar al menos 4 semanas del programa actual para ver resultados significativos.
+                  Yes, you can change programs at any time from your dashboard. However, we recommend completing at least 4 weeks of your current program to see significant results.
                 </p>
               </div>
               
               <div className="bg-gray-800 p-6 rounded-lg">
-                <h3 className="text-xl font-bold mb-2">¿Cómo funciona la integración con dispositivos?</h3>
+                <h3 className="text-xl font-bold mb-2">How does device integration work?</h3>
                 <p className="text-gray-300">
-                  Fitness AI se conecta con las principales plataformas como Google Fit, Apple Health, Fitbit y Strava. Solo necesitas autorizar la conexión desde tu cuenta y comenzaremos a sincronizar automáticamente tus datos de actividad.
+                  Fitness AI connects with major platforms like Google Fit, Apple Health, Fitbit, and Strava. You simply need to authorize the connection from your account and we'll automatically sync your activity data.
                 </p>
               </div>
               
               <div className="bg-gray-800 p-6 rounded-lg">
-                <h3 className="text-xl font-bold mb-2">¿Ofrecen soporte para dietas específicas?</h3>
+                <h3 className="text-xl font-bold mb-2">Do you offer support for specific diets?</h3>
                 <p className="text-gray-300">
-                  Sí, nuestros planes nutricionales pueden adaptarse a diversas necesidades dietéticas, incluyendo vegetariana, vegana, cetogénica, paleo, sin gluten, y más. Simplemente indica tus preferencias en tu perfil.
+                  Yes, our nutritional plans can be adapted to various dietary needs, including vegetarian, vegan, ketogenic, paleo, gluten-free, and more. Simply indicate your preferences in your profile.
                 </p>
               </div>
             </div>
@@ -352,16 +352,16 @@ export default function ContactPage() {
         {/* CTA Section */}
         <section className="py-20 bg-green-500 text-black">
           <div className="container mx-auto px-4 md:px-6 text-center">
-            <h2 className="text-3xl font-bold mb-4">¿Listo para transformar tu entrenamiento?</h2>
+            <h2 className="text-3xl font-bold mb-4">Ready to transform your workout?</h2>
             <p className="text-xl mb-8 max-w-2xl mx-auto">
-              Únete a nuestra comunidad y descubre cómo la inteligencia artificial puede potenciar tus resultados.
+              Join our community and discover how artificial intelligence can enhance your results.
             </p>
             <Button
               onClick={() => setLocation('/signup')}
               size="lg"
               className="bg-black text-white hover:bg-gray-800"
             >
-              Comenzar ahora
+              Get Started Now
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </div>
