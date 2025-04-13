@@ -48,8 +48,7 @@ export function countRepetitions(
   exerciseType: string = 'generic',
   sensitivity: number = 0.6
 ): { count: number; confidence: number } {
-  // In a real implementation, this would analyze the audio for repetition patterns
-  // For a prototype, we'll use a simplified algorithm that detects amplitude peaks
+  // Enhanced rep counting algorithm with temporal and amplitude pattern analysis
   
   // Convert buffer to array of audio samples (assuming 16-bit PCM mono audio)
   const samples = [];
@@ -71,48 +70,114 @@ export function countRepetitions(
     rmsValues.push(rms);
   }
   
-  // Apply threshold based on sensitivity
-  const maxRms = Math.max(...rmsValues);
-  const threshold = maxRms * (1 - sensitivity);
+  // Apply adaptive thresholding based on sensitivity and noise floor
+  const sortedRms = [...rmsValues].sort((a, b) => a - b);
+  const noiseFloor = sortedRms[Math.floor(sortedRms.length * 0.1)]; // 10th percentile as noise floor
+  const signalCeiling = sortedRms[Math.floor(sortedRms.length * 0.9)]; // 90th percentile as signal ceiling
   
-  // Detect peaks (repetitions)
+  // Calculate dynamic threshold using sensitivity parameter
+  const dynamicRange = signalCeiling - noiseFloor;
+  const threshold = noiseFloor + (dynamicRange * (1 - sensitivity));
+  
+  // Apply moving average filter to smooth the RMS values
+  const smoothingWindow = 3;
+  const smoothedRms = [];
+  
+  for (let i = 0; i < rmsValues.length; i++) {
+    let sum = 0;
+    let count = 0;
+    
+    for (let j = Math.max(0, i - smoothingWindow); j <= Math.min(rmsValues.length - 1, i + smoothingWindow); j++) {
+      sum += rmsValues[j];
+      count++;
+    }
+    
+    smoothedRms.push(sum / count);
+  }
+  
+  // Detect peaks with minimum time between repetitions based on exercise type
   let isPeak = false;
   let repCount = 0;
+  let lastPeakIndex = -1;
+  let minSamplesBetweenPeaks = 0;
   
-  for (const rms of rmsValues) {
+  // Set minimum time between peaks based on exercise type
+  switch (exerciseType.toLowerCase()) {
+    case 'pushup':
+      minSamplesBetweenPeaks = 8; // Slower movement
+      break;
+    case 'squat':
+      minSamplesBetweenPeaks = 7;
+      break;
+    case 'crunch':
+      minSamplesBetweenPeaks = 7;
+      break;
+    case 'jumping_jack':
+      minSamplesBetweenPeaks = 5; // Faster movement
+      break;
+    default:
+      minSamplesBetweenPeaks = 6;
+  }
+  
+  // Detect repetitions using peak detection with minimum distance constraint
+  for (let i = 0; i < smoothedRms.length; i++) {
+    const rms = smoothedRms[i];
+    
+    // Check if this is a potential peak
     if (rms > threshold && !isPeak) {
-      isPeak = true;
-      repCount++;
+      // Ensure minimum time has passed since last peak
+      if (lastPeakIndex === -1 || (i - lastPeakIndex) >= minSamplesBetweenPeaks) {
+        isPeak = true;
+        repCount++;
+        lastPeakIndex = i;
+      }
     } else if (rms <= threshold) {
       isPeak = false;
     }
   }
   
-  // Adjust count based on exercise type
+  // Exercise-specific pattern recognition and adjustments
   let adjustedCount = repCount;
   let confidence = 0.8; // Base confidence level
   
-  // Apply exercise-specific adjustments
+  // Apply exercise-specific adjustments based on known patterns
   switch (exerciseType.toLowerCase()) {
     case 'pushup':
-      // Typically slower, may need to reduce count
-      adjustedCount = Math.max(1, Math.floor(repCount * 0.7));
+      // Pushups typically have a consistent pattern with clear peaks and valleys
+      // They tend to be slower, so we apply a modest correction factor
+      adjustedCount = Math.max(1, Math.round(repCount * 0.9));
+      confidence = 0.88;
+      break;
+      
+    case 'squat':
+      // Squats have a similar pattern to pushups but can vary more in intensity
+      adjustedCount = Math.max(1, Math.round(repCount * 0.95));
       confidence = 0.85;
       break;
-    case 'squat':
-      // Similar adjustment for squats
-      adjustedCount = Math.max(1, Math.floor(repCount * 0.8));
-      confidence = 0.82;
-      break;
+      
     case 'jumping_jack':
-      // Faster exercise, usually more peaks
-      adjustedCount = Math.max(1, Math.floor(repCount * 0.5));
+      // Jumping jacks create multiple sound patterns per rep, so we need a stronger correction
+      adjustedCount = Math.max(1, Math.round(repCount * 0.65));
+      confidence = 0.80;
+      break;
+      
+    case 'crunch':
+      // Crunches are quieter with less distinct audio patterns
+      adjustedCount = Math.max(1, Math.round(repCount * 0.85));
       confidence = 0.75;
       break;
+      
     default:
-      // Generic exercise, simple threshold
-      adjustedCount = Math.max(1, Math.floor(repCount * 0.6));
-      confidence = 0.7;
+      // Generic exercise, apply moderate correction
+      adjustedCount = Math.max(1, Math.round(repCount * 0.8));
+      confidence = 0.70;
+  }
+  
+  // Apply anti-jitter logic
+  if (adjustedCount <= 2 && confidence < 0.75) {
+    // For very low counts with low confidence, they're likely noise
+    adjustedCount = 0;
+    confidence = 0.5;
   }
   
   return {
@@ -134,8 +199,10 @@ export function generateCoachingResponse(
   exerciseType: string,
   isComplete: boolean = false
 ): string {
-  // Dictionary of encouragement phrases
-  const encouragement = [
+  // Enhanced coaching responses with exercise-specific feedback
+  
+  // Base encouragement phrases
+  const generalEncouragement = [
     "Great job! Keep it up!",
     "You're doing great!",
     "Excellent form!",
@@ -146,8 +213,57 @@ export function generateCoachingResponse(
     "Awesome work!"
   ];
   
-  // Dictionary of completion phrases
-  const completion = [
+  // Exercise-specific encouragement
+  const exerciseEncouragement: Record<string, string[]> = {
+    'pushup': [
+      "Keep your core tight!",
+      "Lower your chest all the way down!",
+      "Drive through your palms!",
+      "Maintain a straight back!",
+      "Control the movement!",
+      "Full range of motion, you're doing great!",
+      "Breathe out as you push up!"
+    ],
+    'squat': [
+      "Drive through your heels!",
+      "Keep your chest up!",
+      "Knees tracking over toes!",
+      "Go deeper if you can!",
+      "Engage your glutes!",
+      "Keep your back straight!",
+      "Push your knees out as you descend!"
+    ],
+    'jumping_jack': [
+      "Full extension on jumps!",
+      "Land softly on your feet!",
+      "Keep your arms straight!",
+      "Engage your core!",
+      "Higher energy, you've got this!",
+      "Maintain your rhythm!",
+      "Breathe with each movement!"
+    ],
+    'crunch': [
+      "Engage your abs!",
+      "Focus on contracting your core!",
+      "Controlled movement, that's it!",
+      "Keep your neck relaxed!",
+      "Exhale as you come up!",
+      "Quality over quantity!",
+      "Feel each rep in your abs!"
+    ]
+  };
+  
+  // Progress-based encouragement
+  const progressEncouragement = [
+    "You're more than halfway there!",
+    "Just a few more reps to go!",
+    "You're almost at your goal!",
+    "Final push, you can do it!",
+    "Finish strong, nearly there!"
+  ];
+  
+  // Completion phrases with exercise-specific benefits
+  const generalCompletion = [
     "Set complete! Great work!",
     "Excellent job completing that set!",
     "You crushed it! Set complete!",
@@ -157,14 +273,60 @@ export function generateCoachingResponse(
     "That's a wrap on this set! Keep up the good work!"
   ];
   
-  const randomEncouragement = encouragement[Math.floor(Math.random() * encouragement.length)];
-  const randomCompletion = completion[Math.floor(Math.random() * completion.length)];
+  // Exercise-specific completion feedback
+  const exerciseCompletion: Record<string, string[]> = {
+    'pushup': [
+      "Great job on those push-ups! You're building upper body strength!",
+      "Push-up set complete! You're strengthening your chest, shoulders, and arms!",
+      "Push-ups done! You're improving your core stability!"
+    ],
+    'squat': [
+      "Squat set complete! You're building powerful legs!",
+      "Great squats! You're strengthening your entire lower body!",
+      "Squats finished! You're developing functional strength for everyday movements!"
+    ],
+    'jumping_jack': [
+      "Jumping jacks complete! Great cardio work!",
+      "Jumping jacks done! You've boosted your heart rate and coordination!",
+      "Great work on the jumping jacks! You're improving your cardiovascular fitness!"
+    ],
+    'crunch': [
+      "Crunches complete! Your core is getting stronger!",
+      "Great job on those crunches! You're building abdominal definition!",
+      "Crunches done! You're strengthening your core stabilizers!"
+    ]
+  };
+  
+  // Get appropriate encouragement based on exercise type
+  const specificEncouragement = exerciseEncouragement[exerciseType.toLowerCase()] || generalEncouragement;
+  
+  // Select random encouragement phrase from the specific list or general list
+  const allEncouragementOptions = [...specificEncouragement, ...generalEncouragement];
+  const randomEncouragement = allEncouragementOptions[Math.floor(Math.random() * allEncouragementOptions.length)];
+  
+  // Get appropriate completion feedback based on exercise type
+  const specificCompletion = exerciseCompletion[exerciseType.toLowerCase()] || [];
+  
+  // Select random completion phrase from combined list
+  const allCompletionOptions = [...specificCompletion, ...generalCompletion];
+  const randomCompletion = allCompletionOptions[Math.floor(Math.random() * allCompletionOptions.length)];
+  
+  // Format the exercise type for better speech
+  const formattedExerciseType = exerciseType.toLowerCase()
+    .replace('_', ' ')
+    .replace('pushup', 'push-up')
+    .replace('jumping_jack', 'jumping jack');
   
   if (isComplete) {
-    return `${randomCompletion} You completed ${repCount} ${exerciseType} repetitions.`;
+    return `${randomCompletion} You completed ${repCount} ${formattedExerciseType} repetitions.`;
   } else if (repCount === 0) {
-    return `I'm listening for your ${exerciseType}. Start when you're ready.`;
+    // Starting guidance
+    return `I'm listening for your ${formattedExerciseType}s. Start when you're ready.`;
+  } else if (repCount % 5 === 0) {
+    // Milestone encouragement (every 5 reps)
+    return `${repCount}! ${progressEncouragement[Math.floor(Math.random() * progressEncouragement.length)]}`;
   } else {
+    // Regular counting with encouragement
     return `${repCount}... ${randomEncouragement}`;
   }
 }
