@@ -1,102 +1,75 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'wouter';
+import React from 'react';
+import { useLocation } from 'wouter';
 import AdminPanel from '../components/AdminPanel';
 
-// Simple admin authentication check - would be replaced with real auth in production
-const isAdmin = (): boolean => {
-  // In a real app, this would check a token, cookie, or server-side auth
-  return true; // For demo purposes always return true
-};
-
+/**
+ * Admin panel page component
+ * Hosts the admin panel for managing users and access codes
+ */
 const AdminPanelPage: React.FC = () => {
-  const [authenticated, setAuthenticated] = useState<boolean>(false);
   const [, setLocation] = useLocation();
   
-  // Check admin status on component mount
-  useEffect(() => {
-    const adminStatus = isAdmin();
-    
-    if (adminStatus) {
-      setAuthenticated(true);
-    } else {
-      // Redirect non-admins to the home page
-      setLocation('/');
-    }
-  }, [setLocation]);
-  
-  // If not authenticated, show loading state
-  if (!authenticated) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
-        <div className="text-center">
-          <div className="animate-spin w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-400">Verifying admin access...</p>
-        </div>
-      </div>
-    );
-  }
-  
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex flex-col">
       <header className="bg-white dark:bg-gray-800 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16 items-center">
             <div className="flex-shrink-0 flex items-center">
-              <Link href="/">
-                <a className="flex items-center space-x-2">
-                  <span className="text-2xl">🏋️</span>
-                  <span className="font-bold text-xl">Fitness AI</span>
-                </a>
-              </Link>
+              <div 
+                onClick={() => setLocation('/')}
+                className="cursor-pointer flex items-center space-x-2"
+              >
+                <span className="text-2xl">🏋️</span>
+                <span className="font-bold text-xl">Fitness AI</span>
+              </div>
             </div>
             
             <nav className="hidden md:flex space-x-8">
-              <Link href="/dashboard">
-                <a className="px-3 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
-                  Dashboard
-                </a>
-              </Link>
-              <Link href="/admin">
-                <a className="px-3 py-2 text-sm font-medium rounded-md bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-100">
-                  Admin Panel
-                </a>
-              </Link>
-              <Link href="/stats">
-                <a className="px-3 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
-                  Analytics
-                </a>
-              </Link>
-              <Link href="/settings">
-                <a className="px-3 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white">
-                  Settings
-                </a>
-              </Link>
+              <div
+                onClick={() => setLocation('/access')}
+                className="cursor-pointer px-3 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+              >
+                Access Code
+              </div>
+              <div
+                onClick={() => setLocation('/dashboard')}
+                className="cursor-pointer px-3 py-2 text-sm font-medium rounded-md text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white"
+              >
+                Dashboard
+              </div>
+              <div
+                className="cursor-pointer px-3 py-2 text-sm font-medium rounded-md bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-100"
+              >
+                Admin
+              </div>
             </nav>
             
-            <div className="flex items-center">
-              <div className="w-8 h-8 rounded-full bg-purple-600 flex items-center justify-center text-white font-medium">
-                A
-              </div>
-              <span className="ml-2 text-sm font-medium hidden md:block">
-                Admin
-              </span>
+            <div className="md:hidden">
+              {/* Mobile menu button */}
+              <button className="p-2 rounded-md text-gray-500 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white focus:outline-none">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+              </button>
             </div>
           </div>
         </div>
       </header>
       
-      <main>
-        <AdminPanel />
+      <main className="flex-grow">
+        <div className="py-6">
+          <AdminPanel />
+        </div>
       </main>
       
-      <footer className="bg-white dark:bg-gray-800 shadow-sm mt-8 py-6">
+      <footer className="bg-white dark:bg-gray-800 shadow-sm py-6">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center text-sm text-gray-500 dark:text-gray-400">
             <p>&copy; 2025 Fitness AI. All rights reserved.</p>
             <div className="mt-2 flex justify-center space-x-6">
-              <a href="#" className="hover:text-gray-900 dark:hover:text-gray-100">Admin Documentation</a>
-              <a href="#" className="hover:text-gray-900 dark:hover:text-gray-100">API Reference</a>
-              <a href="#" className="hover:text-gray-900 dark:hover:text-gray-100">Support</a>
+              <a href="#" className="hover:text-gray-900 dark:hover:text-gray-100">Privacy Policy</a>
+              <a href="#" className="hover:text-gray-900 dark:hover:text-gray-100">Terms of Service</a>
+              <a href="#" className="hover:text-gray-900 dark:hover:text-gray-100">Contact Us</a>
             </div>
           </div>
         </div>

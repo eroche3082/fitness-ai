@@ -1,160 +1,241 @@
-// userService.ts
-// This service handles user profiles, leads, and code validation
+// User profile and lead management service
+import { UserCategory } from '../shared/types';
+import { generateUniqueCode } from './userCodeGenerator';
 
-import { UserProfile, generateUserCode, UserCategory } from './userCodeGenerator';
-
-// Define LeadInfo interface
+// Lead information type
 export interface LeadInfo {
   id: string;
   name: string;
   email: string;
   phone?: string;
   uniqueCode: string;
-  category: string;
+  category: string; // BEG, INT, ADV, PRO, VIP
   date: string;
   source: string;
 }
 
-// Simple in-memory storage for demo purposes
-let storedLeads: LeadInfo[] = [
-  {
-    id: '1',
-    name: 'John Smith',
-    email: 'john@example.com',
-    phone: '555-123-4567',
-    uniqueCode: 'FIT-BEG-1234',
-    category: 'BEG',
-    date: '2025-04-10T14:30:00.000Z',
-    source: 'Website'
-  },
-  {
-    id: '2',
-    name: 'Sarah Jones',
-    email: 'sarah@example.com',
-    uniqueCode: 'FIT-ADV-5678',
-    category: 'ADV',
-    date: '2025-04-11T09:15:00.000Z',
-    source: 'Mobile App'
-  },
-  {
-    id: '3',
-    name: 'Alex Wong',
-    email: 'alex@example.com',
-    phone: '555-987-6543',
-    uniqueCode: 'FIT-INT-9012',
-    category: 'INT',
-    date: '2025-04-12T16:45:00.000Z',
-    source: 'Partner Referral'
-  }
-];
+// User profile type
+export interface UserProfile {
+  id: string;
+  name: string;
+  email: string;
+  phone?: string;
+  uniqueCode: string;
+  category: UserCategory;
+  onboardingCompleted: boolean;
+  fitnessGoals: string[];
+  preferredActivities: string[];
+  dateCreated: string;
+  lastLogin: string;
+}
 
-// Store the current user profile
-let currentUserProfile: UserProfile | null = null;
+// Storage keys for localStorage
+const STORAGE_KEYS = {
+  LEADS: 'fitness_ai_leads',
+  USER_PROFILE: 'fitness_ai_user_profile',
+};
 
+// In-memory user service with localStorage persistence
 const userService = {
-  // Lead Management
+  // Save a new lead to the system
   saveLead: (leadInfo: LeadInfo): void => {
-    // Check if lead already exists by email
-    const existingLeadIndex = storedLeads.findIndex(lead => lead.email === leadInfo.email);
+    // Get existing leads
+    const existingLeads = userService.getLeads();
     
-    if (existingLeadIndex >= 0) {
-      // Update existing lead
-      storedLeads[existingLeadIndex] = {
-        ...storedLeads[existingLeadIndex],
-        ...leadInfo,
-        date: new Date().toISOString() // Update timestamp
-      };
-    } else {
-      // Create new lead
-      storedLeads.push({
-        ...leadInfo,
-        id: String(storedLeads.length + 1),
-        date: new Date().toISOString()
-      });
-    }
+    // Add new lead
+    existingLeads.push(leadInfo);
+    
+    // Save to localStorage
+    localStorage.setItem(STORAGE_KEYS.LEADS, JSON.stringify(existingLeads));
   },
   
+  // Get all leads
   getLeads: (): LeadInfo[] => {
-    return [...storedLeads]; // Return a copy to avoid direct mutations
+    // Get from localStorage or return empty array
+    const leadsJson = localStorage.getItem(STORAGE_KEYS.LEADS);
+    return leadsJson ? JSON.parse(leadsJson) : [];
   },
   
-  // User Profile Management
+  // Save user profile
   saveUserProfile: (profile: UserProfile): void => {
-    // In a real app, this would save to a database and might link to a user account
-    currentUserProfile = { ...profile };
-    
-    // Also create a lead record for this user
-    const leadInfo: LeadInfo = {
-      id: String(storedLeads.length + 1),
-      name: profile.name,
-      email: profile.email,
-      uniqueCode: profile.uniqueCode,
-      category: profile.category,
-      date: new Date().toISOString(),
-      source: 'Assessment'
-    };
-    
-    userService.saveLead(leadInfo);
+    localStorage.setItem(STORAGE_KEYS.USER_PROFILE, JSON.stringify(profile));
   },
   
+  // Get user profile
   getUserProfile: (): UserProfile | null => {
-    // In a real app, this would fetch from a database or API
-    return currentUserProfile ? { ...currentUserProfile } : null;
+    const profileJson = localStorage.getItem(STORAGE_KEYS.USER_PROFILE);
+    return profileJson ? JSON.parse(profileJson) : null;
   },
   
+  // Clear user profile (logout)
   clearUserProfile: (): void => {
-    currentUserProfile = null;
+    localStorage.removeItem(STORAGE_KEYS.USER_PROFILE);
   },
   
-  // Access Code Validation
-  validateCode: async (code: string): Promise<{ valid: boolean; userProfile?: UserProfile }> => {
-    // In a real app, this would validate against a database
-    // For demo purposes, check against stored leads
+  // Validate an access code
+  validateCode: async (code: string): Promise<{ 
+    valid: boolean, 
+    userProfile?: UserProfile 
+  }> => {
+    // Simulate API call delay
+    await new Promise(resolve => setTimeout(resolve, 800));
     
-    // Simulate network delay
-    await new Promise(resolve => setTimeout(resolve, 500));
+    // Get all leads
+    const allLeads = userService.getLeads();
     
-    const matchingLead = storedLeads.find(lead => lead.uniqueCode === code);
+    // Find lead with matching code
+    const matchingLead = allLeads.find(lead => 
+      lead.uniqueCode.toLowerCase() === code.toLowerCase()
+    );
     
-    if (matchingLead) {
-      // Create a user profile from the lead
-      const userProfile: UserProfile = {
-        name: matchingLead.name,
-        email: matchingLead.email,
-        uniqueCode: matchingLead.uniqueCode,
-        category: matchingLead.category as UserCategory,
-        onboardingCompleted: true,
-        fitnessGoals: ['Strength', 'Endurance'],
-        preferredActivities: ['Running', 'Weight Training']
-      };
+    if (!matchingLead) {
+      // If using mock data and no leads exist yet, accept any FIT- code that matches pattern
+      if (allLeads.length === 0 && code.match(/^FIT-[A-Z]{3}-\d{4}$/)) {
+        // Create a mock lead for demo purposes
+        const parts = code.split('-');
+        const category = parts[1];
+        
+        const mockProfile: UserProfile = {
+          id: '1',
+          name: 'Demo User',
+          email: 'demo@example.com',
+          uniqueCode: code.toUpperCase(),
+          category: category as UserCategory,
+          onboardingCompleted: true,
+          fitnessGoals: ['Lose weight', 'Build strength'],
+          preferredActivities: ['Running', 'Weight training'],
+          dateCreated: new Date().toISOString(),
+          lastLogin: new Date().toISOString(),
+        };
+        
+        // Save the profile
+        userService.saveUserProfile(mockProfile);
+        
+        // Create a corresponding lead
+        const mockLead: LeadInfo = {
+          id: '1',
+          name: 'Demo User',
+          email: 'demo@example.com',
+          uniqueCode: code.toUpperCase(),
+          category,
+          date: new Date().toISOString(),
+          source: 'Demo',
+        };
+        
+        userService.saveLead(mockLead);
+        
+        return { valid: true, userProfile: mockProfile };
+      }
       
-      // Store the current user
-      currentUserProfile = userProfile;
-      
-      return {
-        valid: true,
-        userProfile
-      };
+      return { valid: false };
     }
     
-    return {
-      valid: false
+    // Create or update user profile from lead info
+    const userProfile: UserProfile = {
+      id: matchingLead.id,
+      name: matchingLead.name,
+      email: matchingLead.email,
+      phone: matchingLead.phone,
+      uniqueCode: matchingLead.uniqueCode,
+      category: matchingLead.category as UserCategory,
+      onboardingCompleted: true,
+      fitnessGoals: [],
+      preferredActivities: [],
+      dateCreated: matchingLead.date,
+      lastLogin: new Date().toISOString(),
     };
+    
+    // Save the profile
+    userService.saveUserProfile(userProfile);
+    
+    return { valid: true, userProfile };
   },
   
-  // Update user profile
+  // Update user profile with partial data
   updateUserProfile: (updates: Partial<UserProfile>): UserProfile | null => {
-    if (!currentUserProfile) {
+    const currentProfile = userService.getUserProfile();
+    
+    if (!currentProfile) {
       return null;
     }
     
-    currentUserProfile = {
-      ...currentUserProfile,
-      ...updates
+    const updatedProfile = {
+      ...currentProfile,
+      ...updates,
+      lastLogin: new Date().toISOString(),
     };
     
-    return { ...currentUserProfile };
+    userService.saveUserProfile(updatedProfile);
+    
+    return updatedProfile;
+  },
+  
+  // Generate a new unique code for a user
+  generateAccessCode: (category: UserCategory): string => {
+    return generateUniqueCode(category);
+  },
+};
+
+// Initialize with sample data for demo purposes
+const initializeSampleData = () => {
+  // Only initialize if no data exists
+  if (userService.getLeads().length === 0) {
+    const sampleLeads: LeadInfo[] = [
+      {
+        id: '1',
+        name: 'Carlos Rodriguez',
+        email: 'carlos@example.com',
+        phone: '+34 612 345 678',
+        uniqueCode: 'FIT-INT-1234',
+        category: 'INT',
+        date: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(), // 15 days ago
+        source: 'Website',
+      },
+      {
+        id: '2',
+        name: 'Maria Garcia',
+        email: 'maria@example.com',
+        uniqueCode: 'FIT-BEG-5678',
+        category: 'BEG',
+        date: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(), // 5 days ago
+        source: 'Mobile App',
+      },
+      {
+        id: '3',
+        name: 'Ana Martinez',
+        email: 'ana@example.com',
+        phone: '+34 632 456 789',
+        uniqueCode: 'FIT-ADV-9012',
+        category: 'ADV',
+        date: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(), // 1 day ago
+        source: 'Referral',
+      },
+      {
+        id: '4',
+        name: 'Javier Lopez',
+        email: 'javier@example.com',
+        uniqueCode: 'FIT-PRO-3456',
+        category: 'PRO',
+        date: new Date().toISOString(), // Today
+        source: 'Social Media',
+      },
+      {
+        id: '5',
+        name: 'Laura Fernandez',
+        email: 'laura@example.com',
+        phone: '+34 654 321 987',
+        uniqueCode: 'FIT-VIP-7890',
+        category: 'VIP',
+        date: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(), // 7 days ago
+        source: 'Partner Gym',
+      },
+    ];
+    
+    localStorage.setItem(STORAGE_KEYS.LEADS, JSON.stringify(sampleLeads));
   }
 };
+
+// Initialize sample data
+initializeSampleData();
 
 export default userService;

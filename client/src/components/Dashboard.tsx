@@ -1,547 +1,685 @@
 import React, { useState, useEffect } from 'react';
+import { UserCategory } from '../shared/types';
 import QRCodeDisplay from './QRCodeDisplay';
-import { useLocation } from 'wouter';
+import userService from '../lib/userService';
+import { generateUniqueCode } from '../lib/userCodeGenerator';
 
-export interface DashboardProps {
+interface DashboardProps {
   userCode: string;
 }
 
 const Dashboard: React.FC<DashboardProps> = ({ userCode }) => {
   const [activeTab, setActiveTab] = useState('journey');
-  const [, setLocation] = useLocation();
+  const [userProfile, setUserProfile] = useState<any>(null);
+  const [fitnessStats, setFitnessStats] = useState({
+    workoutsCompleted: 0,
+    totalMinutes: 0,
+    caloriesBurned: 0,
+    currentStreak: 0,
+  });
   
-  // Mock journey data - would come from API in real app
-  const journeySteps = [
-    { id: 1, title: 'Assessment Complete', date: '2025-04-10', status: 'completed' },
-    { id: 2, title: 'Initial Plan Created', date: '2025-04-11', status: 'completed' },
-    { id: 3, title: 'Week 1 Workouts', date: '2025-04-12', status: 'in-progress' },
-    { id: 4, title: 'First Milestone', date: '2025-04-17', status: 'upcoming' },
-    { id: 5, title: 'Progress Review', date: '2025-04-24', status: 'upcoming' },
-  ];
+  useEffect(() => {
+    // Get user profile from service
+    const profile = userService.getUserProfile();
+    if (profile) {
+      setUserProfile(profile);
+      
+      // In a real app, we would fetch these stats from an API
+      // For demo, generate random stats based on user's category
+      generateMockStats(profile.category);
+    }
+  }, [userCode]);
   
-  // Mock data for statistics - would come from API in real app
-  const stats = [
-    { id: 'workouts', label: 'Workouts', value: 4, unit: '', change: '+2', trend: 'up' },
-    { id: 'duration', label: 'Avg. Duration', value: 42, unit: 'min', change: '+5', trend: 'up' },
-    { id: 'calories', label: 'Calories Burned', value: 1250, unit: 'kcal', change: '+200', trend: 'up' },
-    { id: 'streak', label: 'Current Streak', value: 3, unit: 'days', change: '+1', trend: 'up' },
-  ];
-  
-  // Extract category from code (e.g., "FIT-BEG-1234" => "BEG")
-  const getCategory = (code: string): string => {
-    const parts = code.split('-');
-    return parts.length > 1 ? parts[1] : 'N/A';
+  // Generate mock stats for demo purposes
+  const generateMockStats = (category: UserCategory) => {
+    let multiplier = 1;
+    
+    switch (category) {
+      case 'beginner':
+        multiplier = 1;
+        break;
+      case 'intermediate':
+        multiplier = 2;
+        break;
+      case 'advanced':
+        multiplier = 3;
+        break;
+      case 'professional':
+        multiplier = 4;
+        break;
+      default:
+        multiplier = 1;
+    }
+    
+    setFitnessStats({
+      workoutsCompleted: Math.floor(5 * multiplier + Math.random() * 5),
+      totalMinutes: Math.floor(120 * multiplier + Math.random() * 60),
+      caloriesBurned: Math.floor(1200 * multiplier + Math.random() * 300),
+      currentStreak: Math.floor(2 * multiplier + Math.random() * 3),
+    });
   };
   
-  // Format category name
-  const formatCategory = (categoryCode: string): string => {
-    const categories: Record<string, string> = {
-      'BEG': 'Beginner',
-      'INT': 'Intermediate',
-      'ADV': 'Advanced',
-      'PRO': 'Professional',
-      'VIP': 'VIP Member'
+  // Render different content based on active tab
+  const renderTabContent = () => {
+    switch (activeTab) {
+      case 'journey':
+        return renderJourneyTab();
+      case 'stats':
+        return renderStatsTab();
+      case 'plan':
+        return renderPlanTab();
+      case 'trackers':
+        return renderTrackersTab();
+      default:
+        return renderJourneyTab();
+    }
+  };
+  
+  // Journey tab content
+  const renderJourneyTab = () => {
+    if (!userProfile) return null;
+    
+    return (
+      <div className="space-y-6">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+          <h2 className="text-xl font-semibold mb-4">Welcome Back, {userProfile.name}</h2>
+          <div className="flex items-center gap-4">
+            <div className="bg-gray-100 dark:bg-gray-700 rounded-md p-3">
+              <QRCodeDisplay code={userProfile.uniqueCode} size={100} />
+            </div>
+            <div>
+              <div className="text-sm text-gray-500 dark:text-gray-400">Your Fitness AI Code</div>
+              <div className="text-lg font-medium">{userProfile.uniqueCode}</div>
+              <div className="mt-1 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                {userProfile.category.charAt(0).toUpperCase() + userProfile.category.slice(1)}
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+            <h3 className="text-lg font-medium mb-4">Daily Progress</h3>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="bg-gray-50 dark:bg-gray-700 rounded-md p-4 text-center">
+                <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                  {fitnessStats.currentStreak}
+                </div>
+                <div className="text-sm text-gray-500 dark:text-gray-400">Day Streak</div>
+              </div>
+              <div className="bg-gray-50 dark:bg-gray-700 rounded-md p-4 text-center">
+                <div className="text-2xl font-bold text-green-600 dark:text-green-400">
+                  {Math.round(fitnessStats.workoutsCompleted * 20)}%
+                </div>
+                <div className="text-sm text-gray-500 dark:text-gray-400">Goal Progress</div>
+              </div>
+            </div>
+            <div className="mt-4">
+              <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Today's Focus</h4>
+              <div className="bg-blue-50 dark:bg-blue-900 p-3 rounded-md">
+                <p className="text-sm text-blue-800 dark:text-blue-200">
+                  {userProfile.category === 'beginner' 
+                    ? 'Focus on your form in each exercise today. Quality over quantity!'
+                    : userProfile.category === 'intermediate'
+                    ? 'Push yourself with progressive overload today. Try to increase your weights slightly.'
+                    : userProfile.category === 'advanced'
+                    ? 'Focus on muscle mind connection today. Feel each rep and maintain tension.'
+                    : 'Recovery is key today. Focus on mobility work and proper nutrition.'
+                  }
+                </p>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+            <h3 className="text-lg font-medium mb-4">Weekly Summary</h3>
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="text-sm text-gray-600 dark:text-gray-400">Workouts Completed</div>
+                <div className="font-medium">{fitnessStats.workoutsCompleted}</div>
+              </div>
+              <div className="flex items-center justify-between">
+                <div className="text-sm text-gray-600 dark:text-gray-400">Total Minutes</div>
+                <div className="font-medium">{fitnessStats.totalMinutes}</div>
+              </div>
+              <div className="flex items-center justify-between">
+                <div className="text-sm text-gray-600 dark:text-gray-400">Calories Burned</div>
+                <div className="font-medium">{fitnessStats.caloriesBurned}</div>
+              </div>
+              <div className="flex items-center justify-between">
+                <div className="text-sm text-gray-600 dark:text-gray-400">Average Workout Duration</div>
+                <div className="font-medium">{Math.round(fitnessStats.totalMinutes / (fitnessStats.workoutsCompleted || 1))} min</div>
+              </div>
+            </div>
+            <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+              <div className="flex justify-between items-center">
+                <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Weekly Goal Progress</span>
+                <span className="text-sm text-gray-600 dark:text-gray-400">{fitnessStats.workoutsCompleted}/5 workouts</span>
+              </div>
+              <div className="mt-2 h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-blue-600 rounded-full"
+                  style={{ width: `${Math.min(100, (fitnessStats.workoutsCompleted / 5) * 100)}%` }}
+                ></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+          <h3 className="text-lg font-medium mb-4">Upcoming Workouts</h3>
+          <div className="space-y-3">
+            <div className="flex items-center p-3 bg-gray-50 dark:bg-gray-700 rounded-md">
+              <div className="bg-blue-100 dark:bg-blue-900 rounded-md p-2 mr-4">
+                <span className="text-blue-800 dark:text-blue-200 text-xl">💪</span>
+              </div>
+              <div className="flex-1">
+                <h4 className="font-medium">Upper Body Strength</h4>
+                <p className="text-sm text-gray-500 dark:text-gray-400">Tomorrow, 45 minutes</p>
+              </div>
+              <button className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm">
+                View
+              </button>
+            </div>
+            <div className="flex items-center p-3 bg-gray-50 dark:bg-gray-700 rounded-md">
+              <div className="bg-green-100 dark:bg-green-900 rounded-md p-2 mr-4">
+                <span className="text-green-800 dark:text-green-200 text-xl">🏃</span>
+              </div>
+              <div className="flex-1">
+                <h4 className="font-medium">HIIT Cardio Session</h4>
+                <p className="text-sm text-gray-500 dark:text-gray-400">Wednesday, 30 minutes</p>
+              </div>
+              <button className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm">
+                View
+              </button>
+            </div>
+            <div className="flex items-center p-3 bg-gray-50 dark:bg-gray-700 rounded-md">
+              <div className="bg-purple-100 dark:bg-purple-900 rounded-md p-2 mr-4">
+                <span className="text-purple-800 dark:text-purple-200 text-xl">🧘</span>
+              </div>
+              <div className="flex-1">
+                <h4 className="font-medium">Recovery & Mobility</h4>
+                <p className="text-sm text-gray-500 dark:text-gray-400">Friday, 30 minutes</p>
+              </div>
+              <button className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm">
+                View
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+  
+  // Stats tab content
+  const renderStatsTab = () => {
+    return (
+      <div className="space-y-6">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+          <h2 className="text-xl font-semibold mb-4">Fitness Statistics</h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="bg-blue-50 dark:bg-blue-900 rounded-md p-4 text-center">
+              <div className="text-3xl font-bold text-blue-600 dark:text-blue-300">
+                {fitnessStats.workoutsCompleted}
+              </div>
+              <div className="text-sm text-blue-800 dark:text-blue-200">Workouts</div>
+            </div>
+            <div className="bg-green-50 dark:bg-green-900 rounded-md p-4 text-center">
+              <div className="text-3xl font-bold text-green-600 dark:text-green-300">
+                {fitnessStats.totalMinutes}
+              </div>
+              <div className="text-sm text-green-800 dark:text-green-200">Minutes</div>
+            </div>
+            <div className="bg-orange-50 dark:bg-orange-900 rounded-md p-4 text-center">
+              <div className="text-3xl font-bold text-orange-600 dark:text-orange-300">
+                {fitnessStats.caloriesBurned}
+              </div>
+              <div className="text-sm text-orange-800 dark:text-orange-200">Calories</div>
+            </div>
+            <div className="bg-purple-50 dark:bg-purple-900 rounded-md p-4 text-center">
+              <div className="text-3xl font-bold text-purple-600 dark:text-purple-300">
+                {fitnessStats.currentStreak}
+              </div>
+              <div className="text-sm text-purple-800 dark:text-purple-200">Streak</div>
+            </div>
+          </div>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+            <h3 className="text-lg font-medium mb-4">Workout Distribution</h3>
+            <div className="h-64 flex items-end justify-between">
+              <div className="w-1/5">
+                <div className="bg-blue-600 h-32 rounded-t-md"></div>
+                <div className="text-center mt-2 text-sm text-gray-600 dark:text-gray-400">Mon</div>
+              </div>
+              <div className="w-1/5">
+                <div className="bg-blue-600 h-20 rounded-t-md"></div>
+                <div className="text-center mt-2 text-sm text-gray-600 dark:text-gray-400">Tue</div>
+              </div>
+              <div className="w-1/5">
+                <div className="bg-blue-600 h-48 rounded-t-md"></div>
+                <div className="text-center mt-2 text-sm text-gray-600 dark:text-gray-400">Wed</div>
+              </div>
+              <div className="w-1/5">
+                <div className="bg-blue-600 h-16 rounded-t-md"></div>
+                <div className="text-center mt-2 text-sm text-gray-600 dark:text-gray-400">Thu</div>
+              </div>
+              <div className="w-1/5">
+                <div className="bg-blue-600 h-40 rounded-t-md"></div>
+                <div className="text-center mt-2 text-sm text-gray-600 dark:text-gray-400">Fri</div>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+            <h3 className="text-lg font-medium mb-4">Exercise Types</h3>
+            <div className="space-y-4">
+              <div>
+                <div className="flex justify-between mb-1">
+                  <div className="text-sm font-medium text-gray-700 dark:text-gray-300">Strength</div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400">65%</div>
+                </div>
+                <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                  <div className="h-full bg-blue-600 rounded-full" style={{ width: '65%' }}></div>
+                </div>
+              </div>
+              <div>
+                <div className="flex justify-between mb-1">
+                  <div className="text-sm font-medium text-gray-700 dark:text-gray-300">Cardio</div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400">25%</div>
+                </div>
+                <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                  <div className="h-full bg-green-600 rounded-full" style={{ width: '25%' }}></div>
+                </div>
+              </div>
+              <div>
+                <div className="flex justify-between mb-1">
+                  <div className="text-sm font-medium text-gray-700 dark:text-gray-300">Flexibility</div>
+                  <div className="text-sm text-gray-600 dark:text-gray-400">10%</div>
+                </div>
+                <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                  <div className="h-full bg-purple-600 rounded-full" style={{ width: '10%' }}></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+          <h3 className="text-lg font-medium mb-4">Progress Over Time</h3>
+          <div className="h-64 flex items-end pt-5 px-5">
+            {Array.from({ length: 10 }, (_, i) => (
+              <div key={i} className="flex-1 mx-1">
+                <div 
+                  className="bg-blue-600 rounded-t-sm" 
+                  style={{ height: `${20 + Math.floor(Math.random() * 80)}%` }}
+                ></div>
+                <div className="text-center mt-2 text-xs text-gray-600 dark:text-gray-400">
+                  Week {i+1}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  };
+  
+  // Plan tab content
+  const renderPlanTab = () => {
+    if (!userProfile) return null;
+    
+    // Customize plan based on user category
+    const plans = {
+      beginner: {
+        name: 'Foundation Builder',
+        weeks: 8,
+        focus: 'Building strength and establishing workout routine',
+        workoutsPerWeek: 3,
+      },
+      intermediate: {
+        name: 'Progressive Overload',
+        weeks: 12,
+        focus: 'Increasing strength and conditioning',
+        workoutsPerWeek: 4,
+      },
+      advanced: {
+        name: 'Performance Optimization',
+        weeks: 16,
+        focus: 'Advanced techniques and periodization',
+        workoutsPerWeek: 5,
+      },
+      professional: {
+        name: 'Elite Training System',
+        weeks: 20,
+        focus: 'Specialized training and recovery optimization',
+        workoutsPerWeek: 6,
+      }
     };
     
-    return categories[categoryCode] || categoryCode;
-  };
-  
-  // Get category color
-  const getCategoryColor = (categoryCode: string): string => {
-    const colors: Record<string, string> = {
-      'BEG': 'green',
-      'INT': 'blue',
-      'ADV': 'purple',
-      'PRO': 'orange',
-      'VIP': 'red'
-    };
+    const currentPlan = plans[userProfile.category] || plans.beginner;
     
-    return colors[categoryCode] || 'gray';
-  };
-  
-  const categoryCode = getCategory(userCode);
-  const categoryName = formatCategory(categoryCode);
-  const categoryColor = getCategoryColor(categoryCode);
-
-  return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 mb-6">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
-          <div>
-            <h1 className="text-2xl font-bold">Welcome to Your Fitness Dashboard</h1>
-            <p className="text-gray-600 dark:text-gray-400 mt-1">
-              Track your progress and access personalized workout plans
+    return (
+      <div className="space-y-6">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between">
+            <div>
+              <h2 className="text-xl font-semibold mb-1">{currentPlan.name}</h2>
+              <p className="text-gray-600 dark:text-gray-400">
+                {currentPlan.weeks} week program • {currentPlan.workoutsPerWeek}x per week
+              </p>
+            </div>
+            <div className="mt-4 md:mt-0">
+              <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                Week 3 of {currentPlan.weeks}
+              </span>
+            </div>
+          </div>
+          <div className="mt-6 pt-6 border-t border-gray-200 dark:border-gray-700">
+            <h3 className="text-lg font-medium mb-2">Program Focus</h3>
+            <p className="text-gray-700 dark:text-gray-300">
+              {currentPlan.focus}
             </p>
-          </div>
-          
-          <div className="flex items-center mt-4 md:mt-0">
-            <div className="mr-4 text-right">
-              <div className="text-sm text-gray-600 dark:text-gray-400">Your Plan</div>
-              <div className={`text-${categoryColor}-600 font-semibold`}>{categoryName}</div>
-            </div>
-            <div className="w-12 h-12 bg-gray-100 dark:bg-gray-700 rounded-md overflow-hidden">
-              <QRCodeDisplay 
-                code={userCode} 
-                size={48} 
-                background="#f3f4f6" 
-                foreground="#111827" 
-              />
+            <div className="mt-4 flex flex-wrap gap-2">
+              <span className="px-3 py-1 bg-gray-100 dark:bg-gray-700 rounded-full text-sm font-medium text-gray-800 dark:text-gray-200">
+                Progressive Overload
+              </span>
+              <span className="px-3 py-1 bg-gray-100 dark:bg-gray-700 rounded-full text-sm font-medium text-gray-800 dark:text-gray-200">
+                Compound Movements
+              </span>
+              <span className="px-3 py-1 bg-gray-100 dark:bg-gray-700 rounded-full text-sm font-medium text-gray-800 dark:text-gray-200">
+                Functional Fitness
+              </span>
+              <span className="px-3 py-1 bg-gray-100 dark:bg-gray-700 rounded-full text-sm font-medium text-gray-800 dark:text-gray-200">
+                Recovery Optimization
+              </span>
             </div>
           </div>
         </div>
         
-        {/* Tabs */}
-        <div className="border-b mb-6">
-          <nav className="-mb-px flex space-x-8">
-            <button
-              className={`py-2 px-1 border-b-2 font-medium text-sm ${
-                activeTab === 'journey'
-                  ? 'border-blue-500 text-blue-600 dark:text-blue-400'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              }`}
-              onClick={() => setActiveTab('journey')}
-            >
-              Your Journey
-            </button>
-            <button
-              className={`py-2 px-1 border-b-2 font-medium text-sm ${
-                activeTab === 'stats'
-                  ? 'border-blue-500 text-blue-600 dark:text-blue-400'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              }`}
-              onClick={() => setActiveTab('stats')}
-            >
-              Statistics
-            </button>
-            <button
-              className={`py-2 px-1 border-b-2 font-medium text-sm ${
-                activeTab === 'plans'
-                  ? 'border-blue-500 text-blue-600 dark:text-blue-400'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              }`}
-              onClick={() => setActiveTab('plans')}
-            >
-              Workout Plans
-            </button>
-            <button
-              className={`py-2 px-1 border-b-2 font-medium text-sm ${
-                activeTab === 'trackers'
-                  ? 'border-blue-500 text-blue-600 dark:text-blue-400'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-              }`}
-              onClick={() => setActiveTab('trackers')}
-            >
-              Connected Trackers
-            </button>
-          </nav>
-        </div>
-        
-        {/* Tab content */}
-        <div>
-          {/* Journey Tab */}
-          {activeTab === 'journey' && (
-            <div>
-              <h2 className="text-lg font-semibold mb-4">Your Fitness Journey</h2>
-              
-              <div className="bg-gray-50 dark:bg-gray-900 rounded-md p-4 mb-6">
-                <div className="flex items-center mb-4">
-                  <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center text-blue-600 dark:text-blue-400">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                    </svg>
-                  </div>
-                  <div className="ml-3">
-                    <h3 className="font-medium">Progress Summary</h3>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                      You're making great progress! Keep up the good work.
-                    </p>
-                  </div>
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+          <h3 className="text-lg font-medium mb-4">This Week's Workouts</h3>
+          <div className="space-y-4">
+            <div className="bg-blue-50 dark:bg-blue-900 p-4 rounded-md">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="font-medium">Monday: Upper Body</h4>
+                  <p className="text-sm text-blue-800 dark:text-blue-200">45 minutes • Strength Focus</p>
                 </div>
-                
-                <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full">
-                  <div 
-                    className="h-2 bg-blue-500 rounded-full" 
-                    style={{ width: '35%' }}
-                  ></div>
+                <div className="bg-blue-200 dark:bg-blue-800 rounded-full p-1">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-blue-700 dark:text-blue-300" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                  </svg>
                 </div>
-                
-                <div className="mt-2 text-xs text-gray-500 dark:text-gray-400 text-right">
-                  35% Complete
-                </div>
-              </div>
-              
-              <div className="space-y-4">
-                {journeySteps.map((step) => (
-                  <div 
-                    key={step.id}
-                    className="border border-gray-200 dark:border-gray-700 rounded-md p-4 flex items-start"
-                  >
-                    <div 
-                      className={`w-6 h-6 rounded-full flex-shrink-0 flex items-center justify-center ${
-                        step.status === 'completed' 
-                          ? 'bg-green-100 text-green-600 dark:bg-green-900 dark:text-green-400' 
-                          : step.status === 'in-progress'
-                            ? 'bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-400'
-                            : 'bg-gray-100 text-gray-400 dark:bg-gray-800 dark:text-gray-500'
-                      }`}
-                    >
-                      {step.status === 'completed' ? (
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                        </svg>
-                      ) : step.status === 'in-progress' ? (
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                        </svg>
-                      ) : (
-                        <span className="text-xs">{step.id}</span>
-                      )}
-                    </div>
-                    
-                    <div className="ml-4 flex-1">
-                      <div className="flex justify-between">
-                        <h4 className="font-medium">{step.title}</h4>
-                        <span className="text-sm text-gray-500 dark:text-gray-400">{step.date}</span>
-                      </div>
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                        {step.status === 'completed' 
-                          ? 'Successfully completed on schedule.' 
-                          : step.status === 'in-progress'
-                            ? 'Currently in progress - keep going!'
-                            : 'Coming up next in your journey.'}
-                      </p>
-                      {step.status === 'in-progress' && (
-                        <button 
-                          className="mt-2 text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
-                          onClick={() => console.log('View details for:', step.id)}
-                        >
-                          Continue Workout
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                ))}
               </div>
             </div>
-          )}
-          
-          {/* Statistics Tab */}
-          {activeTab === 'stats' && (
-            <div>
-              <h2 className="text-lg font-semibold mb-4">Your Activity Statistics</h2>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-                {stats.map((stat) => (
-                  <div 
-                    key={stat.id}
-                    className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg p-4 shadow-sm"
-                  >
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <p className="text-sm text-gray-500 dark:text-gray-400">{stat.label}</p>
-                        <p className="text-2xl font-bold mt-1">
-                          {stat.value}{stat.unit}
-                        </p>
-                      </div>
-                      <div className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        stat.trend === 'up' 
-                          ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' 
-                          : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
-                      }`}>
-                        {stat.change}
-                      </div>
-                    </div>
-                    <div className="mt-2">
-                      <div className="h-1 w-full bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-                        <div 
-                          className={`h-1 ${
-                            stat.trend === 'up' ? 'bg-green-500' : 'bg-red-500'
-                          } rounded-full`} 
-                          style={{ width: `${Math.min(100, stat.value * 5)}%` }}
-                        ></div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
+            <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-md">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="font-medium">Wednesday: Lower Body</h4>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">50 minutes • Strength & Power</p>
+                </div>
+                <button className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm">
+                  Start
+                </button>
               </div>
-              
-              <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-4">
-                <h3 className="font-medium mb-3">Activity Over Time</h3>
-                <div className="h-64 flex items-center justify-center">
-                  <p className="text-gray-500 dark:text-gray-400">
-                    Detailed charts and analytics will appear here as you log more workouts.
+            </div>
+            <div className="bg-gray-50 dark:bg-gray-700 p-4 rounded-md">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="font-medium">Friday: Full Body HIIT</h4>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">30 minutes • Cardio & Strength</p>
+                </div>
+                <button className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm">
+                  Start
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-lg font-medium">Upcoming weeks</h3>
+            <button className="text-blue-600 dark:text-blue-400 text-sm font-medium">
+              View All
+            </button>
+          </div>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-md">
+              <div>
+                <div className="font-medium">Week 4</div>
+                <div className="text-sm text-gray-600 dark:text-gray-400">Deload week</div>
+              </div>
+              <div className="text-sm text-gray-500 dark:text-gray-400">
+                May 1-7
+              </div>
+            </div>
+            <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-md">
+              <div>
+                <div className="font-medium">Week 5</div>
+                <div className="text-sm text-gray-600 dark:text-gray-400">Strength focus</div>
+              </div>
+              <div className="text-sm text-gray-500 dark:text-gray-400">
+                May 8-14
+              </div>
+            </div>
+            <div className="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-md">
+              <div>
+                <div className="font-medium">Week 6</div>
+                <div className="text-sm text-gray-600 dark:text-gray-400">Hypertrophy focus</div>
+              </div>
+              <div className="text-sm text-gray-500 dark:text-gray-400">
+                May 15-21
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+  
+  // Trackers tab content
+  const renderTrackersTab = () => {
+    return (
+      <div className="space-y-6">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+          <h2 className="text-xl font-semibold mb-4">Connected Fitness Trackers</h2>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-md">
+              <div className="flex items-center">
+                <div className="bg-blue-100 dark:bg-blue-900 p-3 rounded-md mr-4">
+                  <svg className="h-6 w-6 text-blue-700 dark:text-blue-300" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm-1 17.5h-2.5v-9h2.5v9zm4 0h-2.5v-9h2.5v9zm-2-11.5c-.69 0-1.25-.56-1.25-1.25s.56-1.25 1.25-1.25 1.25.56 1.25 1.25-.56 1.25-1.25 1.25z" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="font-medium">Google Fit</h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    Syncs steps, activities, and heart rate
                   </p>
                 </div>
               </div>
+              <button className="px-3 py-1 bg-green-600 text-white rounded-md text-sm">
+                Connected
+              </button>
             </div>
-          )}
-          
-          {/* Plans Tab */}
-          {activeTab === 'plans' && (
-            <div>
-              <h2 className="text-lg font-semibold mb-4">Your Workout Plans</h2>
-              
-              <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-6 text-center mb-8">
-                <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+            <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-md">
+              <div className="flex items-center">
+                <div className="bg-gray-200 dark:bg-gray-600 p-3 rounded-md mr-4">
+                  <svg className="h-6 w-6 text-gray-700 dark:text-gray-300" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2c5.514 0 10 4.486 10 10s-4.486 10-10 10-10-4.486-10-10 4.486-10 10-10zm0-2c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm-2 10h-2v2h2v-2zm6 0h-4v2h4v-2z" />
                   </svg>
                 </div>
-                <h3 className="text-xl font-medium mb-2">Personalized Plan: {categoryName} Program</h3>
-                <p className="text-gray-600 dark:text-gray-400 mb-4">
-                  Your custom fitness plan designed to help you reach your goals. Tailored to your fitness level and preferences.
-                </p>
-                <button
-                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-                  onClick={() => console.log('View plan')}
-                >
-                  View Your Plan
-                </button>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
-                  <div className="bg-gray-100 dark:bg-gray-800 px-4 py-3 border-b border-gray-200 dark:border-gray-700">
-                    <h3 className="font-medium">This Week's Schedule</h3>
-                  </div>
-                  <div className="p-4">
-                    <div className="space-y-3">
-                      <div className="flex justify-between items-center">
-                        <div>
-                          <div className="font-medium">Monday</div>
-                          <div className="text-sm text-gray-600 dark:text-gray-400">Upper Body Strength</div>
-                        </div>
-                        <div className="text-green-600 dark:text-green-400 text-sm">Completed</div>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <div>
-                          <div className="font-medium">Wednesday</div>
-                          <div className="text-sm text-gray-600 dark:text-gray-400">Lower Body Focus</div>
-                        </div>
-                        <div className="text-green-600 dark:text-green-400 text-sm">Completed</div>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <div>
-                          <div className="font-medium">Friday</div>
-                          <div className="text-sm text-gray-600 dark:text-gray-400">HIIT Cardio</div>
-                        </div>
-                        <div className="text-blue-600 dark:text-blue-400 text-sm">Upcoming</div>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <div>
-                          <div className="font-medium">Sunday</div>
-                          <div className="text-sm text-gray-600 dark:text-gray-400">Active Recovery</div>
-                        </div>
-                        <div className="text-blue-600 dark:text-blue-400 text-sm">Upcoming</div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden">
-                  <div className="bg-gray-100 dark:bg-gray-800 px-4 py-3 border-b border-gray-200 dark:border-gray-700">
-                    <h3 className="font-medium">Recommended Workouts</h3>
-                  </div>
-                  <div className="p-4">
-                    <div className="space-y-4">
-                      <div>
-                        <h4 className="font-medium">25-Minute HIIT Challenge</h4>
-                        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                          High-intensity interval training perfect for your fitness level.
-                        </p>
-                        <button
-                          className="mt-2 text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
-                          onClick={() => console.log('View HIIT workout')}
-                        >
-                          Start Workout →
-                        </button>
-                      </div>
-                      <div>
-                        <h4 className="font-medium">Lower Body Strength</h4>
-                        <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                          Focus on building leg and core strength with this 30-minute routine.
-                        </p>
-                        <button
-                          className="mt-2 text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
-                          onClick={() => console.log('View strength workout')}
-                        >
-                          Start Workout →
-                        </button>
-                      </div>
-                    </div>
-                  </div>
+                <div>
+                  <h3 className="font-medium">Apple Health</h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    Import your Apple Health data
+                  </p>
                 </div>
               </div>
+              <button className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm">
+                Connect
+              </button>
             </div>
-          )}
-          
-          {/* Trackers Tab */}
-          {activeTab === 'trackers' && (
-            <div>
-              <h2 className="text-lg font-semibold mb-4">Connect Your Fitness Trackers</h2>
-              
-              <div className="mb-6">
-                <p className="text-gray-600 dark:text-gray-400">
-                  Link your fitness tracking devices and apps to automatically sync your workout data with Fitness AI.
-                </p>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
-                  <div className="flex items-center mb-4">
-                    <div className="w-12 h-12 bg-red-100 dark:bg-red-900 rounded-lg flex items-center justify-center">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-red-600 dark:text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                      </svg>
-                    </div>
-                    <div className="ml-4">
-                      <h3 className="font-medium">Google Fit</h3>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
-                        Connect your Google Fit account
-                      </p>
-                    </div>
-                  </div>
-                  <button
-                    className="w-full py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium"
-                    onClick={() => console.log('Connect Google Fit')}
-                  >
-                    Connect
-                  </button>
+            <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-md">
+              <div className="flex items-center">
+                <div className="bg-gray-200 dark:bg-gray-600 p-3 rounded-md mr-4">
+                  <svg className="h-6 w-6 text-gray-700 dark:text-gray-300" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2c5.514 0 10 4.486 10 10s-4.486 10-10 10-10-4.486-10-10 4.486-10 10-10zm0-2c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm-2 10h-2v2h2v-2zm-4-4h2v2h-2v-2zm10 8h-2v2h2v-2zm-6-6h-2v2h2v-2z" />
+                  </svg>
                 </div>
-                
-                <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
-                  <div className="flex items-center mb-4">
-                    <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                      </svg>
-                    </div>
-                    <div className="ml-4">
-                      <h3 className="font-medium">Strava</h3>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
-                        Connect your Strava account
-                      </p>
-                    </div>
-                  </div>
-                  <button
-                    className="w-full py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium"
-                    onClick={() => console.log('Connect Strava')}
-                  >
-                    Connect
-                  </button>
-                </div>
-                
-                <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
-                  <div className="flex items-center mb-4">
-                    <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                      </svg>
-                    </div>
-                    <div className="ml-4">
-                      <h3 className="font-medium">Fitbit</h3>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
-                        Connect your Fitbit account
-                      </p>
-                    </div>
-                  </div>
-                  <button
-                    className="w-full py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium"
-                    onClick={() => console.log('Connect Fitbit')}
-                  >
-                    Connect
-                  </button>
-                </div>
-                
-                <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
-                  <div className="flex items-center mb-4">
-                    <div className="w-12 h-12 bg-gray-100 dark:bg-gray-700 rounded-lg flex items-center justify-center">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-600 dark:text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                      </svg>
-                    </div>
-                    <div className="ml-4">
-                      <h3 className="font-medium">Apple Health</h3>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
-                        Connect your Apple Health data
-                      </p>
-                    </div>
-                  </div>
-                  <button
-                    className="w-full py-2 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium"
-                    onClick={() => console.log('Connect Apple Health')}
-                  >
-                    Connect
-                  </button>
+                <div>
+                  <h3 className="font-medium">Fitbit</h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    Sync your Fitbit activity
+                  </p>
                 </div>
               </div>
+              <button className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm">
+                Connect
+              </button>
             </div>
-          )}
+            <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-md">
+              <div className="flex items-center">
+                <div className="bg-gray-200 dark:bg-gray-600 p-3 rounded-md mr-4">
+                  <svg className="h-6 w-6 text-gray-700 dark:text-gray-300" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm6 13h-5v5h-2v-5h-5v-2h5v-5h2v5h5v2z"/>
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="font-medium">Strava</h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                    Connect your running and cycling activities
+                  </p>
+                </div>
+              </div>
+              <button className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm">
+                Connect
+              </button>
+            </div>
+          </div>
         </div>
+        
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+          <h3 className="text-lg font-medium mb-4">Recent Activity From Trackers</h3>
+          <div className="space-y-4">
+            <div className="flex items-center p-3 bg-gray-50 dark:bg-gray-700 rounded-md">
+              <div className="bg-blue-100 dark:bg-blue-900 rounded-md p-2 mr-4">
+                <span className="text-blue-800 dark:text-blue-200 text-xl">🏃</span>
+              </div>
+              <div className="flex-1">
+                <h4 className="font-medium">Morning Run</h4>
+                <div className="flex text-sm text-gray-500 dark:text-gray-400">
+                  <span>2.4 km • 15 min • 148 avg bpm</span>
+                </div>
+              </div>
+              <div className="text-sm text-gray-500 dark:text-gray-400">
+                Today
+              </div>
+            </div>
+            <div className="flex items-center p-3 bg-gray-50 dark:bg-gray-700 rounded-md">
+              <div className="bg-blue-100 dark:bg-blue-900 rounded-md p-2 mr-4">
+                <span className="text-blue-800 dark:text-blue-200 text-xl">⚡</span>
+              </div>
+              <div className="flex-1">
+                <h4 className="font-medium">HIIT Workout</h4>
+                <div className="flex text-sm text-gray-500 dark:text-gray-400">
+                  <span>32 min • 320 calories • 156 avg bpm</span>
+                </div>
+              </div>
+              <div className="text-sm text-gray-500 dark:text-gray-400">
+                Yesterday
+              </div>
+            </div>
+            <div className="flex items-center p-3 bg-gray-50 dark:bg-gray-700 rounded-md">
+              <div className="bg-blue-100 dark:bg-blue-900 rounded-md p-2 mr-4">
+                <span className="text-blue-800 dark:text-blue-200 text-xl">🚶</span>
+              </div>
+              <div className="flex-1">
+                <h4 className="font-medium">Daily Steps</h4>
+                <div className="flex text-sm text-gray-500 dark:text-gray-400">
+                  <span>8,245 steps • 6.1 km</span>
+                </div>
+              </div>
+              <div className="text-sm text-gray-500 dark:text-gray-400">
+                Yesterday
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+          <h3 className="text-lg font-medium mb-4">Add Measurements</h3>
+          <p className="text-gray-600 dark:text-gray-400 mb-4">
+            Track your progress by regularly updating your measurements
+          </p>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <button className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-md">
+                Add Weight
+              </button>
+            </div>
+            <div>
+              <button className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white rounded-md">
+                Add Measurements
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      {/* Tab navigation */}
+      <div className="flex overflow-x-auto space-x-1 sm:space-x-2 bg-white dark:bg-gray-800 rounded-lg shadow-md p-1 mb-6">
+        <button
+          onClick={() => setActiveTab('journey')}
+          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors 
+            ${activeTab === 'journey'
+              ? 'bg-blue-600 text-white' 
+              : 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'
+            }`}
+        >
+          Your Journey
+        </button>
+        <button
+          onClick={() => setActiveTab('stats')}
+          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors 
+            ${activeTab === 'stats'
+              ? 'bg-blue-600 text-white' 
+              : 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'
+            }`}
+        >
+          Statistics
+        </button>
+        <button
+          onClick={() => setActiveTab('plan')}
+          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors 
+            ${activeTab === 'plan'
+              ? 'bg-blue-600 text-white' 
+              : 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'
+            }`}
+        >
+          Workout Plan
+        </button>
+        <button
+          onClick={() => setActiveTab('trackers')}
+          className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors 
+            ${activeTab === 'trackers'
+              ? 'bg-blue-600 text-white' 
+              : 'hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300'
+            }`}
+        >
+          Fitness Trackers
+        </button>
       </div>
       
-      {/* Quick Actions */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-          <div className="flex items-center mb-4">
-            <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-md flex items-center justify-center text-blue-600 dark:text-blue-400">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
-            </div>
-            <h3 className="ml-3 text-lg font-medium">Schedule Workout</h3>
-          </div>
-          <p className="text-gray-600 dark:text-gray-400 mb-4">
-            Plan and schedule your next training session.
-          </p>
-          <button
-            className="w-full py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-            onClick={() => console.log('Schedule workout')}
-          >
-            Schedule Now
-          </button>
-        </div>
-        
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-          <div className="flex items-center mb-4">
-            <div className="w-10 h-10 bg-purple-100 dark:bg-purple-900 rounded-md flex items-center justify-center text-purple-600 dark:text-purple-400">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-              </svg>
-            </div>
-            <h3 className="ml-3 text-lg font-medium">Log Progress</h3>
-          </div>
-          <p className="text-gray-600 dark:text-gray-400 mb-4">
-            Record your workout results and track your progress.
-          </p>
-          <button
-            className="w-full py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700"
-            onClick={() => console.log('Log progress')}
-          >
-            Log Activity
-          </button>
-        </div>
-        
-        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-          <div className="flex items-center mb-4">
-            <div className="w-10 h-10 bg-green-100 dark:bg-green-900 rounded-md flex items-center justify-center text-green-600 dark:text-green-400">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
-              </svg>
-            </div>
-            <h3 className="ml-3 text-lg font-medium">Get AI Coaching</h3>
-          </div>
-          <p className="text-gray-600 dark:text-gray-400 mb-4">
-            Get personalized advice from our AI fitness coach.
-          </p>
-          <button
-            className="w-full py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
-            onClick={() => console.log('Get coaching')}
-          >
-            Talk to Coach
-          </button>
-        </div>
-      </div>
+      {/* Tab content */}
+      {renderTabContent()}
     </div>
   );
 };

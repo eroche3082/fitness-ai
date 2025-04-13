@@ -1,30 +1,33 @@
 import React, { useState, useEffect } from 'react';
-import userService from '../lib/userService';
-import { LeadInfo } from '../lib/userService';
+import QRCodeDisplay from './QRCodeDisplay';
+import userService, { LeadInfo } from '../lib/userService';
 
-const AdminPanel: React.FC = () => {
+interface AdminPanelProps {}
+
+const AdminPanel: React.FC<AdminPanelProps> = () => {
   const [leads, setLeads] = useState<LeadInfo[]>([]);
   const [filteredLeads, setFilteredLeads] = useState<LeadInfo[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [categoryFilter, setCategoryFilter] = useState<string>('all');
-  const [dateFilter, setDateFilter] = useState<string>('all');
-  const [showExportModal, setShowExportModal] = useState(false);
+  const [categoryFilter, setCategoryFilter] = useState('');
+  const [dateSort, setDateSort] = useState<'asc' | 'desc'>('desc');
+  const [selectedLead, setSelectedLead] = useState<LeadInfo | null>(null);
+  const [showQRModal, setShowQRModal] = useState(false);
 
-  // Fetch leads on component mount
+  // Load leads on component mount
   useEffect(() => {
     const allLeads = userService.getLeads();
     setLeads(allLeads);
     setFilteredLeads(allLeads);
   }, []);
 
-  // Apply filters whenever filter settings or search term changes
+  // Handle filtering and sorting
   useEffect(() => {
-    let result = [...leads];
+    let results = [...leads];
     
-    // Apply search term filter
+    // Apply search filter
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
-      result = result.filter(lead => 
+      results = results.filter(lead => 
         lead.name.toLowerCase().includes(term) || 
         lead.email.toLowerCase().includes(term) ||
         lead.uniqueCode.toLowerCase().includes(term)
@@ -32,83 +35,127 @@ const AdminPanel: React.FC = () => {
     }
     
     // Apply category filter
-    if (categoryFilter !== 'all') {
-      result = result.filter(lead => lead.category === categoryFilter);
+    if (categoryFilter) {
+      results = results.filter(lead => lead.category === categoryFilter);
     }
     
-    // Apply date filter
-    if (dateFilter !== 'all') {
-      const now = new Date();
-      const daysAgo = parseInt(dateFilter);
-      const cutoffDate = new Date(now.setDate(now.getDate() - daysAgo));
-      
-      result = result.filter(lead => {
-        const leadDate = new Date(lead.date);
-        return leadDate >= cutoffDate;
-      });
-    }
+    // Apply date sorting
+    results.sort((a, b) => {
+      const dateA = new Date(a.date).getTime();
+      const dateB = new Date(b.date).getTime();
+      return dateSort === 'asc' ? dateA - dateB : dateB - dateA;
+    });
     
-    setFilteredLeads(result);
-  }, [searchTerm, categoryFilter, dateFilter, leads]);
-  
-  // Handle export to CSV
-  const handleExportCSV = () => {
-    // Create CSV content
-    const headers = ['Name', 'Email', 'Code', 'Category', 'Date', 'Source'];
-    const rows = filteredLeads.map(lead => [
-      lead.name,
-      lead.email,
-      lead.uniqueCode,
-      lead.category,
-      lead.date,
-      lead.source
-    ]);
+    setFilteredLeads(results);
+  }, [leads, searchTerm, categoryFilter, dateSort]);
+
+  // Handle lead selection for details
+  const handleLeadClick = (lead: LeadInfo) => {
+    setSelectedLead(lead);
+  };
+
+  // Handle showing QR Code modal
+  const handleQRCodeClick = (lead: LeadInfo) => {
+    setSelectedLead(lead);
+    setShowQRModal(true);
+  };
+
+  // Export leads to CSV
+  const exportToCSV = () => {
+    const headers = ['ID', 'Name', 'Email', 'Phone', 'Code', 'Category', 'Date', 'Source'];
     
     const csvContent = [
       headers.join(','),
-      ...rows.map(row => row.join(','))
+      ...filteredLeads.map(lead => [
+        lead.id,
+        `"${lead.name}"`,
+        `"${lead.email}"`,
+        lead.phone ? `"${lead.phone}"` : '""',
+        `"${lead.uniqueCode}"`,
+        `"${lead.category}"`,
+        `"${new Date(lead.date).toLocaleString()}"`,
+        `"${lead.source}"`
+      ].join(','))
     ].join('\n');
     
-    // Create a download link
+    // Create a downloadable CSV file
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
-    link.setAttribute('href', url);
+    link.href = url;
     link.setAttribute('download', `fitness_ai_leads_${new Date().toISOString().slice(0, 10)}.csv`);
     document.body.appendChild(link);
-    
-    // Trigger download and clean up
     link.click();
     document.body.removeChild(link);
-    setShowExportModal(false);
+  };
+
+  // Generate formatted category label
+  const getCategoryLabel = (code: string) => {
+    const categories: Record<string, string> = {
+      'BEG': 'Beginner',
+      'INT': 'Intermediate',
+      'ADV': 'Advanced',
+      'PRO': 'Professional',
+      'VIP': 'VIP'
+    };
+    
+    return categories[code] || code;
+  };
+
+  // Format date from ISO string
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString();
   };
 
   return (
-    <div className="admin-panel p-4 md:p-6 max-w-6xl mx-auto">
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 mb-6">
-        <h1 className="text-2xl font-bold mb-4">Admin Panel - Lead Management</h1>
+    <div className="container mx-auto px-4 py-6">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+        <div>
+          <h1 className="text-2xl font-bold">Admin Dashboard</h1>
+          <p className="text-gray-600 dark:text-gray-400">
+            Manage leads and user profiles
+          </p>
+        </div>
         
-        {/* Filters and Search */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div className="mt-4 md:mt-0">
+          <button
+            onClick={exportToCSV}
+            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+          >
+            Export to CSV
+          </button>
+        </div>
+      </div>
+      
+      {/* Filters and Search */}
+      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* Search input */}
           <div>
-            <label className="block text-sm font-medium mb-1">Search</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Search
+            </label>
             <input
               type="text"
-              placeholder="Search by name, email, or code"
-              className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Search by name, email, or code"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
             />
           </div>
           
+          {/* Category filter */}
           <div>
-            <label className="block text-sm font-medium mb-1">Category</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Filter by Category
+            </label>
             <select
-              className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800"
               value={categoryFilter}
               onChange={(e) => setCategoryFilter(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
             >
-              <option value="all">All Categories</option>
+              <option value="">All Categories</option>
               <option value="BEG">Beginner</option>
               <option value="INT">Intermediate</option>
               <option value="ADV">Advanced</option>
@@ -117,142 +164,282 @@ const AdminPanel: React.FC = () => {
             </select>
           </div>
           
+          {/* Date sort */}
           <div>
-            <label className="block text-sm font-medium mb-1">Date Range</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+              Date
+            </label>
             <select
-              className="w-full p-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800"
-              value={dateFilter}
-              onChange={(e) => setDateFilter(e.target.value)}
+              value={dateSort}
+              onChange={(e) => setDateSort(e.target.value as 'asc' | 'desc')}
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
             >
-              <option value="all">All Time</option>
-              <option value="7">Last 7 Days</option>
-              <option value="30">Last 30 Days</option>
-              <option value="90">Last 90 Days</option>
+              <option value="desc">Newest First</option>
+              <option value="asc">Oldest First</option>
             </select>
           </div>
         </div>
-        
-        {/* Actions */}
-        <div className="flex justify-between items-center mb-4">
-          <div>
-            <span className="text-sm font-medium">
-              {filteredLeads.length} 
-              {filteredLeads.length === 1 ? ' lead ' : ' leads '} 
-              found
-            </span>
+      </div>
+      
+      <div className="flex flex-col md:flex-row space-y-6 md:space-y-0 md:space-x-6">
+        {/* Leads Table */}
+        <div className="md:w-7/12 bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
+          <div className="p-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
+            <h2 className="font-medium">Leads ({filteredLeads.length})</h2>
           </div>
           
-          <div>
-            <button
-              onClick={() => setShowExportModal(true)}
-              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
-            >
-              Export Data
-            </button>
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+              <thead className="bg-gray-50 dark:bg-gray-900">
+                <tr>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Name
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Code
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Category
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Date
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Source
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+                {filteredLeads.length > 0 ? (
+                  filteredLeads.map((lead) => (
+                    <tr 
+                      key={lead.id}
+                      onClick={() => handleLeadClick(lead)}
+                      className="hover:bg-gray-50 dark:hover:bg-gray-900 cursor-pointer"
+                    >
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm font-medium text-gray-900 dark:text-white">
+                          {lead.name}
+                        </div>
+                        <div className="text-sm text-gray-500 dark:text-gray-400">
+                          {lead.email}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm text-gray-900 dark:text-white">
+                          {lead.uniqueCode}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className={`px-2 py-1 text-xs font-medium rounded-full
+                          ${lead.category === 'BEG' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
+                            lead.category === 'INT' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' :
+                            lead.category === 'ADV' ? 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200' :
+                            lead.category === 'PRO' ? 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200' :
+                            lead.category === 'VIP' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' :
+                            'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200'
+                          }`}
+                        >
+                          {getCategoryLabel(lead.category)}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                        {formatDate(lead.date)}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                        {lead.source}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleQRCodeClick(lead);
+                          }}
+                          className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+                        >
+                          View QR
+                        </button>
+                      </td>
+                    </tr>
+                  ))
+                ) : (
+                  <tr>
+                    <td colSpan={6} className="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
+                      No leads match your search criteria
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
           </div>
         </div>
         
-        {/* Leads Table */}
-        <div className="overflow-x-auto">
-          <table className="min-w-full">
-            <thead className="bg-gray-100 dark:bg-gray-700">
-              <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  Name
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  Email
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  Code
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  Category
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  Date
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  Source
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-              {filteredLeads.length > 0 ? (
-                filteredLeads.map((lead, index) => (
-                  <tr key={index}>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                      {lead.name}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm">
-                      {lead.email}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-mono">
-                      {lead.uniqueCode}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm">
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium 
-                        ${lead.category === 'BEG' ? 'bg-green-100 text-green-800' : ''}
-                        ${lead.category === 'INT' ? 'bg-blue-100 text-blue-800' : ''}
-                        ${lead.category === 'ADV' ? 'bg-purple-100 text-purple-800' : ''}
-                        ${lead.category === 'PRO' ? 'bg-orange-100 text-orange-800' : ''}
-                        ${lead.category === 'VIP' ? 'bg-red-100 text-red-800' : ''}
-                      `}>
-                        {lead.category}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm">
-                      {new Date(lead.date).toLocaleDateString()}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm">
-                      {lead.source}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm">
-                      <button className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300">
-                        View
-                      </button>
-                    </td>
-                  </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={7} className="px-6 py-4 text-center text-gray-500 dark:text-gray-400">
-                    No leads found
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+        {/* Lead Details */}
+        <div className="md:w-5/12 bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden">
+          <div className="p-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
+            <h2 className="font-medium">Lead Details</h2>
+          </div>
+          
+          {selectedLead ? (
+            <div className="p-6">
+              <div className="flex items-start mb-6">
+                <div className="bg-gray-100 dark:bg-gray-700 rounded-md p-2 mr-4">
+                  <div className="w-20 h-20">
+                    <QRCodeDisplay 
+                      code={selectedLead.uniqueCode} 
+                      size={80} 
+                      background="#f3f4f6"
+                      foreground="#111827"
+                    />
+                  </div>
+                </div>
+                
+                <div>
+                  <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+                    {selectedLead.name}
+                  </h3>
+                  <p className="text-gray-600 dark:text-gray-400">
+                    {selectedLead.email}
+                  </p>
+                  {selectedLead.phone && (
+                    <p className="text-gray-600 dark:text-gray-400">
+                      {selectedLead.phone}
+                    </p>
+                  )}
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-4 mb-6">
+                <div>
+                  <div className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                    Access Code
+                  </div>
+                  <div className="mt-1 text-gray-900 dark:text-white font-medium">
+                    {selectedLead.uniqueCode}
+                  </div>
+                </div>
+                
+                <div>
+                  <div className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                    Category
+                  </div>
+                  <div className="mt-1">
+                    <span className={`px-2 py-1 text-xs font-medium rounded-full
+                      ${selectedLead.category === 'BEG' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
+                        selectedLead.category === 'INT' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' :
+                        selectedLead.category === 'ADV' ? 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200' :
+                        selectedLead.category === 'PRO' ? 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200' :
+                        selectedLead.category === 'VIP' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' :
+                        'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200'
+                      }`}
+                    >
+                      {getCategoryLabel(selectedLead.category)}
+                    </span>
+                  </div>
+                </div>
+                
+                <div>
+                  <div className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                    Sign Up Date
+                  </div>
+                  <div className="mt-1 text-gray-900 dark:text-white">
+                    {new Date(selectedLead.date).toLocaleDateString()}
+                  </div>
+                </div>
+                
+                <div>
+                  <div className="text-sm font-medium text-gray-500 dark:text-gray-400">
+                    Lead Source
+                  </div>
+                  <div className="mt-1 text-gray-900 dark:text-white">
+                    {selectedLead.source}
+                  </div>
+                </div>
+              </div>
+              
+              <div className="mt-6 space-y-3">
+                <button
+                  onClick={() => {
+                    // Copy code to clipboard
+                    navigator.clipboard.writeText(selectedLead.uniqueCode);
+                    // Show alert or toast
+                    alert('Code copied to clipboard');
+                  }}
+                  className="w-full py-2 px-4 border border-gray-300 dark:border-gray-600 rounded-md text-gray-800 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700"
+                >
+                  Copy Code
+                </button>
+                
+                <button
+                  onClick={() => setShowQRModal(true)}
+                  className="w-full py-2 px-4 border border-blue-500 text-blue-500 rounded-md hover:bg-blue-50 dark:hover:bg-blue-900"
+                >
+                  View QR Code
+                </button>
+                
+                <button
+                  onClick={() => {
+                    // Email the user their code (in a real app)
+                    alert('In a real app, this would send an email with the access code');
+                  }}
+                  className="w-full py-2 px-4 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                >
+                  Send Code via Email
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="p-6 text-center text-gray-500 dark:text-gray-400">
+              Select a lead to view details
+            </div>
+          )}
         </div>
       </div>
       
-      {/* Export Modal */}
-      {showExportModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-md w-full">
-            <h2 className="text-xl font-bold mb-4">Export Lead Data</h2>
+      {/* QR Code Modal */}
+      {showQRModal && selectedLead && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 max-w-md w-full">
+            <div className="text-center mb-4">
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white">
+                QR Code for {selectedLead.name}
+              </h3>
+              <p className="text-gray-600 dark:text-gray-400">
+                Code: {selectedLead.uniqueCode}
+              </p>
+            </div>
             
-            <p className="mb-4">
-              You are about to export {filteredLeads.length} leads as a CSV file.
-              This file will contain all user information including names, emails, and codes.
-            </p>
+            <div className="flex justify-center mb-6">
+              <div className="bg-white p-4 rounded-md">
+                <QRCodeDisplay 
+                  code={selectedLead.uniqueCode} 
+                  size={250} 
+                  background="#ffffff"
+                  foreground="#000000"
+                />
+              </div>
+            </div>
             
-            <div className="flex space-x-3">
+            <div className="flex justify-end">
               <button
-                onClick={handleExportCSV}
-                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
+                onClick={() => setShowQRModal(false)}
+                className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-gray-800 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700"
               >
-                Export as CSV
+                Close
               </button>
               
               <button
-                onClick={() => setShowExportModal(false)}
-                className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md"
+                onClick={() => {
+                  // Download QR code (in a real app)
+                  alert('In a real app, this would download the QR code as an image');
+                  setShowQRModal(false);
+                }}
+                className="ml-3 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
               >
-                Cancel
+                Download
               </button>
             </div>
           </div>

@@ -20,7 +20,7 @@ const beginner: AssessmentResponse = {
   strengths: ['Motivation', 'Flexibility'],
   areasToImprove: ['Cardiovascular endurance', 'Strength', 'Consistency'],
   recommendedPlan: 'Foundation Builder',
-  summary: 'You're at the beginning of your fitness journey. The assessment indicates that while you have good motivation and flexibility, there are significant opportunities to develop your cardiovascular endurance and strength. A consistent foundation-building program will help you establish healthy habits and gradually build fitness.'
+  summary: "You're at the beginning of your fitness journey. The assessment indicates that while you have good motivation and flexibility, there are significant opportunities to develop your cardiovascular endurance and strength. A consistent foundation-building program will help you establish healthy habits and gradually build fitness."
 };
 
 const intermediate: AssessmentResponse = {

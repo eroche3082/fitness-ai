@@ -1,102 +1,88 @@
-// userCodeGenerator.ts
-// Provides functions to generate unique user access codes based on fitness assessment
+import { UserCategory } from '../shared/types';
 
-// Define possible user categories
-export enum UserCategory {
-  Beginner = 'BEG',
-  Intermediate = 'INT',
-  Advanced = 'ADV',
-  Professional = 'PRO',
-  VIP = 'VIP'
-}
-
-// Define user profile interface
-export interface UserProfile {
-  name: string;
-  email: string;
-  uniqueCode: string;
-  category: UserCategory;
-  onboardingCompleted: boolean;
-  fitnessGoals: string[];
-  preferredActivities: string[];
-}
-
-// Generate a random 4-digit number
-const generateRandomDigits = (): string => {
-  return Math.floor(1000 + Math.random() * 9000).toString();
-};
-
-// Generate a unique user code
-export const generateUserCode = (
-  category: UserCategory,
-  existingCodes: string[] = []
-): string => {
-  // Create the base code with format: FIT-[CATEGORY]-XXXX
-  let code: string;
-  let attempts = 0;
-  const maxAttempts = 10;
+/**
+ * Generates a unique code for a user based on their fitness category
+ * Format: FIT-[CATEGORY]-[4-DIGIT NUMBER]
+ * Examples: FIT-BEG-1234, FIT-INT-5678, FIT-ADV-9012
+ */
+export function generateUniqueCode(category: UserCategory): string {
+  // Create prefix based on category
+  let prefix = '';
   
-  do {
-    const randomDigits = generateRandomDigits();
-    code = `FIT-${category}-${randomDigits}`;
-    attempts++;
-    
-    // Avoid infinite loops by limiting attempts
-    if (attempts >= maxAttempts) {
-      // Add timestamp to ensure uniqueness in worst case
-      const timestamp = Date.now().toString().slice(-4);
-      code = `FIT-${category}-${timestamp}`;
+  switch (category) {
+    case 'beginner':
+      prefix = 'BEG';
       break;
-    }
-  } while (existingCodes.includes(code));
-  
-  return code;
-};
-
-// Determine user category based on assessment results
-export const determineUserCategory = (
-  assessmentScore: number,
-  experienceYears: number,
-  trainingFrequency: number
-): UserCategory => {
-  // Simple scoring system - in a real app would be more sophisticated
-  const totalScore = assessmentScore + (experienceYears * 5) + (trainingFrequency * 3);
-  
-  if (totalScore >= 80) {
-    return UserCategory.Professional;
-  } else if (totalScore >= 60) {
-    return UserCategory.Advanced;
-  } else if (totalScore >= 40) {
-    return UserCategory.Intermediate;
-  } else {
-    return UserCategory.Beginner;
+    case 'intermediate':
+      prefix = 'INT';
+      break;
+    case 'advanced':
+      prefix = 'ADV';
+      break;
+    case 'professional':
+      prefix = 'PRO';
+      break;
+    default:
+      // Default to VIP for special categories
+      prefix = 'VIP';
   }
-};
-
-// Create a new user profile
-export const createUserProfile = (
-  name: string,
-  email: string,
-  category: UserCategory,
-  fitnessGoals: string[],
-  preferredActivities: string[],
-  existingCodes: string[] = []
-): UserProfile => {
-  const uniqueCode = generateUserCode(category, existingCodes);
   
-  return {
-    name,
-    email,
-    uniqueCode,
-    category,
-    onboardingCompleted: true,
-    fitnessGoals,
-    preferredActivities
-  };
-};
+  // Generate random 4-digit number
+  const randomNum = Math.floor(1000 + Math.random() * 9000);
+  
+  // Combine to create unique code
+  return `FIT-${prefix}-${randomNum}`;
+}
+
+/**
+ * Extracts the category from a code
+ * @param code Format: FIT-[CATEGORY]-[4-DIGIT NUMBER]
+ * @returns UserCategory or null if invalid
+ */
+export function getCategoryFromCode(code: string): UserCategory | null {
+  if (!code || typeof code !== 'string') {
+    return null;
+  }
+
+  const parts = code.split('-');
+  if (parts.length !== 3 || parts[0] !== 'FIT') {
+    return null;
+  }
+
+  const categoryCode = parts[1];
+  
+  // Map category code to UserCategory
+  switch (categoryCode) {
+    case 'BEG':
+      return 'beginner';
+    case 'INT':
+      return 'intermediate';
+    case 'ADV':
+      return 'advanced';
+    case 'PRO':
+      return 'professional';
+    default:
+      return null;
+  }
+}
+
+/**
+ * Validates if a code is in the correct format
+ * @param code Format: FIT-[CATEGORY]-[4-DIGIT NUMBER]
+ * @returns boolean
+ */
+export function isValidCode(code: string): boolean {
+  if (!code || typeof code !== 'string') {
+    return false;
+  }
+  
+  // Check format
+  const regex = /^FIT-(BEG|INT|ADV|PRO|VIP)-\d{4}$/;
+  return regex.test(code);
+}
 
 export default {
-  generateUserCode,
-  determineUserCategory,
-  createUserProfile
+  generateUniqueCode,
+  getCategoryFromCode,
+  isValidCode
 };
