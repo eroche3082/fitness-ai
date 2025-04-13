@@ -1,33 +1,6 @@
 // User profile and lead management service
-import { UserCategory } from '../shared/types';
+import { UserCategory, UserProfile, LeadInfo } from '../shared/types';
 import { generateUniqueCode } from './userCodeGenerator';
-
-// Lead information type
-export interface LeadInfo {
-  id: string;
-  name: string;
-  email: string;
-  phone?: string;
-  uniqueCode: string;
-  category: string; // BEG, INT, ADV, PRO, VIP
-  date: string;
-  source: string;
-}
-
-// User profile type
-export interface UserProfile {
-  id: string;
-  name: string;
-  email: string;
-  phone?: string;
-  uniqueCode: string;
-  category: UserCategory;
-  onboardingCompleted: boolean;
-  fitnessGoals: string[];
-  preferredActivities: string[];
-  dateCreated: string;
-  lastLogin: string;
-}
 
 // Storage keys for localStorage
 const STORAGE_KEYS = {

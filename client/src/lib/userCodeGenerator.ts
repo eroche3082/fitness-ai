@@ -6,26 +6,9 @@ import { UserCategory } from '../shared/types';
  * Examples: FIT-BEG-1234, FIT-INT-5678, FIT-ADV-9012
  */
 export function generateUniqueCode(category: UserCategory): string {
-  // Create prefix based on category
-  let prefix = '';
-  
-  switch (category) {
-    case 'beginner':
-      prefix = 'BEG';
-      break;
-    case 'intermediate':
-      prefix = 'INT';
-      break;
-    case 'advanced':
-      prefix = 'ADV';
-      break;
-    case 'professional':
-      prefix = 'PRO';
-      break;
-    default:
-      // Default to VIP for special categories
-      prefix = 'VIP';
-  }
+  // Create prefix based on category - already using correct prefix codes 
+  // as our UserCategory type is now already defined as BEG, INT, etc.
+  const prefix = category;
   
   // Generate random 4-digit number
   const randomNum = Math.floor(1000 + Math.random() * 9000);
@@ -49,21 +32,14 @@ export function getCategoryFromCode(code: string): UserCategory | null {
     return null;
   }
 
-  const categoryCode = parts[1];
+  const categoryCode = parts[1] as UserCategory;
   
-  // Map category code to UserCategory
-  switch (categoryCode) {
-    case 'BEG':
-      return 'beginner';
-    case 'INT':
-      return 'intermediate';
-    case 'ADV':
-      return 'advanced';
-    case 'PRO':
-      return 'professional';
-    default:
-      return null;
+  // Validate that the category code is a valid UserCategory
+  if (['BEG', 'INT', 'ADV', 'PRO', 'VIP'].includes(categoryCode)) {
+    return categoryCode;
   }
+  
+  return null;
 }
 
 /**

@@ -1,113 +1,84 @@
 /**
- * Shared types for the client and server
+ * Shared type definitions used throughout the Fitness AI application
  */
 
-// User fitness categories
-export type UserCategory = 'beginner' | 'intermediate' | 'advanced' | 'professional';
+/**
+ * User category enum
+ * Represents different levels of user fitness expertise
+ */
+export type UserCategory = 'BEG' | 'INT' | 'ADV' | 'PRO' | 'VIP';
 
-// Fitness tracker integration types
-export type FitnessTrackerType = 'google-fit' | 'apple-health' | 'fitbit' | 'strava';
-
-// Activity type
-export interface ActivityData {
-  id: string;
-  type: string; // 'run', 'walk', 'cycle', 'swim', 'strength', etc.
-  startTime: string;
-  endTime: string;
-  duration: number; // in seconds
-  distance?: number; // in meters
-  calories?: number;
-  heartRateAvg?: number;
-  heartRateMax?: number;
-  steps?: number;
-  source: FitnessTrackerType;
-}
-
-// Workout data
-export interface WorkoutData {
+/**
+ * Lead information interface
+ * Used for storing basic user contact and category info
+ */
+export interface LeadInfo {
   id: string;
   name: string;
-  exercises: Exercise[];
-  duration: number; // in seconds
-  calories?: number;
+  email: string;
+  phone?: string;
+  uniqueCode: string;
+  category: string; // BEG, INT, ADV, PRO, VIP
   date: string;
-  completed: boolean;
+  source: string;
 }
 
-// Exercise definition
+/**
+ * User profile interface
+ * Complete user information including fitness preferences
+ */
+export interface UserProfile {
+  id: string;
+  name: string;
+  email: string;
+  phone?: string;
+  uniqueCode: string;
+  category: UserCategory;
+  onboardingCompleted: boolean;
+  fitnessGoals: string[];
+  preferredActivities: string[];
+  dateCreated: string;
+  lastLogin: string;
+}
+
+/**
+ * Workout interface
+ * Represents a single workout in the user's plan
+ */
+export interface Workout {
+  id: string;
+  name: string;
+  description: string;
+  duration: number; // in minutes
+  intensity: 'low' | 'medium' | 'high';
+  exercises: Exercise[];
+  dateScheduled?: string;
+  completed?: boolean;
+  dateCompleted?: string;
+}
+
+/**
+ * Exercise interface
+ * Represents a single exercise within a workout
+ */
 export interface Exercise {
   id: string;
   name: string;
-  type: 'strength' | 'cardio' | 'flexibility' | 'balance';
+  muscle: string;
+  equipment: string;
   sets?: number;
   reps?: number;
-  duration?: number; // in seconds, for timed exercises
-  weight?: number; // in kilograms
-  restBetweenSets?: number; // in seconds
+  time?: number; // in seconds
+  rest?: number; // in seconds
   notes?: string;
+  imageUrl?: string;
+  videoUrl?: string;
 }
 
-// Fitness goal
-export interface FitnessGoal {
-  id: string;
-  name: string;
-  type: 'weight' | 'strength' | 'endurance' | 'flexibility' | 'habit' | 'custom';
-  target: number | string;
-  unit?: string;
-  startDate: string;
-  endDate?: string;
-  progress: number; // 0-100%
-  completed: boolean;
-}
-
-// Nutrition data
-export interface NutritionData {
-  id: string;
-  date: string;
-  meals: Meal[];
-  totalCalories: number;
-  totalProtein: number; // in grams
-  totalCarbs: number; // in grams
-  totalFat: number; // in grams
-  totalWater: number; // in ml
-}
-
-// Meal data
-export interface Meal {
-  id: string;
-  name: string;
-  time: string;
-  foods: Food[];
-  totalCalories: number;
-}
-
-// Food data
-export interface Food {
-  id: string;
-  name: string;
-  serving: number;
-  servingUnit: string;
-  calories: number;
-  protein: number; // in grams
-  carbs: number; // in grams
-  fat: number; // in grams
-}
-
-// User measurements
-export interface UserMeasurements {
-  id: string;
-  date: string;
-  weight?: number; // in kg
-  height?: number; // in cm
-  bodyFat?: number; // percentage
-  chest?: number; // in cm
-  waist?: number; // in cm
-  hips?: number; // in cm
-  biceps?: number; // in cm
-  thighs?: number; // in cm
-}
-
-// Message type for chatbot
+/**
+ * Chat message interface
+ * Used for the chatbot conversations
+ */
 export interface Message {
   id: string;
   role: 'user' | 'assistant' | 'system';
@@ -115,39 +86,106 @@ export interface Message {
   timestamp: string;
 }
 
-// Sleep data
-export interface SleepData {
-  id: string;
+/**
+ * Fitness tracker data interface
+ * Used for storing fitness tracking data from various sources
+ */
+export interface FitnessTrackingData {
+  steps: number;
+  distance: number; // in km
+  calories: number;
+  activeMinutes: number;
+  heartRate?: {
+    average: number;
+    max: number;
+    min: number;
+  };
+  sleep?: {
+    duration: number; // in hours
+    quality: 'poor' | 'fair' | 'good' | 'excellent';
+  };
   date: string;
-  startTime: string;
-  endTime: string;
-  duration: number; // in minutes
-  quality: number; // 1-10
-  deepSleep?: number; // in minutes
-  lightSleep?: number; // in minutes
-  remSleep?: number; // in minutes
-  awake?: number; // in minutes
-  source: FitnessTrackerType;
+  source: 'google-fit' | 'apple-health' | 'fitbit' | 'strava' | 'manual';
 }
 
-// Assessment result
-export interface AssessmentResult {
+/**
+ * Progress milestone interface
+ * Represents achievements in the user's fitness journey
+ */
+export interface ProgressMilestone {
   id: string;
-  date: string;
-  category: UserCategory;
-  score: number; // 0-100
-  strengths: string[];
-  weaknesses: string[];
-  recommendations: string[];
+  name: string;
+  description: string;
+  achieved: boolean;
+  dateAchieved?: string;
+  category: 'workout' | 'nutrition' | 'consistency' | 'milestone';
+  icon?: string;
 }
 
-// User notification
-export interface UserNotification {
+/**
+ * Notification interface
+ * Used for system notifications and reminders
+ */
+export interface Notification {
   id: string;
-  type: 'workout' | 'goal' | 'measurement' | 'system';
   title: string;
   message: string;
+  type: 'reminder' | 'achievement' | 'system' | 'tracking';
   read: boolean;
   date: string;
-  actionUrl?: string;
+  action?: {
+    label: string;
+    url: string;
+  };
+}
+
+/**
+ * Feature interface
+ * Represents a feature of the Fitness AI platform
+ */
+export interface Feature {
+  id: string;
+  name: string;
+  description: string;
+  enabled: boolean;
+  premium: boolean;
+  requiredLevel: UserCategory;
+  icon?: string;
+}
+
+/**
+ * Onboarding question interface
+ * Used for the 10-question onboarding flow
+ */
+export interface OnboardingQuestion {
+  id: string;
+  question: string;
+  type: 'text' | 'select' | 'multiple' | 'range' | 'boolean';
+  options?: string[];
+  required: boolean;
+}
+
+/**
+ * Onboarding answer interface
+ * Used to store user responses from onboarding
+ */
+export interface OnboardingAnswer {
+  questionId: string;
+  value: string | string[] | number | boolean;
+}
+
+/**
+ * Fitness plan interface
+ * Represents a structured fitness program
+ */
+export interface FitnessPlan {
+  id: string;
+  name: string;
+  description: string;
+  category: UserCategory;
+  weeks: number;
+  workoutsPerWeek: number;
+  focus: string;
+  goals: string[];
+  workouts: Workout[];
 }

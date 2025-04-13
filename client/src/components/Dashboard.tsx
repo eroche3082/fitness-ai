@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { UserCategory } from '../shared/types';
+import { UserCategory, UserProfile as UserProfileType } from '../shared/types';
 import QRCodeDisplay from './QRCodeDisplay';
 import userService from '../lib/userService';
 import { generateUniqueCode } from '../lib/userCodeGenerator';
+import JourneyTab from './JourneyTab';
+import FeaturesGrid from './FeaturesGrid';
 
 interface DashboardProps {
   userCode: string;
@@ -10,7 +12,8 @@ interface DashboardProps {
 
 const Dashboard: React.FC<DashboardProps> = ({ userCode }) => {
   const [activeTab, setActiveTab] = useState('journey');
-  const [userProfile, setUserProfile] = useState<any>(null);
+  const [userProfile, setUserProfile] = useState<UserProfileType | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
   const [fitnessStats, setFitnessStats] = useState({
     workoutsCompleted: 0,
     totalMinutes: 0,

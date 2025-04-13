@@ -1,0 +1,131 @@
+MEGAPROMPT: FITNESS AI – UNIVERSAL FULL INTEGRATION AND ACTIVATION
+You are now tasked with completing and verifying the entire integration of Fitness AI across all components: frontend, backend, chatbot, onboarding, access code generation, personalized dashboard, and the 20 fitness-related AI features.
+
+This project must strictly follow the guidelines provided by the Captain. Do not change any visual frontend structure that has already been approved. Your mission is to implement the core logic and functional backbone of the Fitness AI platform and confirm that all systems are fully operational.
+
+1. Frontend Activation Checklist
+ Ensure only ONE chatbot icon is visible on the bottom right of the landing page.
+
+ The chatbot must trigger the 10-question onboarding flow, with:
+
+Question 1: What's your name?
+
+Question 2: What's your email?
+
+Questions 3–10: Multiple choice questions related to fitness goals, preferences, frequency, devices, injuries, etc.
+
+ After completing onboarding, the system must generate a unique access code (e.g. FIT-BEG-2565) and a QR code.
+
+ The chatbot must not show duplicated elements or unnecessary fields (e.g. “Create Profile”, extra chat modules, etc.)
+
+ Ensure smooth transitions and proper display of chatbot messages, code, and QR screen.
+
+ Activate all buttons in the main menu: Home, About, Programs, Contact Us, etc.
+
+ Ensure all menu links are working correctly.
+
+ Ensure AR/VR tab and Workout tab in the chatbot are functional or hidden if not yet implemented.
+
+2. Backend & Database Activation Checklist
+ Ensure that user responses are saved with:
+
+name, email, access_code, category_level, preferences, QR_reference
+
+ Verify that access codes are stored and linked to user data.
+
+ Store leads in Firebase/Firestore or designated backend DB.
+
+ Implement or verify an Admin Panel with access to all captured leads and their data.
+
+ Ensure that once a user has completed the onboarding, they can access the personalized dashboard using:
+
+The generated code (input field or redirect logic)
+
+The QR code (via mobile scan)
+
+ Optional: Connect the leads to HubSpot or exportable CSV system for newsletters.
+
+3. Dashboard Implementation (Post-Onboarding)
+The dashboard must:
+
+ Display the access code and user’s fitness level (Beginner, Intermediate, Advanced, etc.)
+
+ Show a progress tracker called “Your Journey”, showing unlocked and locked levels.
+
+ Include a section showing unlocked features and available content.
+
+4. Include All 20 Fitness AI Features Inside the Dashboard
+Each user, based on their profile, should be granted access to specific features. The system must dynamically unlock or show features based on onboarding answers.
+
+The 20 Fitness AI features:
+
+Fitness Tracker Integration
+
+Personalized Workout Generator
+
+Nutrition Analysis & Recommendations
+
+AI Form Analysis
+
+Health Metrics Visualization
+
+Voice Coaching Integration
+
+Progress Milestone Alerts
+
+Smart Goal Setting Assistant
+
+Fitness Device Connection Helper
+
+Workout Plan Scheduler
+
+Exercise Library Search
+
+Recovery Recommendation Engine
+
+Training Program Builder
+
+Community Challenge Creator
+
+Sleep Quality Analyzer
+
+Cross-Platform Activity Sync
+
+AI Personal Record Tracker
+
+Voice-Activated Data Queries
+
+Multilingual Fitness Support
+
+Workout Session Export
+
+Each of these must be:
+
+ Represented with a module or tile inside the dashboard.
+
+ Some features can be grayed out/locked and require upgrade/payment to unlock.
+
+ At least 5–10 features should be unlocked for “Beginner” users.
+
+5. Summary Output Required After Completion
+Once everything is completed, provide:
+
+ A report with at least 20 working features or activated components.
+
+ A list of 5+ features not yet activated or pending implementation.
+
+ A direct link to test the chatbot on the landing page.
+
+ A working demo of the personalized dashboard using a test code (e.g., FIT-BEG-2565).
+
+ Confirmation that the QR code is being generated and stored, and can be scanned on mobile.
+
+ Confirmation that emails and codes are being stored in the backend or Firebase.
+
+ Confirmation that the admin panel is tracking all users and codes.
+
+Final Note
+No visual redesigns. The frontend structure is approved. Focus only on functional accuracy, chatbot flow, onboarding, code logic, backend data, and dashboard integration.
+
+The mission is clear: Activate Fitness AI completely, with the onboarding code system, chatbot, dashboard, and 20 features.
+
