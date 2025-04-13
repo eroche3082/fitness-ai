@@ -1,27 +1,157 @@
 <svg width="800" height="600" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <linearGradient id="gradient3" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#3a3a3a;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#121212;stop-opacity:1" />
+      <stop offset="0%" style="stop-color:#2a2a2a;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0a0a0a;stop-opacity:1" />
     </linearGradient>
-    <radialGradient id="highlightGradient3" cx="50%" cy="30%" r="50%" fx="50%" fy="30%">
-      <stop offset="0%" style="stop-color:#666666;stop-opacity:0.7" />
-      <stop offset="100%" style="stop-color:#101010;stop-opacity:0" />
+    
+    <radialGradient id="accentGradient" cx="50%" cy="50%" r="70%" fx="50%" fy="50%">
+      <stop offset="0%" style="stop-color:#e63946;stop-opacity:0.3" />
+      <stop offset="70%" style="stop-color:#000000;stop-opacity:0" />
     </radialGradient>
+    
+    <pattern id="diagonalLines" patternUnits="userSpaceOnUse" width="40" height="40" patternTransform="rotate(45)">
+      <rect width="40" height="40" fill="none" />
+      <line x1="0" y1="20" x2="40" y2="20" stroke="#333" stroke-width="1" />
+    </pattern>
+    
+    <filter id="sharpShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="5" stdDeviation="10" flood-color="#000000" flood-opacity="0.5"/>
+    </filter>
+    
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="3" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
   </defs>
+  
+  <!-- Background layers with texture -->
   <rect width="100%" height="100%" fill="url(#gradient3)" />
-  <circle cx="400" cy="200" r="150" fill="url(#highlightGradient3)" />
-  <text x="400" y="500" font-family="Arial" font-size="36" fill="white" text-anchor="middle" font-weight="bold">MADISON FRONING</text>
+  <rect width="100%" height="100%" fill="url(#diagonalLines)" opacity="0.2" />
   
-  <!-- Silhouette of a fitness trainer with weights -->
-  <path d="M400,100 C425,100 445,120 445,160 C445,200 425,220 400,220 C375,220 355,200 355,160 C355,120 375,100 400,100 Z" fill="#252525" />
-  <path d="M370,220 C370,220 360,300 360,350 C360,380 370,420 380,450 L390,470 L390,480 L410,480 L410,470 L420,450 C430,420 440,380 440,350 C440,300 430,220 430,220 L400,240 Z" fill="#252525" />
+  <!-- Dynamic lighting effect -->
+  <circle cx="400" cy="250" r="220" fill="url(#accentGradient)" />
   
-  <!-- Weights -->
-  <rect x="310" y="320" width="70" height="20" rx="5" fill="#333" />
-  <rect x="420" y="320" width="70" height="20" rx="5" fill="#333" />
-  <circle cx="300" cy="330" r="25" fill="#444" />
-  <circle cx="390" cy="330" r="25" fill="#444" />
-  <circle cx="410" cy="330" r="25" fill="#444" />
-  <circle cx="500" cy="330" r="25" fill="#444" />
+  <!-- Decorative framework elements -->
+  <rect x="80" y="80" width="640" height="440" fill="none" stroke="#ffffff" stroke-width="1" stroke-opacity="0.1" />
+  <rect x="100" y="100" width="600" height="400" fill="none" stroke="#ffffff" stroke-width="1" stroke-opacity="0.1" />
+  
+  <!-- Accent lines -->
+  <line x1="100" y1="550" x2="700" y2="550" stroke="#e63946" stroke-width="3" opacity="0.5" />
+  <line x1="150" y1="50" x2="150" y2="120" stroke="#e63946" stroke-width="3" opacity="0.5" />
+  <line x1="650" y1="50" x2="650" y2="120" stroke="#e63946" stroke-width="3" opacity="0.5" />
+  
+  <!-- Name with enhanced styling -->
+  <g filter="url(#sharpShadow)">
+    <text x="400" y="500" font-family="Arial" font-size="36" fill="white" text-anchor="middle" font-weight="bold">MADISON FRONING</text>
+  </g>
+  
+  <!-- Trainer role/position -->
+  <text x="400" y="540" font-family="Arial" font-size="16" fill="#999999" text-anchor="middle" letter-spacing="2" font-weight="bold">STRENGTH SPECIALIST</text>
+  
+  <!-- Stylized trainer silhouette in weight lifting pose -->
+  <g transform="translate(400, 200)">
+    <!-- Head -->
+    <circle cx="0" cy="-75" r="35" fill="#191919" />
+    
+    <!-- Upper body - weight lifting stance -->
+    <path d="M0,-40 
+             C40,-40 60,-20 60,20 
+             C60,45 40,60 25,70 
+             L20,100 
+             L-20,100 
+             L-25,70 
+             C-40,60 -60,45 -60,20 
+             C-60,-20 -40,-40 0,-40 Z" 
+          fill="#131313" />
+    
+    <!-- Arms - bent in weight lifting position -->
+    <path d="M60,20 
+             L100,10 
+             L140,20 
+             L145,30 
+             L105,35 
+             L65,30 Z" 
+          fill="#191919" />
+          
+    <path d="M-60,20 
+             L-100,10 
+             L-140,20 
+             L-145,30 
+             L-105,35 
+             L-65,30 Z" 
+          fill="#191919" />
+    
+    <!-- Legs - stable stance -->
+    <path d="M20,100 
+             L30,150 
+             L35,200 
+             L0,210 
+             L-35,200 
+             L-30,150 
+             L-20,100 Z" 
+          fill="#131313" />
+  </g>
+  
+  <!-- Enhanced weight design with metallic effect -->
+  <g transform="translate(0, 10)">
+    <!-- Left dumbbell -->
+    <g transform="translate(270, 320)">
+      <!-- Handle -->
+      <rect x="0" y="-7.5" width="80" height="15" rx="7.5" fill="#444444" />
+      
+      <!-- Weight plates with shine effect -->
+      <g>
+        <!-- Main plate -->
+        <circle cx="-5" cy="0" r="30" fill="#333333" />
+        <circle cx="-5" cy="0" r="25" fill="#3c3c3c" />
+        <circle cx="-5" cy="0" r="10" fill="#222222" />
+        
+        <!-- Inner shine -->
+        <path d="M-15,-15 A30,30 0 0,1 5,15" stroke="#666666" stroke-width="2" fill="none" opacity="0.5" />
+      </g>
+      
+      <g>
+        <!-- Main plate on right side -->
+        <circle cx="85" cy="0" r="30" fill="#333333" />
+        <circle cx="85" cy="0" r="25" fill="#3c3c3c" />
+        <circle cx="85" cy="0" r="10" fill="#222222" />
+        
+        <!-- Inner shine -->
+        <path d="M75,-15 A30,30 0 0,1 95,15" stroke="#666666" stroke-width="2" fill="none" opacity="0.5" />
+      </g>
+    </g>
+    
+    <!-- Right dumbbell -->
+    <g transform="translate(450, 320)">
+      <!-- Handle -->
+      <rect x="0" y="-7.5" width="80" height="15" rx="7.5" fill="#444444" />
+      
+      <!-- Weight plates with shine effect -->
+      <g>
+        <!-- Main plate -->
+        <circle cx="-5" cy="0" r="30" fill="#333333" />
+        <circle cx="-5" cy="0" r="25" fill="#3c3c3c" />
+        <circle cx="-5" cy="0" r="10" fill="#222222" />
+        
+        <!-- Inner shine -->
+        <path d="M-15,-15 A30,30 0 0,1 5,15" stroke="#666666" stroke-width="2" fill="none" opacity="0.5" />
+      </g>
+      
+      <g>
+        <!-- Main plate on right side -->
+        <circle cx="85" cy="0" r="30" fill="#333333" />
+        <circle cx="85" cy="0" r="25" fill="#3c3c3c" />
+        <circle cx="85" cy="0" r="10" fill="#222222" />
+        
+        <!-- Inner shine -->
+        <path d="M75,-15 A30,30 0 0,1 95,15" stroke="#666666" stroke-width="2" fill="none" opacity="0.5" />
+      </g>
+    </g>
+  </g>
+  
+  <!-- Bridge branding element -->
+  <g transform="translate(750, 550)">
+    <text x="0" y="0" font-family="Arial" font-size="12" fill="#999999" text-anchor="end">BRIDGE</text>
+  </g>
 </svg>
