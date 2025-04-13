@@ -1,4 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { createUserProfile, UserCategory } from '../lib/userCodeGenerator';
+import userService from '../lib/userService';
+import vertexAIService from '../lib/vertexAIService';
+import AccessCodeScreen from './AccessCodeScreen';
 
 interface Question {
   id: number;
