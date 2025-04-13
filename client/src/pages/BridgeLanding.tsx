@@ -62,8 +62,12 @@ export default function BridgeLanding() {
       <section className="bridge-hero min-h-screen flex items-center pt-20 relative bg-black">
         <div className="absolute inset-0 z-0 bg-black opacity-70"></div>
         <div className="absolute inset-0 z-[-1] bg-black">
-          {/* Fallback color is black if image fails to load */}
-          <div className="w-full h-full bg-gradient-to-b from-black to-gray-900"></div>
+          {/* Background image using SVG gradient */}
+          <div className="w-full h-full" style={{ 
+            backgroundImage: `url(${heroBackground})`, 
+            backgroundSize: 'cover',
+            backgroundPosition: 'center'
+          }}></div>
         </div>
         <div className="container mx-auto px-4 md:px-6 relative z-10">
           <div className="max-w-4xl">
@@ -115,7 +119,12 @@ export default function BridgeLanding() {
       <section className="bg-black">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-0">
           {/* Trainer 1 */}
-          <div className="relative group h-96 bg-gray-900">
+          <div className="relative group h-96">
+            <div className="absolute inset-0" style={{ 
+              backgroundImage: `url(${trainer1})`, 
+              backgroundSize: 'cover',
+              backgroundPosition: 'center'
+            }}></div>
             <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black opacity-60"></div>
             <div className="absolute left-0 bottom-0 transform origin-bottom-left rotate-90 z-10">
               <div className="whitespace-nowrap text-white text-2xl uppercase tracking-wider font-bold py-4 px-6">
@@ -142,7 +151,12 @@ export default function BridgeLanding() {
           </div>
           
           {/* Trainer 2 */}
-          <div className="relative group h-96 bg-gray-800">
+          <div className="relative group h-96">
+            <div className="absolute inset-0" style={{ 
+              backgroundImage: `url(${trainer2})`, 
+              backgroundSize: 'cover',
+              backgroundPosition: 'center'
+            }}></div>
             <div className="absolute inset-0 bg-gradient-to-b from-transparent to-black opacity-60"></div>
             <div className="absolute left-0 bottom-0 transform origin-bottom-left rotate-90 z-10">
               <div className="whitespace-nowrap text-white text-2xl uppercase tracking-wider font-bold py-4 px-6">
