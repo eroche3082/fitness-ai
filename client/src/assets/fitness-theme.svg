@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="1440" height="800" viewBox="0 0 1440 800" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background gradient -->
+  <rect width="1440" height="800" fill="#f0fdf4"/>
+
+  <!-- Decorative elements -->
+  <path d="M0 258.5C266.5 328 533 -51 799.5 8.49999C1066 68 1332.5 48.5 1599 68V800H0V258.5Z" fill="#dcfce7" fill-opacity="0.6"/>
+  <path d="M0 525C266.5 455.5 533 798 799.5 738.5C1066 679 1332.5 738.5 1599 679V0H0V525Z" fill="#bbf7d0" fill-opacity="0.4"/>
+
+  <!-- Fitness-themed shapes -->
+  <!-- Abstract dumbbells -->
+  <circle cx="200" cy="200" r="12" fill="#15803d" fill-opacity="0.1"/>
+  <circle cx="250" cy="200" r="12" fill="#15803d" fill-opacity="0.1"/>
+  <rect x="212" y="198" width="26" height="4" fill="#15803d" fill-opacity="0.1"/>
+
+  <circle cx="1200" cy="600" r="15" fill="#15803d" fill-opacity="0.1"/>
+  <circle cx="1260" cy="600" r="15" fill="#15803d" fill-opacity="0.1"/>
+  <rect x="1215" y="598" width="30" height="4" fill="#15803d" fill-opacity="0.1"/>
+
+  <!-- Abstract heartbeat line -->
+  <path d="M100 400 L150 400 L175 350 L200 450 L225 400 L275 400" stroke="#22c55e" stroke-width="3" stroke-opacity="0.2" fill="none"/>
+  <path d="M1100 250 L1150 250 L1175 200 L1200 300 L1225 250 L1275 250" stroke="#22c55e" stroke-width="3" stroke-opacity="0.2" fill="none"/>
+
+  <!-- Abstract running figure -->
+  <circle cx="900" cy="350" r="10" fill="#15803d" fill-opacity="0.1"/>
+  <path d="M890 360 L870 390 L880 390" stroke="#15803d" stroke-width="2" stroke-opacity="0.1" fill="none"/>
+  <path d="M910 360 L930 390 L920 390" stroke="#15803d" stroke-width="2" stroke-opacity="0.1" fill="none"/>
+  <line x1="900" y1="360" x2="900" y2="380" stroke="#15803d" stroke-width="2" stroke-opacity="0.1"/>
+
+  <!-- Abstract water bottle -->
+  <rect x="600" y="500" rx="8" ry="8" width="16" height="40" fill="#a7f3d0" fill-opacity="0.3"/>
+  <rect x="603" y="490" rx="4" ry="4" width="10" height="10" fill="#a7f3d0" fill-opacity="0.3"/>
+
+  <!-- Decorative circles -->
+  <circle cx="400" cy="700" r="70" fill="#bbf7d0" fill-opacity="0.3"/>
+  <circle cx="1040" cy="120" r="50" fill="#bbf7d0" fill-opacity="0.3"/>
+  <circle cx="100" cy="150" r="30" fill="#bbf7d0" fill-opacity="0.3"/>
+  <circle cx="1300" cy="450" r="40" fill="#bbf7d0" fill-opacity="0.3"/>
+
+  <!-- Wavy pattern at the bottom -->
+  <path d="M0 740 Q180 770, 360 740 Q540 710, 720 740 Q900 770, 1080 740 Q1260 710, 1440 740 L1440 800 L0 800 Z" fill="#86efac" fill-opacity="0.2"/>
+</svg>

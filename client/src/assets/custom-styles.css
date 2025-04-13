@@ -1,18 +1,18 @@
-/* Custom Minimal Styles for Fitness AI */
+/* Custom Green Fitness & Health Styles for Fitness AI */
 
 :root {
-  --primary: #3b82f6;
-  --primary-dark: #1e40af;
-  --primary-light: #93c5fd;
-  --secondary: #f59e0b;
-  --secondary-dark: #d97706;
-  --secondary-light: #fcd34d;
-  --dark-text: #334155;
-  --light-text: #64748b;
-  --gradient-bg: #f8fafc;
+  --primary: #22c55e;        /* Green 500 */
+  --primary-dark: #15803d;   /* Green 700 */
+  --primary-light: #86efac;  /* Green 300 */
+  --secondary: #eab308;      /* Yellow 500 */
+  --secondary-dark: #a16207; /* Yellow 700 */
+  --secondary-light: #fef08a;/* Yellow 200 */
+  --dark-text: #1e293b;      /* Slate 800 */
+  --light-text: #64748b;     /* Slate 500 */
+  --gradient-bg: #f0fdf4;    /* Green 50 */
   --surface: #ffffff;
-  --coral: #f97316;
-  --blue: #3b82f6;
+  --success: #4ade80;        /* Green 400 */
+  --energy: #fbbf24;         /* Amber 400 */
 }
 
 /* General Styles */
@@ -49,9 +49,29 @@ body {
 /* Gradients */
 .gradient-bg {
   background-color: var(--gradient-bg);
-  background-image: url('../assets/minimal-theme.svg');
+  background-image: url('../assets/fitness-theme.svg');
   background-size: cover;
   background-position: center;
+}
+
+.fitness-header {
+  background: linear-gradient(120deg, var(--primary) 0%, var(--primary-dark) 100%);
+  color: white;
+}
+
+.fitness-card {
+  background-color: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(21, 128, 61, 0.1);
+}
+
+.fitness-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  border-color: rgba(21, 128, 61, 0.2);
 }
 
 /* FitnessSlider */
@@ -103,12 +123,16 @@ body {
   color: white;
 }
 
-.stat-icon.blue {
-  background-color: var(--blue);
+.stat-icon.green {
+  background-color: var(--primary);
 }
 
-.stat-icon.coral {
-  background-color: var(--coral);
+.stat-icon.dark-green {
+  background-color: var(--primary-dark);
+}
+
+.stat-icon.energy {
+  background-color: var(--secondary);
 }
 
 /* Animations */
