@@ -137,7 +137,7 @@ const samplePosts: Post[] = [
   {
     id: 'post-1',
     userId: 'user-1',
-    content: 'Just crushed my leg day workout! 💪 Feeling stronger every week. The progressive overload approach is really paying off. How's everyone else's training going this week?',
+    content: "Just crushed my leg day workout! 💪 Feeling stronger every week. The progressive overload approach is really paying off. How's everyone else's training going this week?",
     workoutData: {
       type: 'Strength',
       duration: 65,
@@ -153,13 +153,13 @@ const samplePosts: Post[] = [
       {
         id: 'comment-1',
         userId: 'user-2',
-        text: 'Amazing progress! What's your squat PR now?',
+        text: "Amazing progress! What's your squat PR now?",
         timestamp: new Date('2025-04-13T10:30:00')
       },
       {
         id: 'comment-2',
         userId: 'user-4',
-        text: 'Great work! Make sure you're focusing on proper form with those heavy lifts.',
+        text: "Great work! Make sure you're focusing on proper form with those heavy lifts.",
         timestamp: new Date('2025-04-13T11:15:00')
       }
     ],
@@ -169,14 +169,14 @@ const samplePosts: Post[] = [
   {
     id: 'post-2',
     userId: 'user-2',
-    content: 'Completed my first 10K run today! So proud of this achievement. Six months ago I couldn't even run 1K without stopping. Consistency really is key! Thanks to this community for all the motivation.',
+    content: "Completed my first 10K run today! So proud of this achievement. Six months ago I couldn't even run 1K without stopping. Consistency really is key! Thanks to this community for all the motivation.",
     images: ['https://placehold.co/600x400/png'],
     likes: 56,
     comments: [
       {
         id: 'comment-3',
         userId: 'user-3',
-        text: 'That's incredible progress! What's your next goal?',
+        text: "That's incredible progress! What's your next goal?",
         timestamp: new Date('2025-04-12T15:10:00')
       }
     ],
@@ -186,7 +186,7 @@ const samplePosts: Post[] = [
   {
     id: 'post-3',
     userId: 'user-4',
-    content: 'NEW WORKOUT GUIDE: "Building Core Strength for Beginners" is now available in the Resources section. This 4-week program focuses on building a solid foundation with progressive exercises. Let me know if you have any questions!',
+    content: "NEW WORKOUT GUIDE: \"Building Core Strength for Beginners\" is now available in the Resources section. This 4-week program focuses on building a solid foundation with progressive exercises. Let me know if you have any questions!",
     likes: 42,
     comments: [],
     timestamp: new Date('2025-04-11T11:00:00'),
@@ -197,8 +197,8 @@ const samplePosts: Post[] = [
 const sampleChallenges: Challenge[] = [
   {
     id: 'challenge-1',
-    title: '30-Day Pushup Challenge',
-    description: 'Progressively increase your pushup reps over 30 days. Start with what you can do and build from there!',
+    title: "30-Day Pushup Challenge",
+    description: "Progressively increase your pushup reps over 30 days. Start with what you can do and build from there!",
     startDate: new Date('2025-04-15'),
     endDate: new Date('2025-05-15'),
     participants: 187,
@@ -209,8 +209,8 @@ const sampleChallenges: Challenge[] = [
   },
   {
     id: 'challenge-2',
-    title: 'Spring 5K Virtual Race',
-    description: 'Run a 5K (3.1 miles) at your own pace, anywhere, anytime during the event period. Submit your time to see how you rank!',
+    title: "Spring 5K Virtual Race",
+    description: "Run a 5K (3.1 miles) at your own pace, anywhere, anytime during the event period. Submit your time to see how you rank!",
     startDate: new Date('2025-04-20'),
     endDate: new Date('2025-04-30'),
     participants: 312,
@@ -220,8 +220,8 @@ const sampleChallenges: Challenge[] = [
   },
   {
     id: 'challenge-3',
-    title: 'Mobility Master Challenge',
-    description: 'Complete daily 15-minute mobility routines for better flexibility, less pain, and improved performance.',
+    title: "Mobility Master Challenge",
+    description: "Complete daily 15-minute mobility routines for better flexibility, less pain, and improved performance.",
     startDate: new Date('2025-05-01'),
     endDate: new Date('2025-05-21'),
     participants: 134,
@@ -233,8 +233,8 @@ const sampleChallenges: Challenge[] = [
 const sampleEvents: Event[] = [
   {
     id: 'event-1',
-    title: 'Nutrition for Performance Webinar',
-    description: 'Learn how to optimize your nutrition for better workout performance and recovery with our nutrition expert.',
+    title: "Nutrition for Performance Webinar",
+    description: "Learn how to optimize your nutrition for better workout performance and recovery with our nutrition expert.",
     date: new Date('2025-04-20T18:00:00'),
     location: 'Online (Zoom)',
     organizer: 'Fitness AI Team',
@@ -244,8 +244,8 @@ const sampleEvents: Event[] = [
   },
   {
     id: 'event-2',
-    title: 'HIIT Workout Session',
-    description: 'Join us for a live 45-minute high-intensity interval training session suitable for all fitness levels.',
+    title: "HIIT Workout Session",
+    description: "Join us for a live 45-minute high-intensity interval training session suitable for all fitness levels.",
     date: new Date('2025-04-22T19:30:00'),
     location: 'Online (Zoom)',
     organizer: 'Coach Emma',
@@ -254,8 +254,8 @@ const sampleEvents: Event[] = [
   },
   {
     id: 'event-3',
-    title: 'Ask a Trainer: Q&A Session',
-    description: 'Have your fitness and nutrition questions answered by our certified trainers in this interactive session.',
+    title: "Ask a Trainer: Q&A Session",
+    description: "Have your fitness and nutrition questions answered by our certified trainers in this interactive session.",
     date: new Date('2025-04-25T17:00:00'),
     location: 'Online (Discord)',
     organizer: 'Fitness AI Coaches',

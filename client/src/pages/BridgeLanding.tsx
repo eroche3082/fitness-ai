@@ -559,6 +559,15 @@ export default function BridgeLanding() {
         </div>
       </section>
 
+      {/* Dashboard Preview Section */}
+      <DashboardPreview />
+
+      {/* Features Showcase */}
+      <FeaturesShowcase />
+
+      {/* QR Code Demo Section */}
+      <QRCodeDemoSection />
+
       {/* CTA Block After Memberships */}
       <section className="py-20 bg-green-500 text-black">
         <div className="container mx-auto px-4 md:px-6">
