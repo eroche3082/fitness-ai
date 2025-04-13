@@ -29,6 +29,9 @@ import {
   training5,
   training6
 } from '../assets/images';
+import QRCodeDemoSection from '../components/QRCodeDemoSection';
+import DashboardPreview from '../components/DashboardPreview';
+import FeaturesShowcase from '../components/FeaturesShowcase';
 
 export default function BridgeLanding() {
   return (

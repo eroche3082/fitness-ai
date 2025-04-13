@@ -1,0 +1,261 @@
+FITNESS AI – FULL SYSTEM UPGRADE & FEATURE IMPLEMENTATION (PHASE 3 FINAL)
+✅ LANGUAGE: All UI and prompts in English
+✅ GOAL: Validate and enhance the Fitness AI platform across onboarding, dashboard, features, AI routines, and monetization.
+
+📌 PHASE 1 – HOMEPAGE & NAVIGATION CHECK
+Main Menu Tabs
+
+✅ Home
+
+✅ Dashboard
+
+✅ Fitness Trackers
+
+✅ AI Assistant
+
+✅ Voice Coaching
+
+✅ Login / Logout
+
+✅ Plans / Pricing
+
+✅ Features
+
+✅ Contact
+
+✅ Terms of Use / Privacy Policy
+
+🔄 Make sure all routes are connected and active. All tabs must be functional and labeled in English.
+
+Hero Section
+
+Headline: “Train Smarter. Move Stronger. Powered by AI.”
+
+CTA Buttons: “Get Started” → onboarding | “Explore Plans” → pricing
+
+Background: Replace with dynamic fitness-themed video or animated visual
+
+Features Block
+
+Add a full list of 20 features in card format:
+
+Smart Workout Analysis
+
+Adaptive Training
+
+Health Tracker Integration (Google Fit, Apple Health)
+
+Voice-Guided Workouts
+
+Rep Counter
+
+Form Visualizer
+
+Recovery Recommendations
+
+Community Challenges
+
+Rest Timer
+
+Personalized Analytics
+
+Real-time Feedback
+
+AI Nutrition Coach
+
+Meal Planning System
+
+Subscription Tiers
+
+QR Code Access System
+
+Workout Video Generator
+
+AR/VR Training Experience
+
+Goal Milestone Tracker
+
+Body Progress Graph
+
+Exportable Fitness Reports
+
+📌 PHASE 2 – ONBOARDING FLOW & ACCESS CODE SYSTEM
+Floating ChatBot (bottom right)
+
+✅ Connected to Vertex AI + Gemini
+
+Onboarding questions (10 steps):
+
+Name
+
+Email
+
+Age Group
+
+Gender
+
+Fitness Goal
+
+Preferred Workout Style
+
+Time Availability
+
+Equipment Access
+
+Meal Preference
+
+Health Conditions or Injuries
+
+Access Code
+
+Generate personalized fitness code: FIT-[LEVEL]-XXXX
+
+Levels: BEGINNER / INTERMEDIATE / ADVANCED / PRO / VIP
+
+Onboarding Email
+
+Send welcome email via SendGrid with:
+
+Summary of preferences
+
+Personalized code
+
+Link to access dashboard
+
+Suggested plan based on level
+
+📌 PHASE 3 – DASHBOARD STRUCTURE
+User Dashboard Tabs
+
+My Routine
+
+Workout Library
+
+Nutrition Coach
+
+Fitness Tracker
+
+My Code & Access Level
+
+Progress Graph
+
+Premium Plans
+
+Upload Progress (Photo/Video)
+
+Weekly Challenges
+
+Community Feed
+
+Settings
+
+Dashboard Behavior
+
+Show user’s fitness level, routine, and completed milestones
+
+Display dynamic data using real-time Google Cloud backend
+
+Enable access to premium content via access code unlock
+
+📌 PHASE 4 – AI-GENERATED WORKOUT & CONTENT
+Workout Generator
+
+AI recommends routines based on onboarding data
+
+Includes: reps, rest time, sets, form tips
+
+Enables user to check off completed exercises
+
+Video + Social Integration
+
+Let user record workout videos inside dashboard
+
+Generate Social Media Post (using Vertex):
+
+Format: Reel, Story, Carousel
+
+Auto-caption: Workout completed, fitness level, calories burned
+
+Connect with:
+
+Instagram, TikTok, YouTube Shorts, Facebook
+
+📌 PHASE 5 – AR / VR INTEGRATION
+AR Feature
+
+Use camera to verify form
+
+Project AI-generated avatar doing the exercise beside the user
+
+Track reps and form feedback visually
+
+QR Code Testing
+
+After generating a workout, produce QR code
+
+Let user scan on mobile and activate form assistant on phone
+
+📌 PHASE 6 – MEMBERSHIP SYSTEM & PAYMENTS
+Plans
+
+Starter
+
+Pro
+
+Elite
+
+Professional
+
+VIP
+
+Checkout
+
+Connected with Stripe and/or PayPal
+
+After payment, trigger access code email + unlock dashboard content
+
+Promo Codes
+
+Allow promo codes for discounts
+
+Auto-generate Access Code based on chosen tier
+
+📌 PHASE 7 – ADMIN PANEL INTEGRATION
+Admin Dashboard
+
+Secure route /admin
+
+Show list of leads
+
+Export CSV
+
+Track user levels, plans, activity
+
+QR Code logs, content created, videos uploaded
+
+📌 PHASE 8 – EXTERNAL INTEGRATIONS
+✅ Stripe → Payments
+
+✅ SendGrid → Emails
+
+✅ Firebase → Storage & Auth
+
+✅ Google Fit / Apple Health → Fitness Data
+
+✅ Gemini & Vertex AI → Conversational & Analysis AI
+
+✅ Google Translate → Multilingual Content
+
+📌 FINAL TASKS & REPORT
+📥 Send full report:
+
+✅ List of what is working (20+ points)
+
+⚠️ List of missing items or errors (5+)
+
+💡 Suggestions for improvement
+
+📸 Include screenshots of working features
+
+⚙️ Run a full test of all flows (onboarding → dashboard → workout → content)
+
