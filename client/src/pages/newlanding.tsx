@@ -79,7 +79,12 @@ export default function LandingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-bg">
+    <div className="min-h-screen bg-gradient-bg relative overflow-hidden">
+      {/* Abstract Background */}
+      <div className="absolute inset-0 w-full h-full overflow-hidden z-0 pointer-events-none">
+        <img src="/src/assets/abstract-bg.svg" alt="" className="w-full h-auto min-h-full object-cover"/>
+      </div>
+      
       {/* Side Panel */}
       <SidePanel isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
@@ -264,7 +269,13 @@ export default function LandingPage() {
       </section>
 
       {/* Features Section */}
-      <section className="py-20 bg-gradient-bg">
+      <section className="py-20 bg-gradient-bg relative overflow-hidden">
+        {/* Abstract Background Elements */}
+        <div className="absolute inset-0 w-full h-full overflow-hidden z-0 pointer-events-none opacity-30">
+          <div className="absolute top-1/4 -left-10 w-40 h-40 rounded-full bg-green-200"></div>
+          <div className="absolute bottom-1/3 -right-20 w-64 h-64 rounded-full bg-green-300 opacity-30"></div>
+          <div className="absolute bottom-0 left-1/3 w-40 h-40 rounded-full bg-primary opacity-20"></div>
+        </div>
         <div className="container mx-auto px-4 md:px-6">
           <div className="text-center mb-16">
             <div className="inline-block px-4 py-1 rounded-full bg-green-100 text-primary text-sm font-medium mb-4">
@@ -404,7 +415,13 @@ export default function LandingPage() {
       </section>
 
       {/* Testimonials */}
-      <section className="py-20 bg-gradient-bg">
+      <section className="py-20 bg-gradient-bg relative overflow-hidden">
+        {/* Abstract Background Elements */}
+        <div className="absolute inset-0 w-full h-full overflow-hidden z-0 pointer-events-none opacity-30">
+          <div className="absolute -top-10 right-1/4 w-48 h-48 rounded-full bg-green-200"></div>
+          <div className="absolute top-1/2 -right-10 w-36 h-36 rounded-full bg-green-300 opacity-30"></div>
+          <div className="absolute -bottom-10 left-1/4 w-52 h-52 rounded-full bg-primary opacity-20"></div>
+        </div>
         <div className="container mx-auto px-4 md:px-6">
           <div className="text-center mb-16">
             <div className="inline-block px-4 py-1 rounded-full bg-green-100 text-primary text-sm font-medium mb-4">
