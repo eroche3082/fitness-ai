@@ -555,182 +555,164 @@ export default function LandingPage() {
       </section>
 
       {/* Pricing Plans */}
-      <section className="py-20 bg-gradient-bg relative overflow-hidden">
-        {/* Abstract Background Elements */}
-        <div className="absolute inset-0 w-full h-full overflow-hidden z-0 pointer-events-none opacity-30">
-          <div className="absolute top-10 left-1/4 w-56 h-56 rounded-full bg-green-200"></div>
-          <div className="absolute bottom-20 right-1/4 w-72 h-72 rounded-full bg-green-300 opacity-30"></div>
-          <div className="absolute top-1/3 right-0 w-48 h-48 rounded-full bg-primary opacity-20"></div>
-        </div>
+      <section className="py-20 bg-white">
         <div className="container mx-auto px-4 md:px-6">
           <div className="text-center mb-16">
-            <div className="inline-block px-4 py-1 rounded-full bg-green-100 text-primary text-sm font-medium mb-4">
-              <span className="flex items-center justify-center">
-                <Zap className="h-4 w-4 mr-2" />
-                Pricing Plans
-              </span>
-            </div>
-            <h2 className="text-3xl md:text-4xl font-bold text-dark-text mb-4">Choose Your Fitness Journey</h2>
-            <p className="text-xl text-light-text max-w-3xl mx-auto">
+            <h2 className="text-3xl md:text-4xl font-bold text-primary-dark mb-4">Choose Your Fitness Journey</h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
               Select the perfect plan for your fitness goals and lifestyle.
             </p>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12">
             {/* Basic Plan */}
-            <div className="pricing-card shadow-lg">
-              <div className="pricing-card-header">
-                <Badge variant="outline" className="mb-4">Basic</Badge>
-                <div className="flex items-end justify-center mb-2">
-                  <span className="text-4xl font-bold">$9</span>
-                  <span className="text-xl text-light-text">/month</span>
+            <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100 hover:shadow-xl transition-all">
+              <div className="p-8 text-center border-b border-gray-100">
+                <h3 className="text-xl font-bold text-gray-800 mb-2">Basic</h3>
+                <div className="flex items-end justify-center mb-4">
+                  <span className="text-4xl font-bold text-primary">$9</span>
+                  <span className="text-gray-500 ml-1">/month</span>
                 </div>
-                <p className="text-light-text">Perfect for fitness beginners</p>
+                <p className="text-gray-600">Perfect for fitness beginners</p>
               </div>
-              <div className="pricing-card-content">
-                <ul className="pricing-feature-list">
-                  <li className="pricing-feature-item">
-                    <CheckCircle className="pricing-feature-icon h-5 w-5 flex-shrink-0" />
+              <div className="p-8">
+                <ul className="space-y-4">
+                  <li className="flex items-start">
+                    <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 mr-3 flex-shrink-0" />
                     <span>Basic workout plans</span>
                   </li>
-                  <li className="pricing-feature-item">
-                    <CheckCircle className="pricing-feature-icon h-5 w-5 flex-shrink-0" />
+                  <li className="flex items-start">
+                    <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 mr-3 flex-shrink-0" />
                     <span>AI-powered nutrition guidance</span>
                   </li>
-                  <li className="pricing-feature-item">
-                    <CheckCircle className="pricing-feature-icon h-5 w-5 flex-shrink-0" />
+                  <li className="flex items-start">
+                    <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 mr-3 flex-shrink-0" />
                     <span>Connect 2 fitness devices</span>
                   </li>
-                  <li className="pricing-feature-item">
-                    <CheckCircle className="pricing-feature-icon h-5 w-5 flex-shrink-0" />
+                  <li className="flex items-start">
+                    <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 mr-3 flex-shrink-0" />
                     <span>Weekly progress reports</span>
                   </li>
-                  <li className="pricing-feature-item text-gray-400">
-                    <X className="h-5 w-5 flex-shrink-0 mr-2" />
+                  <li className="flex items-start text-gray-400">
+                    <X className="h-5 w-5 mt-0.5 mr-3 flex-shrink-0" />
                     <span>Voice coaching</span>
                   </li>
-                  <li className="pricing-feature-item text-gray-400">
-                    <X className="h-5 w-5 flex-shrink-0 mr-2" />
+                  <li className="flex items-start text-gray-400">
+                    <X className="h-5 w-5 mt-0.5 mr-3 flex-shrink-0" />
                     <span>Advanced analytics</span>
                   </li>
                 </ul>
               </div>
-              <div className="pricing-card-footer">
-                <Button className="w-full bg-primary text-white hover:bg-primary-dark">Get Started</Button>
+              <div className="px-8 pb-8">
+                <Button className="w-full bg-primary text-white font-medium py-3">Get Started</Button>
               </div>
             </div>
             
             {/* Pro Plan */}
-            <div className="pricing-card pricing-highlight shadow-xl scale-105 transform z-10">
-              <div className="pricing-card-header">
-                <Badge className="bg-white text-primary mb-4">Pro</Badge>
-                <div className="flex items-end justify-center mb-2">
-                  <span className="text-4xl font-bold">$19</span>
-                  <span className="text-xl text-white/70">/month</span>
+            <div className="bg-gradient-to-br from-primary to-primary-dark rounded-xl shadow-xl overflow-hidden border border-primary transform scale-105 z-10">
+              <div className="p-8 text-center border-b border-white/10">
+                <h3 className="text-xl font-bold text-white mb-2">Pro</h3>
+                <div className="flex items-end justify-center mb-4">
+                  <span className="text-4xl font-bold text-white">$19</span>
+                  <span className="text-white/70 ml-1">/month</span>
                 </div>
                 <p className="text-white/80">Most popular for fitness enthusiasts</p>
               </div>
-              <div className="pricing-card-content">
-                <ul className="pricing-feature-list">
-                  <li className="pricing-feature-item">
-                    <CheckCircle className="pricing-feature-icon h-5 w-5 flex-shrink-0" />
+              <div className="p-8">
+                <ul className="space-y-4 text-white">
+                  <li className="flex items-start">
+                    <CheckCircle className="h-5 w-5 text-white mt-0.5 mr-3 flex-shrink-0" />
                     <span>Advanced workout plans</span>
                   </li>
-                  <li className="pricing-feature-item">
-                    <CheckCircle className="pricing-feature-icon h-5 w-5 flex-shrink-0" />
+                  <li className="flex items-start">
+                    <CheckCircle className="h-5 w-5 text-white mt-0.5 mr-3 flex-shrink-0" />
                     <span>Personalized meal planning</span>
                   </li>
-                  <li className="pricing-feature-item">
-                    <CheckCircle className="pricing-feature-icon h-5 w-5 flex-shrink-0" />
+                  <li className="flex items-start">
+                    <CheckCircle className="h-5 w-5 text-white mt-0.5 mr-3 flex-shrink-0" />
                     <span>Connect 5 fitness devices</span>
                   </li>
-                  <li className="pricing-feature-item">
-                    <CheckCircle className="pricing-feature-icon h-5 w-5 flex-shrink-0" />
+                  <li className="flex items-start">
+                    <CheckCircle className="h-5 w-5 text-white mt-0.5 mr-3 flex-shrink-0" />
                     <span>Voice coaching with rep counting</span>
                   </li>
-                  <li className="pricing-feature-item">
-                    <CheckCircle className="pricing-feature-icon h-5 w-5 flex-shrink-0" />
+                  <li className="flex items-start">
+                    <CheckCircle className="h-5 w-5 text-white mt-0.5 mr-3 flex-shrink-0" />
                     <span>Detailed progress analytics</span>
                   </li>
-                  <li className="pricing-feature-item">
-                    <CheckCircle className="pricing-feature-icon h-5 w-5 flex-shrink-0" />
+                  <li className="flex items-start">
+                    <CheckCircle className="h-5 w-5 text-white mt-0.5 mr-3 flex-shrink-0" />
                     <span>Priority support</span>
                   </li>
                 </ul>
               </div>
-              <div className="pricing-card-footer border-t border-white/10">
-                <Button className="w-full bg-white text-primary hover:bg-white/90">Get Pro</Button>
+              <div className="px-8 pb-8">
+                <Button className="w-full bg-white text-primary hover:bg-white/90 font-medium py-3">Get Pro</Button>
               </div>
             </div>
             
             {/* Premium Plan */}
-            <div className="pricing-card shadow-lg">
-              <div className="pricing-card-header">
-                <Badge variant="outline" className="mb-4">Premium</Badge>
-                <div className="flex items-end justify-center mb-2">
-                  <span className="text-4xl font-bold">$29</span>
-                  <span className="text-xl text-light-text">/month</span>
+            <div className="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-100 hover:shadow-xl transition-all">
+              <div className="p-8 text-center border-b border-gray-100">
+                <h3 className="text-xl font-bold text-gray-800 mb-2">Premium</h3>
+                <div className="flex items-end justify-center mb-4">
+                  <span className="text-4xl font-bold text-primary">$29</span>
+                  <span className="text-gray-500 ml-1">/month</span>
                 </div>
-                <p className="text-light-text">For serious athletes and professionals</p>
+                <p className="text-gray-600">For serious athletes and professionals</p>
               </div>
-              <div className="pricing-card-content">
-                <ul className="pricing-feature-list">
-                  <li className="pricing-feature-item">
-                    <CheckCircle className="pricing-feature-icon h-5 w-5 flex-shrink-0" />
+              <div className="p-8">
+                <ul className="space-y-4">
+                  <li className="flex items-start">
+                    <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 mr-3 flex-shrink-0" />
                     <span>Elite workout plans</span>
                   </li>
-                  <li className="pricing-feature-item">
-                    <CheckCircle className="pricing-feature-icon h-5 w-5 flex-shrink-0" />
+                  <li className="flex items-start">
+                    <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 mr-3 flex-shrink-0" />
                     <span>Pro nutrition & recovery coaching</span>
                   </li>
-                  <li className="pricing-feature-item">
-                    <CheckCircle className="pricing-feature-icon h-5 w-5 flex-shrink-0" />
+                  <li className="flex items-start">
+                    <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 mr-3 flex-shrink-0" />
                     <span>Unlimited device connections</span>
                   </li>
-                  <li className="pricing-feature-item">
-                    <CheckCircle className="pricing-feature-icon h-5 w-5 flex-shrink-0" />
+                  <li className="flex items-start">
+                    <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 mr-3 flex-shrink-0" />
                     <span>Advanced voice coaching</span>
                   </li>
-                  <li className="pricing-feature-item">
-                    <CheckCircle className="pricing-feature-icon h-5 w-5 flex-shrink-0" />
+                  <li className="flex items-start">
+                    <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 mr-3 flex-shrink-0" />
                     <span>Predictive performance analytics</span>
                   </li>
-                  <li className="pricing-feature-item">
-                    <CheckCircle className="pricing-feature-icon h-5 w-5 flex-shrink-0" />
+                  <li className="flex items-start">
+                    <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 mr-3 flex-shrink-0" />
                     <span>1-on-1 expert consultations</span>
                   </li>
                 </ul>
               </div>
-              <div className="pricing-card-footer">
-                <Button className="w-full bg-primary text-white hover:bg-primary-dark">Get Premium</Button>
+              <div className="px-8 pb-8">
+                <Button className="w-full bg-primary text-white font-medium py-3">Get Premium</Button>
               </div>
             </div>
           </div>
           
-          <div className="text-center mt-12 text-light-text">
+          <div className="text-center mt-10 text-gray-500">
             <p>All plans include a 14-day free trial. No credit card required to start.</p>
           </div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 fitness-header relative overflow-hidden">
-        {/* Abstract Background Elements */}
-        <div className="absolute inset-0 w-full h-full overflow-hidden z-0 pointer-events-none opacity-50">
-          <div className="absolute -bottom-20 -left-20 w-64 h-64 rounded-full bg-green-500 opacity-20"></div>
-          <div className="absolute top-10 right-10 w-32 h-32 rounded-full bg-green-300 opacity-30"></div>
-          <div className="absolute bottom-1/3 right-1/4 w-40 h-40 rounded-full bg-white opacity-10"></div>
-        </div>
+      <section className="py-20 bg-gradient-to-br from-primary to-primary-dark">
         <div className="container mx-auto px-4 md:px-6">
           <div className="max-w-3xl mx-auto text-center">
             <h2 className="text-3xl md:text-4xl font-bold mb-6 text-white">Start Your Fitness Transformation Today</h2>
-            <p className="text-xl mb-8 text-white/80">
+            <p className="text-xl mb-8 text-white/90">
               Join thousands of users who have already revolutionized their approach to fitness with our AI-powered platform.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button 
                 size="lg" 
-                className="bg-white text-primary-dark hover:bg-white/90 font-medium"
+                className="bg-white text-primary-dark hover:bg-white/90 font-medium py-6 px-8 text-lg"
                 onClick={() => setShowSignupModal(true)}
               >
                 Start For Free
@@ -739,12 +721,12 @@ export default function LandingPage() {
               <Button 
                 variant="outline" 
                 size="lg"
-                className="border-white text-white hover:bg-white/10"
+                className="border-white text-white hover:bg-white/10 py-6 px-8 text-lg"
               >
                 View Pricing
               </Button>
             </div>
-            <p className="text-white/70 mt-6 text-sm">
+            <p className="text-white/80 mt-6">
               No credit card required. Free 14-day trial.
             </p>
           </div>
