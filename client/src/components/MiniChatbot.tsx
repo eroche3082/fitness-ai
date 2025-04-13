@@ -311,23 +311,65 @@ export default function MiniChatbot() {
     setMessages(prev => [...prev, { text: formattedAnswer, sender: 'user' }]);
   };
 
-  // Generate unique code based on user answers
-  const generateUniqueCode = (): string => {
-    // Get user's fitness level from answers (question 3)
-    const fitnessLevel = answers[3] || 'beginner';
+  // AI-based user analysis and categorization
+  const analyzeUserWithAI = async (): Promise<{
+    category: UserCategory;
+    code: string;
+    profile: any;
+  }> => {
+    // In a real implementation, this would call the Vertex AI API
+    // Convert answers to a structured user profile
+    const userProfile = {
+      name: answers[1] || '',
+      email: answers[2] || '',
+      fitnessLevel: answers[3] || 'beginner',
+      fitnessGoals: Array.isArray(answers[4]) ? answers[4] : [answers[4]],
+      limitations: answers[5] || 'none',
+      workoutFrequency: answers[6] || '1-2_times',
+      preferredTime: answers[7] || 'flexible',
+      dietPreference: answers[8] || 'no_restriction',
+      sleepHours: answers[9] || '6-7_hours',
+      voiceCoaching: answers[10] || 'sometimes',
+    };
     
-    // Generate random 4-digit number
-    const randomNum = Math.floor(1000 + Math.random() * 9000);
-    
-    // Create code pattern: FIT-[LEVEL]-[RANDOM]
-    let levelCode = 'BEG'; // Default
-    
-    if (typeof fitnessLevel === 'string') {
-      if (fitnessLevel.includes('intermediate')) levelCode = 'INT';
-      else if (fitnessLevel.includes('advanced')) levelCode = 'ADV';
+    try {
+      // Use VertexAI service to analyze the user data
+      const analysis = await vertexAIService.analyzeWithVertexAI({
+        type: 'user_categorization',
+        userData: userProfile
+      });
+      
+      // Get the category from the analysis
+      const category = (analysis.result?.category || 'BEG') as UserCategory;
+      
+      // Generate code
+      const code = createUserProfile(userProfile).uniqueCode || '';
+      
+      return {
+        category,
+        code,
+        profile: userProfile
+      };
+    } catch (error) {
+      console.error('Error analyzing user with AI:', error);
+      
+      // Fallback categorization
+      let category: UserCategory = 'BEG';
+      if (userProfile.fitnessLevel === 'advanced') {
+        category = 'ADV';
+      } else if (userProfile.fitnessLevel === 'intermediate') {
+        category = 'INT';
+      }
+      
+      // Generate code
+      const code = `FIT-${category}-${Math.floor(1000 + Math.random() * 9000)}`;
+      
+      return {
+        category,
+        code,
+        profile: userProfile
+      };
     }
-    
-    return `FIT-${levelCode}-${randomNum}`;
   };
 
   // Handle multi-select submit
@@ -340,6 +382,15 @@ export default function MiniChatbot() {
   };
 
   // Go to next step
+  // State for access code screen
+  const [showAccessScreen, setShowAccessScreen] = useState(false);
+  const [userAnalysis, setUserAnalysis] = useState<{
+    category: UserCategory;
+    code: string;
+    profile: any;
+  } | null>(null);
+  
+  // Go to next question or finish onboarding
   const goToNextStep = () => {
     if (currentStep < questions.length) {
       // Move to next question
@@ -359,37 +410,50 @@ export default function MiniChatbot() {
       // Onboarding complete
       setOnboardingComplete(true);
       
-      // Generate unique code
-      const userCode = generateUniqueCode();
-      
       // Show loading message
       setMessages(prev => [...prev, { 
-        text: 'Thanks for completing the onboarding! Analyzing your responses...', 
+        text: 'Thanks for completing the onboarding! Analyzing your responses with Vertex AI...', 
         sender: 'bot' 
       }]);
       
-      // Simulate AI analysis (In a real app, this would call Vertex AI)
-      setTimeout(() => {
+      // Use the AI analysis function
+      analyzeUserWithAI().then(analysis => {
+        setUserAnalysis(analysis);
+        
+        // Save to user service
+        const userProfile = {
+          name: answers[1] || '',
+          email: answers[2] || '',
+          fitnessLevel: answers[3] || 'beginner',
+          fitnessGoals: Array.isArray(answers[4]) ? answers[4] : [answers[4] || ''],
+          limitations: answers[5] || 'none',
+          workoutFrequency: answers[6] || '1-2_times',
+          preferredTime: answers[7] || 'morning',
+          dietPreference: answers[8] || 'no_restriction',
+          sleepHours: answers[9] || '6-7_hours',
+          waterIntake: answers[10] || '1-2_liters',
+          uniqueCode: analysis.code,
+          category: analysis.category
+        };
+        
+        // Save user profile to local storage
+        userService.saveUserProfile(userProfile);
+        
+        // Create lead for tracking
+        const lead = userService.createLead(userProfile);
+        userService.saveLead(lead);
+        
+        // Show completion message
         setMessages(prev => [...prev, {
-          text: 'Loading your personalized dashboard...',
+          text: 'Your personalized fitness profile is ready! I\'ve created a unique access code for your dashboard.',
           sender: 'bot'
         }]);
         
-        // Simulate completion and show code
+        // Show access screen after a short delay
         setTimeout(() => {
-          setMessages(prev => [...prev, {
-            text: `Your unique access code is: ${userCode}\n\nYou can use this code to unlock your personalized fitness dashboard. Scan the QR code or click the button below to access your dashboard.`,
-            sender: 'bot'
-          }]);
-          
-          // Save answers to database with the generated code
-          saveToDatabase({
-            ...answers,
-            uniqueCode: userCode,
-            timestamp: new Date().toISOString()
-          });
+          setShowAccessScreen(true);
         }, 1000);
-      }, 1500);
+      });
     }
   };
 
