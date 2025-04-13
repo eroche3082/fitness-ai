@@ -1,0 +1,202 @@
+GOAL:
+Finalize and polish the Fitness AI platform by ensuring all features are active, scalable, and fully connected, including AI integrations, membership flow, AR/voice systems, and onboarding.
+
+📍 MAIN DIRECTIVES
+Please review and implement the following directives to complete the Fitness AI platform:
+
+🔁 1. Homepage Finalization
+✅ Ensure all main menu tabs are active:
+
+Home
+
+Dashboard
+
+Fitness Trackers
+
+Voice Coaching
+
+Workout History (NEW)
+
+Meal Plans (NEW)
+
+Goals (NEW)
+
+Community (NEW)
+
+API Status
+
+Settings
+
+Login/Logout
+
+✅ All labels must be in English
+
+✅ All buttons must scroll or route to functional pages
+
+✅ Add visual previews of dashboard and features on homepage
+
+✅ Add QR code demo section showing how routines can be scanned/viewed
+
+🤖 2. ChatBot Finalization
+✅ Ensure the chatbot:
+
+Is visible on the bottom-right corner
+
+Initiates with: What’s your name?
+
+Follows with: What’s your email?
+
+Then launches the 10-question multiple selection onboarding
+
+✅ Connect to Gemini Flash (Vertex AI) with proper model fallback
+
+✅ After the flow, the system must:
+
+Analyze the user
+
+Generate a Fitness Access Code (e.g. FIT-BEG-2749)
+
+Show QR code and code string
+
+Store lead in the Admin Panel with name, email, level, preferences
+
+💪 3. Voice Coaching & Rep Counting
+✅ Voice system must:
+
+Detect form via video and audio
+
+Count reps with noise reduction logic
+
+Provide live feedback (animated tips)
+
+Suggest rest time and record completed reps
+
+✅ Add video preview to explain how voice coaching works
+
+🧠 4. AI-Driven Smart Features
+Ensure the following smart features are fully implemented:
+
+AI Form Correction (via Google Vision)
+
+AI Rep Tracking (adaptive thresholds)
+
+AI Smart Routine Generator
+
+AI-Driven Meal Plan Generator (connect GPT/Gemini)
+
+AI Workout Summary Email (SendGrid)
+
+Must include: reps, exercises completed, feedback, QR Code
+
+🛍️ 5. Membership Flow
+✅ Display five tiers clearly:
+
+Starter | Pro | Elite | Professional | VIP
+
+✅ Access codes unlock specific dashboard tabs/features
+
+✅ All pricing buttons must redirect to Stripe or QR payment flow
+
+✅ Add promo codes field + optional code generator
+
+🔌 6. API Integrations
+Ensure the following APIs are connected and functioning:
+
+✅ Google Fit
+
+✅ Apple Health
+
+✅ Strava
+
+❌ Fitbit (→ Implement API keys now)
+
+✅ Google Cloud Speech-to-Text
+
+✅ Google Cloud Vision
+
+✅ Firebase Auth
+
+✅ Stripe
+
+✅ SendGrid
+
+📥 7. Admin Panel
+✅ Add /admin route with auth (admin/admin123456)
+
+✅ Display:
+
+All leads captured via chatbot
+
+Their fitness category
+
+Their access code
+
+Membership tier
+
+✅ Allow:
+
+Export to CSV
+
+Search/filter by level (e.g., PRO, VIP)
+
+Edit user level manually
+
+🎥 8. Media Content Upgrade
+✅ Add workout demonstration videos (YouTube embeds or hosted)
+
+✅ Add animations to hero section
+
+✅ Add dashboard screenshots on homepage
+
+✅ Add video preview of onboarding chatbot
+
+✅ Add icon-based feature explanations in landing
+
+📈 9. Post-Routine Social Posting
+✅ After a routine is completed:
+
+Show a summary
+
+Allow user to generate a social media post
+
+Include workout, reps, calories burned
+
+Connect to: Instagram, YouTube Shorts, TikTok, X, Pinterest
+
+📲 10. Smart Suggestions to Include in Footer or CTA
+Add:
+
+Fitness Challenge of the Week
+
+Leaderboard & Community Ranks
+
+Join Fitness AI Newsletter
+
+Language Selector
+
+Terms of Use, Privacy Policy
+
+🌟 OPTIONAL ADD-ONS (Future Sprint)
+Gamified Journey System: Badges, levels, XP
+
+Fitness AI App Download: Add QR to app launcher
+
+Multi-device sync: Allow live workout sync from desktop to mobile
+
+Apple Pay / Google Pay: Add to Stripe payment sheet
+
+🔚 Final Steps for the Agent
+✅ Confirm all 20+ features are implemented
+
+✅ Confirm chatbot flow is functional with code + dashboard
+
+✅ Confirm all APIs are live
+
+✅ Submit final checklist of:
+
+✅ What is working
+
+❌ What is missing
+
+💡 Suggestions for optimization
+

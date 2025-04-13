@@ -38,6 +38,10 @@ import {
   Headphones, 
   MessageSquare,
   Info,
+  History,
+  Utensils,
+  Target,
+  Users,
   Settings as SettingsIcon
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
@@ -91,6 +95,30 @@ function MainNavigation() {
             <a className="flex items-center px-3 py-2 rounded-md hover:bg-accent">
               <Headphones className="h-5 w-5 mr-3" />
               <span>Voice Coaching</span>
+            </a>
+          </Link>
+          <Link href="/workout-history">
+            <a className="flex items-center px-3 py-2 rounded-md hover:bg-accent">
+              <History className="h-5 w-5 mr-3" />
+              <span>Workout History</span>
+            </a>
+          </Link>
+          <Link href="/meal-plans">
+            <a className="flex items-center px-3 py-2 rounded-md hover:bg-accent">
+              <Utensils className="h-5 w-5 mr-3" />
+              <span>Meal Plans</span>
+            </a>
+          </Link>
+          <Link href="/goals">
+            <a className="flex items-center px-3 py-2 rounded-md hover:bg-accent">
+              <Target className="h-5 w-5 mr-3" />
+              <span>Goals</span>
+            </a>
+          </Link>
+          <Link href="/community">
+            <a className="flex items-center px-3 py-2 rounded-md hover:bg-accent">
+              <Users className="h-5 w-5 mr-3" />
+              <span>Community</span>
             </a>
           </Link>
         </div>
@@ -220,6 +248,10 @@ function Router() {
           <Route path="/chat" component={ChatPage}/>
           <Route path="/fitness-trackers" component={FitnessTrackersPage}/>
           <Route path="/voice-coaching" component={VoiceCoachingPage}/>
+          <Route path="/workout-history" component={WorkoutHistoryPage}/>
+          <Route path="/meal-plans" component={MealPlansPage}/>
+          <Route path="/goals" component={GoalsPage}/>
+          <Route path="/community" component={CommunityPage}/>
           <Route path="/api-status" component={ApiStatusPage}/>
           <Route path="/agent-status" component={SystemAuditPage}/>
           <Route path="/fitness-api" component={FitnessApiPage}/>
