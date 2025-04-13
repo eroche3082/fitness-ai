@@ -13,6 +13,11 @@ export const users = pgTable("users", {
   workoutPreference: text("workout_preference"),
   fitnessGoal: text("fitness_goal"),
   lastActive: timestamp("last_active"),
+  // Stripe integration fields
+  stripeCustomerId: text("stripe_customer_id"),
+  stripeSubscriptionId: text("stripe_subscription_id"),
+  subscriptionStatus: text("subscription_status"),
+  subscriptionPlan: text("subscription_plan").default("free"),
 });
 
 // Conversations table to store chat history
@@ -63,6 +68,10 @@ export const insertUserSchema = createInsertSchema(users).pick({
   workoutPreference: true,
   fitnessGoal: true,
   lastActive: true,
+  stripeCustomerId: true,
+  stripeSubscriptionId: true,
+  subscriptionStatus: true,
+  subscriptionPlan: true,
 });
 
 export const insertConversationSchema = createInsertSchema(conversations).pick({

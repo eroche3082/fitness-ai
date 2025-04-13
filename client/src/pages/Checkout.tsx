@@ -15,7 +15,12 @@ if (!import.meta.env.VITE_STRIPE_PUBLIC_KEY) {
 }
 const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
 
-const CheckoutForm = ({ amount, plan }) => {
+interface CheckoutFormProps {
+  amount: number;
+  plan: string;
+}
+
+const CheckoutForm = ({ amount, plan }: CheckoutFormProps) => {
   const stripe = useStripe();
   const elements = useElements();
   const { toast } = useToast();
@@ -112,7 +117,7 @@ export default function Checkout() {
       apiRequest("POST", "/api/create-payment-intent", { 
         amount: planDetails.amount,
         plan: planDetails.name
-      })
+      }, undefined)
         .then((res) => res.json())
         .then((data) => {
           if (data.clientSecret) {

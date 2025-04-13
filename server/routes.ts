@@ -4,6 +4,7 @@ import { storage } from "./storage";
 import { generateGeminiResponse, configureGemini } from "./gemini";
 import { WebSocketServer } from "ws";
 import { z } from "zod";
+import Stripe from "stripe";
 import { 
   insertUserSchema, 
   insertConversationSchema, 
@@ -276,6 +277,195 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Register user profile routes
   registerUserProfileRoutes(apiRouter);
   console.log("👤 User Profile routes registered successfully");
+
+  // Stripe payment integration
+  if (!process.env.STRIPE_SECRET_KEY) {
+    console.warn("⚠️ Stripe payment integration not configured. Missing STRIPE_SECRET_KEY");
+  } else {
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+      apiVersion: "2023-10-16",
+    });
+
+    // Create Payment Intent for one-time payments
+    apiRouter.post("/create-payment-intent", async (req, res) => {
+      try {
+        const { amount, plan } = req.body;
+        
+        if (!amount || amount <= 0) {
+          return res.status(400).json({ message: "Invalid amount" });
+        }
+
+        console.log(`Creating payment intent for ${amount} cents (${plan || 'no plan specified'})`);
+        
+        const paymentIntent = await stripe.paymentIntents.create({
+          amount: amount, // Amount in cents
+          currency: "usd",
+          metadata: {
+            plan: plan || "one-time",
+          },
+        });
+        
+        res.json({ 
+          clientSecret: paymentIntent.client_secret,
+          id: paymentIntent.id
+        });
+      } catch (error: any) {
+        console.error("Stripe payment intent error:", error.message);
+        res.status(500).json({ 
+          message: "Error creating payment intent", 
+          error: error.message 
+        });
+      }
+    });
+
+    // Create or retrieve a subscription
+    apiRouter.post("/get-or-create-subscription", async (req, res) => {
+      try {
+        const { userId, plan } = req.body;
+        
+        if (!userId) {
+          return res.status(400).json({ message: "User ID is required" });
+        }
+
+        const user = await storage.getUser(userId);
+        
+        if (!user) {
+          return res.status(404).json({ message: "User not found" });
+        }
+
+        // For simplicity, we'll start with a basic implementation
+        // A real implementation would check if the user already has a subscription
+        // and would handle more complex subscription logic
+        
+        let customerId = user.stripeCustomerId;
+        
+        // If no customer ID exists, create a new customer
+        if (!customerId) {
+          const customer = await stripe.customers.create({
+            email: user.email || `user${userId}@example.com`,
+            name: user.name || user.username,
+            metadata: {
+              userId: userId.toString()
+            }
+          });
+          
+          customerId = customer.id;
+          
+          // Update user with Stripe customer ID
+          await storage.updateUser(userId, { 
+            stripeCustomerId: customerId 
+          });
+        }
+        
+        // Set up the subscription
+        // This is simplified - in a real app you'd have product/price IDs defined in Stripe
+        const priceId = plan === "elite" ? "price_elite_monthly" : "price_pro_monthly";
+        
+        // Create the subscription
+        try {
+          const subscription = await stripe.subscriptions.create({
+            customer: customerId,
+            items: [{
+              price: priceId,
+            }],
+            payment_behavior: 'default_incomplete',
+            expand: ['latest_invoice.payment_intent'],
+          });
+          
+          // Update user's subscription info
+          await storage.updateUser(userId, {
+            stripeSubscriptionId: subscription.id
+          });
+          
+          // Send client secret back to the client
+          res.json({
+            subscriptionId: subscription.id,
+            clientSecret: (subscription.latest_invoice as any)?.payment_intent?.client_secret
+          });
+        } catch (err: any) {
+          console.error("Stripe subscription error:", err.message);
+          
+          // For demo purposes, we'll create a payment intent instead if the subscription fails
+          // (since we might not have real price IDs in Stripe)
+          const amount = plan === "elite" ? 4999 : 1999;
+          
+          const paymentIntent = await stripe.paymentIntents.create({
+            amount: amount,
+            currency: "usd",
+            customer: customerId,
+            metadata: {
+              plan: plan || "pro",
+              userId: userId.toString()
+            },
+          });
+          
+          res.json({ 
+            clientSecret: paymentIntent.client_secret,
+            id: paymentIntent.id
+          });
+        }
+      } catch (error: any) {
+        console.error("Stripe subscription error:", error.message);
+        res.status(500).json({ 
+          message: "Error creating subscription", 
+          error: error.message 
+        });
+      }
+    });
+
+    // API endpoint to check subscription status
+    apiRouter.get("/subscription/:userId", async (req, res) => {
+      try {
+        const userId = parseInt(req.params.userId);
+        
+        if (isNaN(userId)) {
+          return res.status(400).json({ message: "Invalid user ID" });
+        }
+        
+        const user = await storage.getUser(userId);
+        
+        if (!user) {
+          return res.status(404).json({ message: "User not found" });
+        }
+        
+        // Check if user has a subscription
+        if (!user.stripeSubscriptionId) {
+          return res.json({ 
+            active: false,
+            plan: "free",
+            message: "No active subscription" 
+          });
+        }
+        
+        // Retrieve subscription from Stripe
+        try {
+          const subscription = await stripe.subscriptions.retrieve(user.stripeSubscriptionId);
+          
+          return res.json({
+            active: subscription.status === "active",
+            plan: subscription.metadata.plan || "pro",
+            status: subscription.status,
+            currentPeriodEnd: new Date(subscription.current_period_end * 1000).toISOString()
+          });
+        } catch (err) {
+          // If subscription not found in Stripe
+          return res.json({ 
+            active: false,
+            plan: "free",
+            message: "Subscription not found in Stripe" 
+          });
+        }
+      } catch (error: any) {
+        console.error("Error checking subscription:", error.message);
+        res.status(500).json({ 
+          message: "Error checking subscription status", 
+          error: error.message 
+        });
+      }
+    });
+
+    console.log("💳 Stripe payment routes registered successfully");
+  }
   
   return httpServer;
 }
