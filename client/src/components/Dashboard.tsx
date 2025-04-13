@@ -137,13 +137,15 @@ const Dashboard: React.FC<DashboardProps> = ({ userCode }) => {
               <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Today's Focus</h4>
               <div className="bg-blue-50 dark:bg-blue-900 p-3 rounded-md">
                 <p className="text-sm text-blue-800 dark:text-blue-200">
-                  {userProfile.category === 'beginner' 
+                  {userProfile.category === 'BEG' 
                     ? 'Focus on your form in each exercise today. Quality over quantity!'
-                    : userProfile.category === 'intermediate'
+                    : userProfile.category === 'INT'
                     ? 'Push yourself with progressive overload today. Try to increase your weights slightly.'
-                    : userProfile.category === 'advanced'
+                    : userProfile.category === 'ADV'
                     ? 'Focus on muscle mind connection today. Feel each rep and maintain tension.'
-                    : 'Recovery is key today. Focus on mobility work and proper nutrition.'
+                    : userProfile.category === 'PRO'
+                    ? 'Recovery is key today. Focus on mobility work and proper nutrition.'
+                    : 'Elite performance demands elite recovery. Focus on recovery techniques today.'
                   }
                 </p>
               </div>
@@ -351,33 +353,39 @@ const Dashboard: React.FC<DashboardProps> = ({ userCode }) => {
     
     // Customize plan based on user category
     const plans = {
-      beginner: {
+      BEG: {
         name: 'Foundation Builder',
         weeks: 8,
         focus: 'Building strength and establishing workout routine',
         workoutsPerWeek: 3,
       },
-      intermediate: {
+      INT: {
         name: 'Progressive Overload',
         weeks: 12,
         focus: 'Increasing strength and conditioning',
         workoutsPerWeek: 4,
       },
-      advanced: {
+      ADV: {
         name: 'Performance Optimization',
         weeks: 16,
         focus: 'Advanced techniques and periodization',
         workoutsPerWeek: 5,
       },
-      professional: {
+      PRO: {
         name: 'Elite Training System',
         weeks: 20,
         focus: 'Specialized training and recovery optimization',
         workoutsPerWeek: 6,
+      },
+      VIP: {
+        name: 'VIP Training Experience',
+        weeks: 24,
+        focus: 'Personalized elite coaching and exclusive content',
+        workoutsPerWeek: 6,
       }
     };
     
-    const currentPlan = plans[userProfile.category] || plans.beginner;
+    const currentPlan = plans[userProfile.category] || plans.BEG;
     
     return (
       <div className="space-y-6">
@@ -651,6 +659,54 @@ const Dashboard: React.FC<DashboardProps> = ({ userCode }) => {
     );
   };
 
+  // Premium tab content
+  const renderPremiumTab = () => {
+    if (!userProfile) return null;
+    
+    return (
+      <div className="space-y-6">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+          <h2 className="text-xl font-semibold mb-4">Premium Membership Levels</h2>
+          <p className="text-gray-600 dark:text-gray-400 mb-6">
+            Unlock premium features and advanced fitness experiences with our membership plans.
+          </p>
+          
+          <PremiumLevels 
+            userProfile={userProfile} 
+            onLevelUnlock={(levelId) => {
+              // In a real app, this would update the user profile after payment
+              const updatedProfile = {
+                ...userProfile,
+                unlockedLevels: [...(userProfile.unlockedLevels || []), levelId]
+              };
+              setUserProfile(updatedProfile);
+            }} 
+          />
+        </div>
+      </div>
+    );
+  };
+  
+  // Access Code tab content
+  const renderAccessCodeTab = () => {
+    if (!userProfile) return null;
+    
+    return (
+      <div className="space-y-6">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+          <h2 className="text-xl font-semibold mb-4">Access Code Management</h2>
+          <p className="text-gray-600 dark:text-gray-400 mb-6">
+            Use your personal access code to unlock features across the Fitness AI ecosystem.
+          </p>
+          
+          <AccessCodeQR 
+            userProfile={userProfile}
+          />
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
       {/* Tab navigation */}
@@ -740,43 +796,6 @@ const Dashboard: React.FC<DashboardProps> = ({ userCode }) => {
       {/* Tab content */}
       {renderTabContent()}
     </div>
-  );
-};
-
-// Premium tab content
-const renderPremiumTab = () => {
-  if (!userProfile) return null;
-  
-  const handleLevelUnlock = (levelId: string) => {
-    // Handle level unlock - this would update the user's profile after payment
-    console.log(`Unlocking level: ${levelId}`);
-    
-    // In a real app, we would call an API to process the payment and update the user's profile
-    if (userProfile) {
-      const updatedUserProfile = {
-        ...userProfile,
-        unlockedLevels: [...(userProfile.unlockedLevels || []), levelId],
-        paymentStatus: 'paid',
-      };
-      
-      setUserProfile(updatedUserProfile);
-    }
-  };
-  
-  return (
-    <PremiumLevels 
-      userProfile={userProfile} 
-      onLevelUnlock={handleLevelUnlock} 
-    />
-  );
-};
-
-// Access Code tab content
-const renderAccessCodeTab = () => {
-  if (!userProfile) return null;
-  
-  return (
-    <AccessCodeQR userProfile={userProfile} />
   );
 };
 
