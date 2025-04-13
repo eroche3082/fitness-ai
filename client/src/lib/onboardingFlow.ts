@@ -21,7 +21,7 @@ export interface OnboardingQuestion {
   order: number; // For sorting questions in the right order
 }
 
-// Fitness-specific onboarding questions
+// Fitness-specific onboarding questions based on MEGAPROMPT requirements
 const fitnessOnboardingQuestions: OnboardingQuestion[] = [
   {
     id: 'name',
@@ -33,201 +33,162 @@ const fitnessOnboardingQuestions: OnboardingQuestion[] = [
     helpText: 'We\'ll use this to personalize your fitness journey.'
   },
   {
-    id: 'fitnessLevel',
-    label: 'What\'s your fitness level?',
-    field: 'fitnessLevel',
-    type: 'multipleChoice',
-    options: ['beginner', 'intermediate', 'advanced'],
-    optionLabels: ['Beginner', 'Intermediate', 'Advanced'],
+    id: 'email',
+    label: 'What\'s your email address?',
+    field: 'email',
+    type: 'text',
     required: true,
     order: 2,
-    helpText: 'This helps us recommend exercises appropriate for your experience.'
+    helpText: 'We\'ll use this to send you personalized workout plans and updates.',
+    validation: /^[^\s@]+@[^\s@]+\.[^\s@]+$/
   },
   {
     id: 'fitnessGoals',
-    label: 'What are your fitness goals?',
+    label: 'What are your main fitness goals?',
     field: 'fitnessGoals',
     type: 'checkbox',
     options: [
-      'lose_weight', 
       'build_muscle', 
+      'lose_weight', 
       'improve_endurance', 
       'increase_flexibility', 
-      'reduce_stress', 
-      'better_sleep', 
-      'improve_overall_health'
+      'general_wellness'
     ],
     optionLabels: [
-      'Lose Weight', 
-      'Build Muscle', 
-      'Improve Endurance', 
-      'Increase Flexibility', 
-      'Reduce Stress',
-      'Better Sleep',
-      'Improve Overall Health'
+      'Build muscle', 
+      'Lose weight', 
+      'Improve endurance', 
+      'Increase flexibility', 
+      'General wellness'
     ],
     required: true,
     order: 3,
     helpText: 'Select all that apply. We\'ll focus your program on these areas.'
   },
   {
-    id: 'preferredActivities',
-    label: 'What activities do you prefer?',
-    field: 'preferredActivities',
+    id: 'preferredWorkouts',
+    label: 'Which type of workouts do you prefer?',
+    field: 'preferredWorkouts',
     type: 'checkbox',
     options: [
-      'running', 
-      'weightlifting', 
-      'cycling', 
-      'swimming', 
-      'yoga', 
+      'strength_training', 
+      'crossfit', 
       'hiit', 
-      'pilates', 
-      'team_sports', 
-      'walking'
+      'cardio', 
+      'yoga', 
+      'pilates'
     ],
     optionLabels: [
-      'Running',
-      'Weightlifting',
-      'Cycling',
-      'Swimming',
-      'Yoga',
-      'HIIT',
-      'Pilates',
-      'Team Sports',
-      'Walking'
+      'Strength Training', 
+      'CrossFit', 
+      'HIIT', 
+      'Cardio', 
+      'Yoga', 
+      'Pilates'
     ],
     required: true,
     order: 4,
     helpText: 'Select all that you enjoy. We\'ll include these in your workout plans.'
   },
   {
-    id: 'activeHoursPerWeek',
-    label: 'How many hours per week can you dedicate to exercise?',
-    field: 'activeHoursPerWeek',
-    type: 'slider',
-    min: 0,
-    max: 20,
-    step: 1,
-    required: true,
-    order: 5,
-    helpText: 'This helps us build a realistic schedule for you.'
-  },
-  {
-    id: 'healthMetrics',
-    label: 'Would you like to track health metrics?',
-    field: 'trackHealthMetrics',
-    type: 'boolean',
-    required: false,
-    order: 6,
-    helpText: 'Includes weight, BMI, body fat percentage, etc.'
-  },
-  {
-    id: 'dietPreferences',
-    label: 'Do you have any dietary preferences?',
-    field: 'dietPreferences',
-    type: 'checkbox',
-    options: [
-      'vegetarian', 
-      'vegan', 
-      'keto', 
-      'paleo', 
-      'mediterranean', 
-      'low_carb', 
-      'high_protein',
-      'none'
-    ],
-    optionLabels: [
-      'Vegetarian', 
-      'Vegan', 
-      'Keto', 
-      'Paleo', 
-      'Mediterranean', 
-      'Low Carb',
-      'High Protein',
-      'No Specific Diet'
-    ],
-    required: false,
-    order: 7,
-    helpText: 'We\'ll tailor nutrition advice to match your preferences.'
-  },
-  {
-    id: 'language',
-    label: 'What language do you prefer?',
-    field: 'language',
-    type: 'multipleChoice',
-    options: ['en', 'es', 'fr', 'pt'],
-    optionLabels: ['English', 'Spanish', 'French', 'Portuguese'],
-    required: true,
-    order: 8,
-    helpText: 'We\'ll communicate with you in this language.'
-  },
-  {
     id: 'usedDevices',
-    label: 'Which fitness trackers or devices do you use?',
+    label: 'Do you use any fitness trackers or wearables?',
     field: 'usedDevices',
     type: 'checkbox',
     options: [
-      'google_fit', 
-      'apple_health', 
+      'apple_watch', 
       'fitbit', 
-      'strava', 
-      'garmin', 
-      'samsung_health', 
+      'google_fit', 
+      'whoop', 
       'none'
     ],
     optionLabels: [
-      'Google Fit',
-      'Apple Health',
-      'Fitbit',
-      'Strava',
-      'Garmin',
-      'Samsung Health',
+      'Apple Watch', 
+      'Fitbit', 
+      'Google Fit', 
+      'WHOOP', 
       'None'
     ],
     required: true,
-    order: 9,
+    order: 5,
     helpText: 'We\'ll help you connect these devices to track your progress.'
   },
   {
-    id: 'sleepTracking',
-    label: 'Would you like to monitor your sleep patterns?',
-    field: 'sleepTracking',
-    type: 'boolean',
-    required: false,
-    order: 10,
-    helpText: 'Sleep quality affects fitness performance and recovery.'
+    id: 'workoutDays',
+    label: 'What days are best for working out?',
+    field: 'workoutDays',
+    type: 'checkbox',
+    options: [
+      'weekdays', 
+      'weekends', 
+      'flexible'
+    ],
+    optionLabels: [
+      'Monday to Friday', 
+      'Weekends', 
+      'Flexible schedule'
+    ],
+    required: true,
+    order: 6,
+    helpText: 'We\'ll create a workout schedule based on your availability.'
   },
   {
-    id: 'location',
-    label: 'Where do you typically exercise? (Optional)',
-    field: 'exerciseLocation',
+    id: 'sessionDuration',
+    label: 'What\'s your ideal session duration?',
+    field: 'sessionDuration',
     type: 'multipleChoice',
-    options: ['home', 'gym', 'outdoors', 'varies'],
-    optionLabels: ['At Home', 'At the Gym', 'Outdoors', 'It Varies'],
-    required: false,
-    order: 11,
-    helpText: 'This helps us suggest equipment-appropriate workouts.'
+    options: [
+      '15_30_minutes', 
+      '30_45_minutes', 
+      '60_plus_minutes'
+    ],
+    optionLabels: [
+      '15–30 minutes', 
+      '30–45 minutes', 
+      '60+ minutes'
+    ],
+    required: true,
+    order: 7,
+    helpText: 'We\'ll design workouts to fit your available time.'
   },
   {
-    id: 'workoutTimePreference',
-    label: 'When do you prefer to work out?',
-    field: 'workoutTimePreference',
+    id: 'intensityLevel',
+    label: 'What level of intensity do you want?',
+    field: 'intensityLevel',
     type: 'multipleChoice',
-    options: ['morning', 'afternoon', 'evening', 'flexible'],
-    optionLabels: ['Morning', 'Afternoon', 'Evening', 'Flexible'],
-    required: false,
-    order: 12,
-    helpText: 'We\'ll schedule reminders at your preferred time.'
+    options: [
+      'low', 
+      'medium', 
+      'high', 
+      'adaptive'
+    ],
+    optionLabels: [
+      'Low', 
+      'Medium', 
+      'High', 
+      'Adaptive AI-based'
+    ],
+    required: true,
+    order: 8,
+    helpText: 'This helps us set the right difficulty level for your workouts.'
   },
   {
-    id: 'confirmation',
-    label: 'Ready to start your personalized fitness journey?',
-    field: 'confirmation',
+    id: 'nutritionAdvice',
+    label: 'Do you want personalized nutrition advice?',
+    field: 'nutritionAdvice',
     type: 'boolean',
     required: true,
-    order: 13,
-    helpText: 'Let\'s get started on your fitness goals!'
+    order: 9,
+    helpText: 'We can provide meal plans and nutrition tips alongside your workouts.'
+  },
+  {
+    id: 'coachingPreference',
+    label: 'Would you like voice coaching or video guidance?',
+    field: 'coachingPreference',
+    type: 'boolean',
+    required: true,
+    order: 10,
+    helpText: 'You can receive real-time audio coaching or follow video demonstrations.'
   }
 ];
 

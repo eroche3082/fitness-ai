@@ -1,0 +1,201 @@
+MEGAPROMPT: FITNESS AI – FRONTEND, CHATBOT, ONBOARDING & PERSONALIZED DASHBOARD
+IMPORTANT: Do not redesign or modify any approved frontend structure. Focus only on activating, verifying, and aligning the chatbot system, onboarding logic, and dashboard personalization based on user answers. This prompt must be implemented without altering the frontend design unless specified.
+
+1. CHATBOT ACTIVATION (BOTTOM-RIGHT ICON ONLY)
+Activate the floating chatbot icon at the bottom-right corner of the homepage.
+
+Remove any other chat or onboarding forms from the frontend. This icon is the only entry point to the onboarding system.
+
+2. ONBOARDING CHATBOT FLOW (10 Multiple Choice Questions)
+The chatbot must start the flow as follows:
+
+Question 1:
+What's your name?
+(User types their name)
+
+Question 2:
+What's your email address?
+(User types their email)
+
+Question 3:
+What are your main fitness goals?
+(Multiple selections)
+
+Build muscle
+
+Lose weight
+
+Improve endurance
+
+Increase flexibility
+
+General wellness
+
+Question 4:
+Which type of workouts do you prefer?
+(Multiple selections)
+
+Strength Training
+
+CrossFit
+
+HIIT
+
+Cardio
+
+Yoga
+
+Pilates
+
+Question 5:
+Do you use any fitness trackers or wearables?
+(Multiple selections)
+
+Apple Watch
+
+Fitbit
+
+Google Fit
+
+WHOOP
+
+None
+
+Question 6:
+What days are best for working out?
+(Multiple selections)
+
+Monday to Friday
+
+Weekends
+
+Flexible schedule
+
+Question 7:
+What’s your ideal session duration?
+
+15–30 minutes
+
+30–45 minutes
+
+60+ minutes
+
+Question 8:
+What level of intensity do you want?
+
+Low
+
+Medium
+
+High
+
+Adaptive AI-based
+
+Question 9:
+Do you want personalized nutrition advice?
+
+Yes
+
+No
+
+Question 10:
+Would you like voice coaching or video guidance?
+
+Yes
+
+No
+
+3. LOGIN LINK AND DASHBOARD PERSONALIZATION
+After completing the 10 questions, the chatbot should respond:
+“Thanks! You're ready to start. Click here to login and access your personalized dashboard.”
+
+[Login Button]
+
+After login:
+
+The user should be redirected to the existing Fitness AI Dashboard (do not create a new one).
+
+Within the current dashboard layout, create a new tab or personalized panel that reflects:
+
+Fitness goals
+
+Workout types
+
+Preferred coaching format
+
+Suggested plans & metrics
+
+4. NAVBAR & MAIN MENU VERIFICATION
+Make sure the main navigation bar includes:
+
+Home
+
+AI Assistant (explains features, not a chat)
+
+Programs
+
+Pricing / Membership
+
+Contact Us
+
+Login / Sign Up
+
+The AI Assistant page should describe the platform’s 20 core features such as:
+
+Smart Workout Analysis
+
+Adaptive Training
+
+Health Tracker Integration
+
+Recovery Recommendations
+
+Progress Milestone Alerts
+
+Voice Coaching
+
+Sleep Analyzer
+
+Nutrition AI
+
+Cross-Platform Sync
+
+Workout Scheduler
+
+(These must match the features listed previously in the internal list of 20.)
+
+5. FOOTER & LINKS CHECK
+All footer links must be working:
+
+Terms of Service
+
+Privacy Policy
+
+Social media buttons
+
+Company contact
+
+All menu anchors and pages
+
+6. ADMIN PANEL LEAD CAPTURE
+All users who complete the onboarding chat must be added to the Admin Panel > User Leads list.
+
+The admin must be able to:
+
+View their name, email, date, and answers
+
+Export data as CSV
+
+Filter by fitness goal, membership, tracker used, etc.
+
+7. FUNCTIONALITY REPORT REQUIRED
+The dev team must submit a report including:
+
+✅ Verified working functions
+
+❌ Missing / broken functions
+
+⚠️ Partially implemented elements
+
+Recommendations for enhancements
+
