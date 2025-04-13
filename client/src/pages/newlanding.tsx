@@ -458,7 +458,7 @@ export default function LandingPage() {
                 "The AI workout suggestions are spot on! It's like having a personal trainer who knows exactly what I need each day."
               </p>
               <div className="flex items-center">
-                <div className="w-12 h-12 bg-green-100 rounded-full overflow-hidden mr-4 flex items-center justify-center text-primary">
+                <div className="w-12 h-12 bg-blue-100 rounded-full overflow-hidden mr-4 flex items-center justify-center text-primary">
                   <Users className="h-6 w-6" />
                 </div>
                 <div>
@@ -488,7 +488,7 @@ export default function LandingPage() {
                 "The integration with my fitness tracker makes tracking my progress effortless. Best fitness app I've ever used!"
               </p>
               <div className="flex items-center">
-                <div className="w-12 h-12 bg-green-100 rounded-full overflow-hidden mr-4 flex items-center justify-center text-primary">
+                <div className="w-12 h-12 bg-blue-100 rounded-full overflow-hidden mr-4 flex items-center justify-center text-primary">
                   <Users className="h-6 w-6" />
                 </div>
                 <div>
@@ -518,7 +518,7 @@ export default function LandingPage() {
                 "The nutrition suggestions are game-changing. I've never felt better, and my performance has improved significantly."
               </p>
               <div className="flex items-center">
-                <div className="w-12 h-12 bg-green-100 rounded-full overflow-hidden mr-4 flex items-center justify-center text-primary">
+                <div className="w-12 h-12 bg-blue-100 rounded-full overflow-hidden mr-4 flex items-center justify-center text-primary">
                   <Users className="h-6 w-6" />
                 </div>
                 <div>
@@ -955,7 +955,7 @@ export default function LandingPage() {
                   variant="ghost" 
                   size="icon" 
                   onClick={() => setShowLoginModal(false)}
-                  className="rounded-full hover:bg-green-50 text-primary"
+                  className="rounded-full hover:bg-blue-50 text-primary"
                 >
                   <X className="h-5 w-5" />
                 </Button>
@@ -1093,7 +1093,7 @@ export default function LandingPage() {
                   variant="ghost" 
                   size="icon" 
                   onClick={() => setShowSignupModal(false)}
-                  className="rounded-full hover:bg-green-50 text-primary"
+                  className="rounded-full hover:bg-blue-50 text-primary"
                 >
                   <X className="h-5 w-5" />
                 </Button>

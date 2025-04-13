@@ -1,18 +1,18 @@
-/* Custom Green Fitness & Health Styles for Fitness AI */
+/* Custom Blue Fitness & Health Styles for Fitness AI */
 
 :root {
-  --primary: #22c55e;        /* Green 500 */
-  --primary-dark: #15803d;   /* Green 700 */
-  --primary-light: #86efac;  /* Green 300 */
-  --secondary: #eab308;      /* Yellow 500 */
-  --secondary-dark: #a16207; /* Yellow 700 */
-  --secondary-light: #fef08a;/* Yellow 200 */
+  --primary: #3b82f6;        /* Blue 500 */
+  --primary-dark: #1d4ed8;   /* Blue 700 */
+  --primary-light: #93c5fd;  /* Blue 300 */
+  --secondary: #eab308;      /* Yellow 500 - kept for accent */
+  --secondary-dark: #a16207; /* Yellow 700 - kept for accent */
+  --secondary-light: #fef08a;/* Yellow 200 - kept for accent */
   --dark-text: #1e293b;      /* Slate 800 */
   --light-text: #64748b;     /* Slate 500 */
-  --gradient-bg: #f0fdf4;    /* Green 50 */
+  --gradient-bg: #eff6ff;    /* Blue 50 */
   --surface: #ffffff;
-  --success: #4ade80;        /* Green 400 */
-  --energy: #fbbf24;         /* Amber 400 */
+  --success: #60a5fa;        /* Blue 400 */
+  --energy: #fbbf24;         /* Amber 400 - kept for energy */
   --header-bg: #111111;      /* Near black for header */
   --footer-bg: #111111;      /* Near black for footer */
   --header-text: #ffffff;    /* White text for header */
@@ -169,13 +169,13 @@ body {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   overflow: hidden;
   transition: all 0.3s ease;
-  border: 1px solid rgba(21, 128, 61, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.1);
 }
 
 .fitness-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
-  border-color: rgba(21, 128, 61, 0.2);
+  border-color: rgba(59, 130, 246, 0.2);
 }
 
 /* FitnessSlider */
@@ -227,16 +227,26 @@ body {
   color: white;
 }
 
+.stat-icon.blue {
+  background-color: var(--primary);
+}
+
+.stat-icon.dark-blue {
+  background-color: var(--primary-dark);
+}
+
+.stat-icon.energy {
+  background-color: var(--secondary);
+}
+
+/* Mantenemos las clases verdes originales por compatibilidad, 
+   pero ahora usan los colores azules (--primary) */
 .stat-icon.green {
   background-color: var(--primary);
 }
 
 .stat-icon.dark-green {
   background-color: var(--primary-dark);
-}
-
-.stat-icon.energy {
-  background-color: var(--secondary);
 }
 
 /* Animations */
