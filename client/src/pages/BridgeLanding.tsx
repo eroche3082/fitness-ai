@@ -369,22 +369,70 @@ export default function BridgeLanding() {
         </div>
       </section>
 
-      {/* Call to Action */}
-      <section className="py-24 bg-white text-black relative overflow-hidden">
+      {/* Future of Fitness Section */}
+      <section className="py-24 bg-black text-white relative overflow-hidden">
         <div className="container mx-auto px-4 md:px-6 relative z-10">
-          <div className="max-w-3xl mx-auto text-center">
-            <h2 className="bridge-subheading text-3xl md:text-5xl font-bold mb-6 uppercase">JOIN THE REVOLUTION</h2>
-            <p className="text-xl mb-8">
-              Experience the future of fitness with our AI-powered platform. Transform your body, track your progress, and achieve your goals like never before.
+          <div className="max-w-5xl mx-auto text-center mb-14">
+            <h2 className="text-6xl md:text-7xl font-bold mb-8 uppercase">
+              FUTURE OF FITNESS
+            </h2>
+            <div className="w-24 h-1 bg-green-500 mx-auto mb-8"></div>
+            <p className="text-xl mb-8 text-gray-300 max-w-3xl mx-auto">
+              Our cutting-edge AI technology delivers personalized workouts, nutrition plans, and real-time feedback tailored specifically to your body, goals, and progress
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button className="bridge-button bg-black text-white hover:bg-gray-900 py-6 px-8 text-lg rounded-none">
-                Start Free Trial
-              </Button>
-              <Button variant="outline" className="bridge-button bridge-button-outline border-black text-black hover:bg-black hover:text-white py-6 px-8 text-lg rounded-none">
-                Learn More
-              </Button>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-5xl mx-auto">
+            {/* Feature Card 1 */}
+            <div className="bg-gray-900 p-10 text-center hover:shadow-lg hover:shadow-green-500/20 transform transition-all duration-300 hover:-translate-y-2">
+              <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mx-auto mb-6">
+                <Activity className="h-10 w-10 text-black" />
+              </div>
+              <h3 className="text-2xl font-bold uppercase mb-4">
+                SMART WORKOUT ANALYSIS
+              </h3>
+              <div className="w-12 h-1 bg-green-500 mx-auto mb-4"></div>
+              <p className="text-gray-400">
+                Our AI analyzes your form, counts reps, and provides real-time feedback to optimize your training and prevent injuries.
+              </p>
             </div>
+            
+            {/* Feature Card 2 */}
+            <div className="bg-gray-900 p-10 text-center hover:shadow-lg hover:shadow-green-500/20 transform transition-all duration-300 hover:-translate-y-2">
+              <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mx-auto mb-6">
+                <BarChart2 className="h-10 w-10 text-black" />
+              </div>
+              <h3 className="text-2xl font-bold uppercase mb-4">
+                ADAPTIVE TRAINING
+              </h3>
+              <div className="w-12 h-1 bg-green-500 mx-auto mb-4"></div>
+              <p className="text-gray-400">
+                As you progress, our system automatically adjusts your workout intensity and exercises to keep you challenged and growing.
+              </p>
+            </div>
+            
+            {/* Feature Card 3 */}
+            <div className="bg-gray-900 p-10 text-center hover:shadow-lg hover:shadow-green-500/20 transform transition-all duration-300 hover:-translate-y-2">
+              <div className="w-20 h-20 bg-white rounded-full flex items-center justify-center mx-auto mb-6">
+                <Heart className="h-10 w-10 text-black" />
+              </div>
+              <h3 className="text-2xl font-bold uppercase mb-4">
+                HEALTH INTEGRATION
+              </h3>
+              <div className="w-12 h-1 bg-green-500 mx-auto mb-4"></div>
+              <p className="text-gray-400">
+                Connect with Apple Health, Google Fit, Fitbit, and other platforms to get a comprehensive view of your health and fitness data.
+              </p>
+            </div>
+          </div>
+          
+          <div className="flex flex-col sm:flex-row gap-4 justify-center mt-14">
+            <Button className="bg-green-500 text-black hover:bg-green-600 py-6 px-10 text-lg rounded-none uppercase font-bold transform transition-all duration-300 hover:-translate-y-1">
+              Get Started
+            </Button>
+            <Button variant="outline" className="border-green-500 text-white hover:bg-green-500 hover:text-black py-6 px-10 text-lg rounded-none uppercase font-bold transform transition-all duration-300 hover:-translate-y-1">
+              Learn More
+            </Button>
           </div>
         </div>
       </section>
