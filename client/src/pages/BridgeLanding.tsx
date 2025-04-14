@@ -371,7 +371,16 @@ export default function BridgeLanding() {
 
       {/* Join the Revolution section has been removed as requested */}
 
-      {/* Membership Plans Section */}
+      {/* Dashboard Preview Section */}
+      <DashboardPreview />
+
+      {/* Features Showcase */}
+      <FeaturesShowcase />
+
+      {/* QR Code Demo Section */}
+      <QRCodeDemoSection />
+
+      {/* Membership Plans Section - Moved before the CTA section */}
       <section className="py-24 bg-gradient-to-b from-black to-gray-900">
         <div className="container mx-auto px-4 md:px-6">
           <div className="text-center mb-16">
@@ -540,15 +549,6 @@ export default function BridgeLanding() {
           </div>
         </div>
       </section>
-
-      {/* Dashboard Preview Section */}
-      <DashboardPreview />
-
-      {/* Features Showcase */}
-      <FeaturesShowcase />
-
-      {/* QR Code Demo Section */}
-      <QRCodeDemoSection />
 
       {/* CTA Block After Memberships */}
       <section className="py-20 bg-green-500 text-black">
