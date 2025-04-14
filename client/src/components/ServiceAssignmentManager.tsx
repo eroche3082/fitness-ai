@@ -1,294 +1,236 @@
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { useToast } from "@/hooks/use-toast";
-import { Badge } from "@/components/ui/badge";
-import { Plus, RefreshCw, Server } from "lucide-react";
-import { Separator } from "@/components/ui/separator";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
-import { ScrollArea } from "@/components/ui/scroll-area";
+/**
+ * Service Assignment Manager Component
+ * 
+ * This component allows administrators to assign Google Cloud services to different API key groups
+ * for optimal quota management and load balancing.
+ */
 
-interface ServiceAssignment {
-  service: string;
-  assignedGroup: string;
-  status: 'active' | 'failed' | 'pending';
-  timestamp: string;
+import React, { useMemo, useState } from 'react';
+import { 
+  Table, 
+  TableBody, 
+  TableCell, 
+  TableHead, 
+  TableHeader, 
+  TableRow 
+} from '@/components/ui/table';
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { 
+  CheckCircle, 
+  Cpu, 
+  PlayCircle, 
+  RefreshCcw, 
+  ShieldAlert, 
+  XCircle 
+} from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { ScrollArea } from '@/components/ui/scroll-area';
+
+interface ApiKeyGroup {
+  name: string;
+  priority: number;
+  services: string[];
 }
 
-interface ServiceAssignmentResponse {
-  count: number;
-  assignments: ServiceAssignment[];
+interface ApiStatus {
+  isActive: boolean;
+  message: string;
+  error?: string;
+  quotaLimits?: Record<string, number>;
+  quotaUsage?: Record<string, number>;
+  projectId?: string;
+}
+
+interface ServiceAssignment {
+  group: string;
+}
+
+interface ApiDetails {
+  id: string;
+  name: string;
+  description: string;
+  status: ApiStatus;
+  assignment: ServiceAssignment;
 }
 
 interface ServiceAssignmentManagerProps {
-  className?: string;
+  availableApis: ApiDetails[];
+  missingApis: ApiDetails[];
+  apiKeyGroups: ApiKeyGroup[];
+  onAssignmentChange: (serviceId: string, groupName: string) => void;
+  onInitializeService: (serviceId: string) => void;
 }
 
-const availableServices = [
-  { id: 'texttospeech', label: 'Text-to-Speech' },
-  { id: 'speech', label: 'Speech-to-Text' },
-  { id: 'vision', label: 'Vision API' },
-  { id: 'language', label: 'Natural Language' },
-  { id: 'translation', label: 'Translation API' },
-  { id: 'vertex', label: 'Vertex AI' },
-  { id: 'gemini', label: 'Gemini AI' },
-  { id: 'sheets', label: 'Google Sheets' },
-  { id: 'gmail', label: 'Gmail API' },
-  { id: 'calendar', label: 'Calendar API' },
-  { id: 'drive', label: 'Drive API' },
-  { id: 'firebase', label: 'Firebase' }
-];
-
-export function ServiceAssignmentManager({ className }: ServiceAssignmentManagerProps) {
-  const [assignments, setAssignments] = useState<ServiceAssignment[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [initializing, setInitializing] = useState(false);
-  const [selectedServices, setSelectedServices] = useState<string[]>([]);
-  const [open, setOpen] = useState(false);
-  const { toast } = useToast();
-
-  const fetchAssignments = async () => {
-    try {
-      setLoading(true);
-      const response = await fetch('/api/billing-status/service-assignments');
-      
-      if (!response.ok) {
-        throw new Error(`Error: ${response.status}`);
-      }
-      
-      const data: ServiceAssignmentResponse = await response.json();
-      setAssignments(data.assignments);
-      setLoading(false);
-    } catch (error) {
-      console.error("Failed to fetch service assignments:", error);
-      toast({
-        title: "Error",
-        description: "Failed to fetch service assignments",
-        variant: "destructive",
-      });
-      setLoading(false);
-    }
+const ServiceAssignmentManager: React.FC<ServiceAssignmentManagerProps> = ({
+  availableApis,
+  missingApis,
+  apiKeyGroups,
+  onAssignmentChange,
+  onInitializeService
+}) => {
+  const [filter, setFilter] = useState('');
+  
+  // Combine all APIs
+  const allApis = useMemo(() => {
+    return [...availableApis, ...missingApis].sort((a, b) => a.name.localeCompare(b.name));
+  }, [availableApis, missingApis]);
+  
+  // Filter APIs based on search input
+  const filteredApis = useMemo(() => {
+    if (!filter) return allApis;
+    
+    const lowerFilter = filter.toLowerCase();
+    return allApis.filter(api => 
+      api.name.toLowerCase().includes(lowerFilter) || 
+      api.id.toLowerCase().includes(lowerFilter) ||
+      api.description.toLowerCase().includes(lowerFilter) ||
+      api.assignment.group.toLowerCase().includes(lowerFilter)
+    );
+  }, [allApis, filter]);
+  
+  // Handle assignment change
+  const handleAssignmentChange = (serviceId: string, groupName: string) => {
+    onAssignmentChange(serviceId, groupName);
   };
-
-  const initializeServices = async () => {
-    try {
-      if (selectedServices.length === 0) {
-        toast({
-          title: "Error",
-          description: "Please select at least one service",
-          variant: "destructive",
-        });
-        return;
-      }
-      
-      setInitializing(true);
-      const response = await fetch('/api/billing-status/initialize-services', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ services: selectedServices }),
-      });
-      
-      if (!response.ok) {
-        throw new Error(`Error: ${response.status}`);
-      }
-      
-      const data = await response.json();
-      
-      if (data.success) {
-        toast({
-          title: "Success",
-          description: data.message,
-          variant: "default",
-        });
-      } else {
-        toast({
-          title: "Warning",
-          description: data.message,
-          variant: "destructive",
-        });
-      }
-      
-      setOpen(false);
-      fetchAssignments(); // Refresh assignments
-      setInitializing(false);
-    } catch (error) {
-      console.error("Failed to initialize services:", error);
-      toast({
-        title: "Error",
-        description: "Failed to initialize services",
-        variant: "destructive",
-      });
-      setInitializing(false);
-    }
+  
+  // Handle initialize service
+  const handleInitialize = (serviceId: string) => {
+    onInitializeService(serviceId);
   };
-
-  useEffect(() => {
-    fetchAssignments();
-  }, []);
-
-  // Group assignments by assigned API key group
-  const assignmentsByGroup = assignments.reduce<Record<string, ServiceAssignment[]>>(
-    (acc, assignment) => {
-      if (!acc[assignment.assignedGroup]) {
-        acc[assignment.assignedGroup] = [];
-      }
-      acc[assignment.assignedGroup].push(assignment);
-      return acc;
-    }, 
-    {}
-  );
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'active':
-        return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
-      case 'failed':
-        return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
-      case 'pending':
-        return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
-      default:
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200';
-    }
-  };
-
+  
   return (
-    <Card className={className}>
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <CardTitle>Service Assignments</CardTitle>
-          <div className="flex space-x-2">
-            <Button 
-              variant="outline" 
-              size="icon" 
-              onClick={fetchAssignments}
-              disabled={loading}
-              title="Refresh Service Assignments"
-            >
-              <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
-            </Button>
-            <Dialog open={open} onOpenChange={setOpen}>
-              <DialogTrigger asChild>
-                <Button size="sm" className="flex items-center gap-1">
-                  <Plus className="h-4 w-4" />
-                  Initialize Services
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="sm:max-w-[425px]">
-                <DialogHeader>
-                  <DialogTitle>Initialize Google Cloud Services</DialogTitle>
-                  <DialogDescription>
-                    Select the services you need to initialize with the most optimal API keys.
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="py-4">
-                  <div className="space-y-4">
-                    <div>
-                      <Label>Services</Label>
-                      <ScrollArea className="h-[200px] border rounded-md p-2 mt-1">
-                        <div className="space-y-2">
-                          {availableServices.map((service) => (
-                            <div key={service.id} className="flex items-center space-x-2">
-                              <Checkbox 
-                                id={service.id}
-                                checked={selectedServices.includes(service.id)}
-                                onCheckedChange={(checked) => {
-                                  if (checked) {
-                                    setSelectedServices([...selectedServices, service.id]);
-                                  } else {
-                                    setSelectedServices(selectedServices.filter(s => s !== service.id));
-                                  }
-                                }}
-                              />
-                              <Label htmlFor={service.id} className="flex-1 cursor-pointer">
-                                {service.label}
-                              </Label>
-                            </div>
-                          ))}
-                        </div>
-                      </ScrollArea>
-                    </div>
-                  </div>
-                </div>
-                <DialogFooter>
-                  <Button 
-                    type="submit" 
-                    onClick={initializeServices}
-                    disabled={initializing || selectedServices.length === 0}
-                  >
-                    {initializing && <RefreshCw className="mr-2 h-4 w-4 animate-spin" />}
-                    Initialize
-                  </Button>
-                </DialogFooter>
-              </DialogContent>
-            </Dialog>
-          </div>
+    <div>
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-md font-medium flex items-center">
+          <Cpu className="mr-2 h-4 w-4" />
+          Service Assignments
+        </h3>
+        <div className="flex-1 max-w-sm ml-4">
+          <Input
+            placeholder="Filter services..."
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+            className="max-w-sm"
+          />
         </div>
-        <CardDescription>
-          Google Cloud services and their assigned API keys
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        {loading ? (
-          <div className="flex justify-center py-6">
-            <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full" aria-label="Loading"/>
-          </div>
-        ) : assignments.length === 0 ? (
-          <div className="text-center p-6 border rounded-md">
-            <Server className="h-10 w-10 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-base font-medium">No Service Assignments</h3>
-            <p className="text-sm text-muted-foreground mt-1">
-              Initialize services to assign optimal API keys
-            </p>
-          </div>
-        ) : (
-          <div className="space-y-6">
-            {Object.entries(assignmentsByGroup).map(([group, assignments]) => (
-              <div key={group} className="space-y-2">
-                <h3 className="text-sm font-medium flex items-center">
-                  <Badge variant="outline" className="mr-2">
-                    {group}
-                  </Badge>
-                  API Key Group
-                </h3>
-                <div className="space-y-1">
-                  {assignments.map((assignment, index) => (
-                    <div 
-                      key={index}
-                      className="flex items-center justify-between p-2 border rounded-md"
-                    >
-                      <div className="flex items-center">
-                        <span className="text-sm">{assignment.service}</span>
+      </div>
+      
+      <div className="border rounded-md">
+        <ScrollArea className="h-[400px]">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-[180px]">Service</TableHead>
+                <TableHead>Description</TableHead>
+                <TableHead className="w-[150px]">Status</TableHead>
+                <TableHead className="w-[180px]">API Key Group</TableHead>
+                <TableHead className="w-[100px] text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredApis.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={5} className="text-center py-6 text-muted-foreground">
+                    No services found matching your filter criteria
+                  </TableCell>
+                </TableRow>
+              ) : (
+                filteredApis.map((api) => (
+                  <TableRow key={api.id}>
+                    <TableCell className="font-medium">
+                      <div className="flex flex-col">
+                        <span>{api.name}</span>
+                        <span className="text-xs text-muted-foreground">({api.id})</span>
                       </div>
-                      <Badge className={`${getStatusColor(assignment.status)}`}>
-                        {assignment.status}
-                      </Badge>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </CardContent>
-    </Card>
+                    </TableCell>
+                    <TableCell>
+                      <span className="text-sm">{api.description}</span>
+                    </TableCell>
+                    <TableCell>
+                      {api.status.isActive ? (
+                        <Badge variant="success" className="flex items-center gap-1 bg-green-100 text-green-800 hover:bg-green-200">
+                          <CheckCircle className="h-3 w-3" />
+                          <span>Active</span>
+                        </Badge>
+                      ) : (
+                        <Badge variant="destructive" className="flex items-center gap-1">
+                          <XCircle className="h-3 w-3" />
+                          <span>Inactive</span>
+                        </Badge>
+                      )}
+                      {api.status.error && (
+                        <div className="text-xs text-red-500 mt-1 flex items-center">
+                          <ShieldAlert className="h-3 w-3 mr-1" />
+                          {api.status.error.length > 30 
+                            ? `${api.status.error.substring(0, 30)}...` 
+                            : api.status.error}
+                        </div>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      <Select
+                        defaultValue={api.assignment.group}
+                        onValueChange={(value) => handleAssignmentChange(api.id, value)}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select group" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {apiKeyGroups.map((group) => (
+                            <SelectItem key={group.name} value={group.name}>
+                              <div className="flex items-center">
+                                <span>{group.name}</span>
+                                <Badge 
+                                  variant="outline" 
+                                  className="ml-2 text-xs"
+                                >
+                                  {group.priority}
+                                </Badge>
+                              </div>
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => handleInitialize(api.id)}
+                        className="h-8 px-3"
+                      >
+                        {api.status.isActive ? (
+                          <RefreshCcw className="h-3.5 w-3.5 mr-1" />
+                        ) : (
+                          <PlayCircle className="h-3.5 w-3.5 mr-1" />
+                        )}
+                        {api.status.isActive ? 'Refresh' : 'Initialize'}
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))
+              )}
+            </TableBody>
+          </Table>
+        </ScrollArea>
+      </div>
+      <div className="mt-2 text-xs text-muted-foreground">
+        <p>
+          <span className="font-medium">Total services:</span> {allApis.length} | 
+          <span className="font-medium text-green-600"> Active:</span> {availableApis.length} | 
+          <span className="font-medium text-red-600"> Inactive:</span> {missingApis.length}
+        </p>
+      </div>
+    </div>
   );
-}
+};
+
+export default ServiceAssignmentManager;

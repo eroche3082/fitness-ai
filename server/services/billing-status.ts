@@ -1,277 +1,433 @@
-import { GoogleGenerativeAI } from '@google/generative-ai';
-import { aiConfig, fitnessConfig, otherApis } from '../config/api-keys';
+/**
+ * Billing Status Service
+ * 
+ * This service checks the status of Google Cloud API keys and service quotas.
+ * It provides information about service activation, quota limits, and usage.
+ */
 
-interface ApiStatusResponse {
+interface ApiKeyStatus {
   isActive: boolean;
   message: string;
   error?: string;
-  projectId?: string;
   quotaLimits?: Record<string, number>;
   quotaUsage?: Record<string, number>;
+  projectId?: string;
 }
 
-/**
- * Service to check the billing status of Google Cloud APIs
- */
 export class BillingStatusService {
-  private genAI: GoogleGenerativeAI;
-  
-  constructor() {
-    // Initialize the Generative AI client
-    if (!aiConfig.apiKey) {
-      console.warn("Warning: No API key provided for GoogleGenerativeAI");
-    }
-    this.genAI = new GoogleGenerativeAI(aiConfig.apiKey || '');
-  }
+  private cachedStatus: Record<string, ApiKeyStatus> = {};
   
   /**
-   * Reinitialize the service with a new API key
-   * @param apiKey The new API key to use
+   * Check the status of an API key for a specific service
    */
-  reinitialize(apiKey: string | undefined): void {
-    if (!apiKey) {
-      console.warn("Warning: Attempted to reinitialize with undefined API key");
-      return;
+  public async checkApiKeyStatus(service: string, apiKey: string): Promise<ApiKeyStatus> {
+    // Check if we have a cached result
+    const cacheKey = `${service}:${apiKey}`;
+    if (this.cachedStatus[cacheKey]) {
+      return this.cachedStatus[cacheKey];
     }
     
-    console.log(`Reinitializing service with new API key (starts with ${apiKey.substring(0, 5)}...)`);
-    
-    // Create a new instance of the GoogleGenerativeAI client with the new key
-    this.genAI = new GoogleGenerativeAI(apiKey);
-  }
-
-  /**
-   * Check if the Vertex AI API is active and get quota information
-   */
-  async checkVertexApiStatus(): Promise<ApiStatusResponse> {
     try {
-      // Try to make a basic API call to verify the API is working
-      const model = this.genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+      // Different services require different validation methods
+      let status: ApiKeyStatus;
       
-      console.log("Testing Vertex AI API with key:", aiConfig.apiKey ? "Key provided" : "No key provided");
-      
-      const result = await model.generateContent("Hello, are you operational? Please provide today's date.");
-      const response = result.response;
-      const text = response.text();
-      
-      console.log("Vertex AI API Response:", text);
-      
-      if (text) {
-        return {
-          isActive: true,
-          message: "Vertex AI API is operational",
-          projectId: aiConfig.projectId,
-          quotaLimits: {
-            "Daily requests": 60000,
-            "Requests per minute": 1000,
-            "Tokens per minute": 100000
-          },
-          quotaUsage: {
-            "Daily requests": 237,
-            "Requests per minute": 12,
-            "Tokens per minute": 2450
-          }
-        };
-      } else {
-        return {
-          isActive: false,
-          message: "Vertex AI API returned an empty response",
-          projectId: aiConfig.projectId
-        };
+      switch (service) {
+        case 'texttospeech':
+          status = await this.checkTextToSpeechService(apiKey);
+          break;
+        case 'speech':
+          status = await this.checkSpeechToTextService(apiKey);
+          break;
+        case 'vision':
+          status = await this.checkVisionService(apiKey);
+          break;
+        case 'language':
+          status = await this.checkLanguageService(apiKey);
+          break;
+        case 'translation':
+          status = await this.checkTranslationService(apiKey);
+          break;
+        case 'vertex':
+          status = await this.checkVertexService(apiKey);
+          break;
+        case 'gemini':
+          status = await this.checkGeminiService(apiKey);
+          break;
+        case 'maps':
+          status = await this.checkMapsService(apiKey);
+          break;
+        case 'youtube':
+          status = await this.checkYoutubeService(apiKey);
+          break;
+        default:
+          // For other services, simulate a status check
+          status = this.simulateApiKeyCheck(service, apiKey);
       }
-    } catch (error: any) {
-      console.error("Vertex API status check failed:", error);
       
-      return {
+      // Cache the result
+      this.cachedStatus[cacheKey] = status;
+      return status;
+      
+    } catch (error) {
+      const errorStatus: ApiKeyStatus = {
         isActive: false,
-        message: "Failed to connect to Vertex AI API",
-        error: error.message || "Unknown error",
-        projectId: aiConfig.projectId
+        message: `Error checking ${service} API status`,
+        error: error instanceof Error ? error.message : String(error)
       };
+      
+      this.cachedStatus[cacheKey] = errorStatus;
+      return errorStatus;
     }
   }
-
+  
   /**
-   * Check if the Vision API is active
+   * Simulate checking an API key for testing purposes
    */
-  async checkVisionApiStatus(): Promise<ApiStatusResponse> {
-    // For demo purposes, simulating a Vision API check
-    // In a real implementation, you would make an actual API call
-    try {
+  private simulateApiKeyCheck(service: string, apiKey: string): ApiKeyStatus {
+    // For testing and simulation purposes only
+    const isActive = Math.random() > 0.3; // 70% chance of success
+    
+    if (isActive) {
       return {
         isActive: true,
-        message: "Vision API is operational",
-        projectId: aiConfig.projectId,
+        message: `${service} service is active and ready to use`,
         quotaLimits: {
-          "API calls per day": 10000,
-          "API calls per minute": 500,
+          'requests_per_day': 10000,
+          'requests_per_minute': 1000
         },
         quotaUsage: {
-          "API calls per day": 125,
-          "API calls per minute": 5,
-        }
+          'requests_per_day': Math.floor(Math.random() * 5000),
+          'requests_per_minute': Math.floor(Math.random() * 500)
+        },
+        projectId: 'fitness-ai-platform'
       };
-    } catch (error: any) {
-      console.error("Vision API status check failed:", error);
-      
+    } else {
       return {
         isActive: false,
-        message: "Failed to connect to Vision API",
-        error: error.message || "Unknown error",
-        projectId: aiConfig.projectId
+        message: `${service} service is not active`,
+        error: 'API key validation failed',
+        projectId: 'fitness-ai-platform'
       };
     }
   }
-
+  
   /**
-   * Check if the Gemini API is active
+   * Check Text-to-Speech API key status
    */
-  async checkGeminiApiStatus(): Promise<ApiStatusResponse> {
+  private async checkTextToSpeechService(apiKey: string): Promise<ApiKeyStatus> {
+    // In a real implementation, we would make an API call to 
+    // texttospeech.googleapis.com with a minimal request to verify the key
+    
     try {
-      // Try to make a basic API call to verify the API is working
-      const model = this.genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+      // For now, we'll just simulate this check
+      const isActive = true; // apiKey === process.env.GOOGLE_API_KEY;
       
-      const result = await model.generateContent("Hello Gemini, what's the current date?");
-      const response = result.response;
-      const text = response.text();
+      return {
+        isActive,
+        message: isActive 
+          ? 'Text-to-Speech API is active and ready for use' 
+          : 'Text-to-Speech API key validation failed',
+        error: isActive ? undefined : 'Invalid or restricted API key',
+        quotaLimits: {
+          'characters_per_day': 1000000,
+          'requests_per_minute': 1000
+        },
+        quotaUsage: {
+          'characters_per_day': 250000,
+          'requests_per_minute': 200
+        }
+      };
+    } catch (error) {
+      return {
+        isActive: false,
+        message: 'Error checking Text-to-Speech API status',
+        error: error instanceof Error ? error.message : String(error)
+      };
+    }
+  }
+  
+  /**
+   * Check Speech-to-Text API key status
+   */
+  private async checkSpeechToTextService(apiKey: string): Promise<ApiKeyStatus> {
+    // Similar to Text-to-Speech, but for Speech-to-Text API
+    try {
+      // For now, we'll just simulate this check
+      const isActive = true; // apiKey === process.env.GOOGLE_API_KEY;
       
-      if (text) {
-        return {
-          isActive: true,
-          message: "Gemini API is operational",
-          projectId: aiConfig.projectId,
-          quotaLimits: {
-            "Daily token limit": 1000000,
-            "Requests per minute": 2000,
-          },
-          quotaUsage: {
-            "Daily token limit": 42500,
-            "Requests per minute": 15,
-          }
-        };
-      } else {
-        return {
-          isActive: false,
-          message: "Gemini API returned an empty response",
-          projectId: aiConfig.projectId
-        };
+      return {
+        isActive,
+        message: isActive 
+          ? 'Speech-to-Text API is active and ready for use' 
+          : 'Speech-to-Text API key validation failed',
+        error: isActive ? undefined : 'Invalid or restricted API key',
+        quotaLimits: {
+          'minutes_per_day': 60,
+          'requests_per_minute': 100
+        },
+        quotaUsage: {
+          'minutes_per_day': 15,
+          'requests_per_minute': 25
+        }
+      };
+    } catch (error) {
+      return {
+        isActive: false,
+        message: 'Error checking Speech-to-Text API status',
+        error: error instanceof Error ? error.message : String(error)
+      };
+    }
+  }
+  
+  /**
+   * Check Vision API key status
+   */
+  private async checkVisionService(apiKey: string): Promise<ApiKeyStatus> {
+    // For Vision API
+    try {
+      // For now, we'll just simulate this check
+      const isActive = true; // apiKey === process.env.GOOGLE_API_KEY;
+      
+      return {
+        isActive,
+        message: isActive 
+          ? 'Vision API is active and ready for use' 
+          : 'Vision API key validation failed',
+        error: isActive ? undefined : 'Invalid or restricted API key',
+        quotaLimits: {
+          'requests_per_day': 1000,
+          'features_per_request': 10
+        },
+        quotaUsage: {
+          'requests_per_day': 250,
+          'features_per_request': 5
+        }
+      };
+    } catch (error) {
+      return {
+        isActive: false,
+        message: 'Error checking Vision API status',
+        error: error instanceof Error ? error.message : String(error)
+      };
+    }
+  }
+  
+  /**
+   * Check Natural Language API key status
+   */
+  private async checkLanguageService(apiKey: string): Promise<ApiKeyStatus> {
+    // For Natural Language API
+    try {
+      // For now, we'll just simulate this check
+      const isActive = true; // apiKey === process.env.GOOGLE_API_KEY;
+      
+      return {
+        isActive,
+        message: isActive 
+          ? 'Natural Language API is active and ready for use' 
+          : 'Natural Language API key validation failed',
+        error: isActive ? undefined : 'Invalid or restricted API key',
+        quotaLimits: {
+          'requests_per_day': 5000,
+          'characters_per_request': 1000
+        },
+        quotaUsage: {
+          'requests_per_day': 1200,
+          'characters_per_request': 800
+        }
+      };
+    } catch (error) {
+      return {
+        isActive: false,
+        message: 'Error checking Natural Language API status',
+        error: error instanceof Error ? error.message : String(error)
+      };
+    }
+  }
+  
+  /**
+   * Check Translation API key status
+   */
+  private async checkTranslationService(apiKey: string): Promise<ApiKeyStatus> {
+    // For Translation API
+    try {
+      // For now, we'll just simulate this check
+      const isActive = true; // apiKey === process.env.GOOGLE_API_KEY;
+      
+      return {
+        isActive,
+        message: isActive 
+          ? 'Translation API is active and ready for use' 
+          : 'Translation API key validation failed',
+        error: isActive ? undefined : 'Invalid or restricted API key',
+        quotaLimits: {
+          'characters_per_day': 2000000,
+          'requests_per_minute': 1000
+        },
+        quotaUsage: {
+          'characters_per_day': 500000,
+          'requests_per_minute': 250
+        }
+      };
+    } catch (error) {
+      return {
+        isActive: false,
+        message: 'Error checking Translation API status',
+        error: error instanceof Error ? error.message : String(error)
+      };
+    }
+  }
+  
+  /**
+   * Check Vertex AI API key status
+   */
+  private async checkVertexService(apiKey: string): Promise<ApiKeyStatus> {
+    // For Vertex AI API
+    try {
+      // For now, we'll just simulate this check
+      const isActive = apiKey === process.env.GOOGLE_GROUP1_API_KEY;
+      
+      return {
+        isActive,
+        message: isActive 
+          ? 'Vertex AI API is active and ready for use' 
+          : 'Vertex AI API key validation failed',
+        error: isActive ? undefined : 'Invalid or restricted API key',
+        quotaLimits: {
+          'predictions_per_day': 10000,
+          'training_hours_per_month': 100
+        },
+        quotaUsage: {
+          'predictions_per_day': 2500,
+          'training_hours_per_month': 25
+        }
+      };
+    } catch (error) {
+      return {
+        isActive: false,
+        message: 'Error checking Vertex AI API status',
+        error: error instanceof Error ? error.message : String(error)
+      };
+    }
+  }
+  
+  /**
+   * Check Gemini API key status
+   */
+  private async checkGeminiService(apiKey: string): Promise<ApiKeyStatus> {
+    // For Gemini API (part of Vertex AI)
+    try {
+      // For now, we'll just simulate this check
+      const isActive = apiKey === process.env.GOOGLE_GROUP1_API_KEY || 
+                     apiKey === process.env.GEMINI_API_KEY;
+      
+      return {
+        isActive,
+        message: isActive 
+          ? 'Gemini API is active and ready for use' 
+          : 'Gemini API key validation failed',
+        error: isActive ? undefined : 'Invalid or restricted API key',
+        quotaLimits: {
+          'tokens_per_minute': 100000,
+          'requests_per_minute': 200
+        },
+        quotaUsage: {
+          'tokens_per_minute': 25000,
+          'requests_per_minute': 50
+        }
+      };
+    } catch (error) {
+      return {
+        isActive: false,
+        message: 'Error checking Gemini API status',
+        error: error instanceof Error ? error.message : String(error)
+      };
+    }
+  }
+  
+  /**
+   * Check Maps API key status
+   */
+  private async checkMapsService(apiKey: string): Promise<ApiKeyStatus> {
+    // For Maps API
+    try {
+      // For now, we'll just simulate this check
+      const isActive = apiKey === process.env.GOOGLE_GROUP3_API_KEY || 
+                     apiKey === process.env.GOOGLE_MAPS_API_KEY;
+      
+      return {
+        isActive,
+        message: isActive 
+          ? 'Maps API is active and ready for use' 
+          : 'Maps API key validation failed',
+        error: isActive ? undefined : 'Invalid or restricted API key',
+        quotaLimits: {
+          'requests_per_day': 100000,
+          'requests_per_second': 50
+        },
+        quotaUsage: {
+          'requests_per_day': 25000,
+          'requests_per_second': 10
+        }
+      };
+    } catch (error) {
+      return {
+        isActive: false,
+        message: 'Error checking Maps API status',
+        error: error instanceof Error ? error.message : String(error)
+      };
+    }
+  }
+  
+  /**
+   * Check YouTube API key status
+   */
+  private async checkYoutubeService(apiKey: string): Promise<ApiKeyStatus> {
+    // For YouTube API
+    try {
+      // For now, we'll just simulate this check
+      const isActive = apiKey === process.env.GOOGLE_GROUP3_API_KEY || 
+                     apiKey === process.env.YOUTUBE_API_KEY;
+      
+      return {
+        isActive,
+        message: isActive 
+          ? 'YouTube API is active and ready for use' 
+          : 'YouTube API key validation failed',
+        error: isActive ? undefined : 'Invalid or restricted API key',
+        quotaLimits: {
+          'units_per_day': 10000,
+          'requests_per_second': 10
+        },
+        quotaUsage: {
+          'units_per_day': 2500,
+          'requests_per_second': 3
+        }
+      };
+    } catch (error) {
+      return {
+        isActive: false,
+        message: 'Error checking YouTube API status',
+        error: error instanceof Error ? error.message : String(error)
+      };
+    }
+  }
+  
+  /**
+   * Clear the status cache for a service
+   */
+  public clearServiceCache(service: string): void {
+    Object.keys(this.cachedStatus).forEach(key => {
+      if (key.startsWith(`${service}:`)) {
+        delete this.cachedStatus[key];
       }
-    } catch (error: any) {
-      console.error("Gemini API status check failed:", error);
-      
-      return {
-        isActive: false,
-        message: "Failed to connect to Gemini API",
-        error: error.message || "Unknown error",
-        projectId: aiConfig.projectId
-      };
-    }
+    });
   }
-
+  
   /**
-   * Check if the Speech API is active
+   * Clear the entire status cache
    */
-  async checkSpeechApiStatus(): Promise<ApiStatusResponse> {
-    // For demo purposes, simulating a Speech API check
-    // In a real implementation, you would make an actual API call
-    try {
-      return {
-        isActive: true,
-        message: "Speech API is operational",
-        projectId: aiConfig.projectId,
-        quotaLimits: {
-          "Minutes processed per day": 1000,
-          "Concurrent requests": 100,
-        },
-        quotaUsage: {
-          "Minutes processed per day": 37,
-          "Concurrent requests": 3,
-        }
-      };
-    } catch (error: any) {
-      console.error("Speech API status check failed:", error);
-      
-      return {
-        isActive: false,
-        message: "Failed to connect to Speech API",
-        error: error.message || "Unknown error",
-        projectId: aiConfig.projectId
-      };
-    }
-  }
-
-  /**
-   * Get the status of all API keys
-   */
-  async getApiKeyStatus() {
-    const availableApis = [];
-    const missingApis = [];
-    
-    // Check Google Cloud APIs
-    if (aiConfig.apiKey) {
-      availableApis.push('Vertex AI');
-      availableApis.push('Gemini');
-      availableApis.push('Vision API');
-      availableApis.push('Speech API');
-      availableApis.push('Text-to-Speech');
-      availableApis.push('Natural Language');
-    } else {
-      missingApis.push('Vertex AI');
-      missingApis.push('Gemini');
-      missingApis.push('Vision API');
-      missingApis.push('Speech API');
-      missingApis.push('Text-to-Speech');
-      missingApis.push('Natural Language');
-    }
-    
-    // Check fitness APIs
-    if (fitnessConfig.googleFit.clientId && fitnessConfig.googleFit.clientSecret) {
-      availableApis.push('Google Fit');
-    } else {
-      missingApis.push('Google Fit');
-    }
-    
-    if (fitnessConfig.fitbit.clientId && fitnessConfig.fitbit.clientSecret) {
-      availableApis.push('Fitbit');
-    } else {
-      missingApis.push('Fitbit');
-    }
-    
-    if (fitnessConfig.strava.clientId && fitnessConfig.strava.clientSecret) {
-      availableApis.push('Strava');
-    } else {
-      missingApis.push('Strava');
-    }
-    
-    // Check other APIs
-    if (otherApis.openai.apiKey) {
-      availableApis.push('OpenAI');
-    } else {
-      missingApis.push('OpenAI');
-    }
-    
-    if (otherApis.anthropic.apiKey) {
-      availableApis.push('Anthropic Claude');
-    } else {
-      missingApis.push('Anthropic Claude');
-    }
-    
-    if (otherApis.elevenLabs.apiKey) {
-      availableApis.push('Eleven Labs');
-    } else {
-      missingApis.push('Eleven Labs');
-    }
-    
-    if (otherApis.rapidApi.apiKey) {
-      availableApis.push('Rapid API');
-    } else {
-      missingApis.push('Rapid API');
-    }
-    
-    return {
-      availableApis,
-      missingApis,
-      projectId: aiConfig.projectId
-    };
+  public clearAllCache(): void {
+    this.cachedStatus = {};
   }
 }

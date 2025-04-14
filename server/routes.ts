@@ -280,7 +280,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   console.log("👤 User Profile routes registered successfully");
   
   // Register billing status routes
-  apiRouter.use('/billing-status', billingStatusRoutes);
+  app.use(billingStatusRoutes);
   console.log("💰 Billing Status routes registered successfully");
 
   // Stripe payment integration

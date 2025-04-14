@@ -1,256 +1,81 @@
+/**
+ * Admin API Status Page
+ * 
+ * This page provides administrators with a comprehensive view of Google Cloud API key status,
+ * service assignments, and quota usage. It allows dynamic reassignment of services to different
+ * API key groups for optimal resource utilization.
+ */
+
 import React from 'react';
-import AdminLayout from '../../components/layout/AdminLayout';
-import ApiStatusCard from '@/components/ApiStatusCard';
-import { ApiKeyManager } from '@/components/ApiKeyManager';
-import { ServiceAssignmentManager } from '@/components/ServiceAssignmentManager';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
-import { useQuery } from '@tanstack/react-query';
+import { Helmet } from 'react-helmet-async';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator } from '@/components/ui/breadcrumb';
+import { AlertCircle, Home, Key, Lock } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { AlertCircle, Check, RefreshCw, X } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import ApiKeyManager from '../../components/ApiKeyManager';
 
-export default function AdminApiStatusPage() {
-  // Fetch the API keys status
-  const { 
-    data: apiKeysStatus, 
-    isLoading: isLoadingKeys,
-    error: apiKeysError,
-    refetch
-  } = useQuery({
-    queryKey: ['/api/billing-status/api-key-status'],
-    staleTime: 1000 * 60 * 5, // 5 minutes
-    refetchOnWindowFocus: false
-  });
-
+const ApiStatusPage: React.FC = () => {
   return (
-    <AdminLayout title="API Status Dashboard">
-      <div className="space-y-6">
-        <div className="flex justify-between items-center mb-4">
-          <h1 className="text-2xl font-bold tracking-tight">Google Cloud API Management</h1>
-          <Button 
-            variant="outline" 
-            onClick={() => refetch()} 
-            disabled={isLoadingKeys}
-            className="flex items-center gap-2"
-          >
-            <RefreshCw className={`h-4 w-4 ${isLoadingKeys ? 'animate-spin' : ''}`} />
-            Refresh Status
-          </Button>
-        </div>
-        
-        <Tabs defaultValue="overview">
-          <TabsList className="mb-4">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="key-manager">API Key Manager</TabsTrigger>
-            <TabsTrigger value="service-status">Service Status</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="overview" className="space-y-6">
-            {/* Overview section */}
-            <Card>
-              <CardHeader>
-                <CardTitle>API Keys Overview</CardTitle>
-                <CardDescription>
-                  Status of all configured Google Cloud API keys used by the system
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                {isLoadingKeys ? (
-                  <div className="animate-pulse h-20 bg-gray-200 dark:bg-gray-700 rounded-md"></div>
-                ) : apiKeysError ? (
-                  <Alert variant="destructive">
-                    <AlertCircle className="h-4 w-4" />
-                    <AlertTitle>Error</AlertTitle>
-                    <AlertDescription>
-                      Failed to load API keys status. Please try again later.
-                    </AlertDescription>
-                  </Alert>
-                ) : (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="flex items-center space-x-4 p-4 border rounded-md">
-                      <div>
-                        <h3 className="font-medium">Available APIs</h3>
-                        <div className="mt-1 flex flex-wrap gap-2">
-                          {apiKeysStatus?.availableApis?.map((api: string) => (
-                            <span 
-                              key={api}
-                              className="px-2 py-1 bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-100 text-xs rounded-full flex items-center"
-                            >
-                              <Check className="h-3 w-3 mr-1" />
-                              {api}
-                            </span>
-                          ))}
-                          {!apiKeysStatus?.availableApis?.length && (
-                            <span className="text-gray-500 text-sm">
-                              No APIs available
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-center space-x-4 p-4 border rounded-md">
-                      <div>
-                        <h3 className="font-medium">Missing APIs</h3>
-                        <div className="mt-1 flex flex-wrap gap-2">
-                          {apiKeysStatus?.missingApis?.map((api: string) => (
-                            <span 
-                              key={api}
-                              className="px-2 py-1 bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-100 text-xs rounded-full flex items-center"
-                            >
-                              <X className="h-3 w-3 mr-1" />
-                              {api}
-                            </span>
-                          ))}
-                          {!apiKeysStatus?.missingApis?.length && (
-                            <span className="text-gray-500 text-sm">
-                              All required APIs are configured
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-            
-            {/* Account Details */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Account Details</CardTitle>
-                <CardDescription>
-                  Information about your Google Cloud billing account
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  <div className="flex justify-between">
-                    <span className="text-sm text-muted-foreground">Project ID:</span>
-                    <span className="font-medium">erudite-creek-431302</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm text-muted-foreground">Billing Account:</span>
-                    <span className="font-medium">billing-account-123456</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-sm text-muted-foreground">Credit Remaining:</span>
-                    <span className="font-medium">$298.75 / $300.00</span>
-                  </div>
-                  
-                  <div className="pt-4">
-                    <div className="text-sm font-medium mb-2">Credit Usage</div>
-                    <div className="w-full h-3 bg-gray-200 dark:bg-gray-700 rounded-full">
-                      <div 
-                        className="h-3 bg-blue-500 rounded-full" 
-                        style={{ width: `${(298.75 / 300) * 100}%` }}
-                      ></div>
-                    </div>
-                    <div className="flex justify-between text-xs mt-1">
-                      <span>Used: $1.25</span>
-                      <span>Remaining: $298.75</span>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-          
-          <TabsContent value="key-manager" className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              <div className="lg:col-span-2">
-                <ApiKeyManager />
-                <ServiceAssignmentManager className="mt-6" />
-              </div>
-              <div>
-                <Card>
-                  <CardHeader>
-                    <CardTitle>API Key Usage Guide</CardTitle>
-                    <CardDescription>
-                      Optimize your API key usage for best performance
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="space-y-4 text-sm">
-                      <p>
-                        Your application is configured to use multiple Google Cloud API keys to manage
-                        quota limits efficiently and ensure uninterrupted service.
-                      </p>
-                      
-                      <div className="space-y-2">
-                        <h4 className="font-medium">Key Rotation Strategy:</h4>
-                        <ul className="list-disc pl-5 space-y-1">
-                          <li>Use GROUP1 key for development and testing</li>
-                          <li>Use GROUP2 key for production workloads</li>
-                          <li>Switch to a different key when nearing quota limits</li>
-                        </ul>
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <h4 className="font-medium">Best Practices:</h4>
-                        <ul className="list-disc pl-5 space-y-1">
-                          <li>Monitor quota usage regularly</li>
-                          <li>Set up alerts for reaching quota thresholds</li>
-                          <li>Apply for quota increases when necessary</li>
-                        </ul>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
-          </TabsContent>
-          
-          <TabsContent value="service-status" className="space-y-6">
-            {/* API Status Cards */}
-            <Tabs defaultValue="vertex">
-              <TabsList className="mb-4">
-                <TabsTrigger value="vertex">Vertex AI</TabsTrigger>
-                <TabsTrigger value="gemini">Gemini</TabsTrigger>
-                <TabsTrigger value="vision">Vision API</TabsTrigger>
-                <TabsTrigger value="speech">Speech Services</TabsTrigger>
-              </TabsList>
-              
-              <TabsContent value="vertex" className="space-y-4">
-                <ApiStatusCard 
-                  title="Vertex AI Status" 
-                  apiName="Vertex AI"
-                  description="Google Cloud Vertex AI platform integration status"
-                  showQuota={true}
-                />
-              </TabsContent>
-              
-              <TabsContent value="gemini" className="space-y-4">
-                <ApiStatusCard 
-                  title="Gemini AI Status" 
-                  apiName="Gemini"
-                  description="Google Gemini 1.5 Flash model integration status"
-                  showQuota={true}
-                />
-              </TabsContent>
-              
-              <TabsContent value="vision" className="space-y-4">
-                <ApiStatusCard 
-                  title="Vision API Status" 
-                  apiName="Vision"
-                  description="Google Cloud Vision AI services integration status"
-                  showQuota={true}
-                />
-              </TabsContent>
-              
-              <TabsContent value="speech" className="space-y-4">
-                <ApiStatusCard 
-                  title="Speech Services Status" 
-                  apiName="Speech"
-                  description="Google Cloud Speech-to-Text and Text-to-Speech integration status"
-                  showQuota={true}
-                />
-              </TabsContent>
-            </Tabs>
-          </TabsContent>
-        </Tabs>
+    <div className="container py-8">
+      <Helmet>
+        <title>API Key Management | Fitness AI</title>
+      </Helmet>
+      
+      <div className="mb-6">
+        <Breadcrumb>
+          <BreadcrumbList>
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/">
+                <Home className="h-4 w-4 mr-1" />
+                <span>Home</span>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/admin">
+                <Lock className="h-4 w-4 mr-1" />
+                <span>Admin</span>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+            <BreadcrumbSeparator />
+            <BreadcrumbItem>
+              <BreadcrumbLink href="/admin/api-status">
+                <Key className="h-4 w-4 mr-1" />
+                <span>API Status</span>
+              </BreadcrumbLink>
+            </BreadcrumbItem>
+          </BreadcrumbList>
+        </Breadcrumb>
       </div>
-    </AdminLayout>
+      
+      <div className="mb-6">
+        <h1 className="text-3xl font-bold tracking-tight">Google Cloud API Management</h1>
+        <p className="text-muted-foreground mt-2">
+          Monitor and manage Google Cloud API keys, service assignments, and quota usage
+        </p>
+      </div>
+      
+      <Alert className="mb-6">
+        <AlertCircle className="h-4 w-4" />
+        <AlertTitle>Important Note</AlertTitle>
+        <AlertDescription>
+          Changes made here will immediately affect all services. Reassigning APIs may cause temporary service disruptions.
+        </AlertDescription>
+      </Alert>
+      
+      <Card className="mb-6">
+        <CardHeader>
+          <CardTitle>API Status Dashboard</CardTitle>
+          <CardDescription>
+            Monitor and manage Google Cloud API key assignments and status
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ApiKeyManager />
+        </CardContent>
+      </Card>
+    </div>
   );
-}
+};
+
+export default ApiStatusPage;

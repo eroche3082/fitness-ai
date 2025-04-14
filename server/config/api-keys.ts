@@ -1,86 +1,137 @@
 /**
- * Configuration for various API keys used by the application
+ * API Key Configuration Module
+ * 
+ * This module defines the Google Cloud API key configuration for the Fitness AI platform.
+ * It includes key assignments, service groupings, and default fallback keys.
  */
 
-// Google Cloud API Configuration
-// Try multiple API keys from different groups
+// Main universal API key (highest priority)
+export const UNIVERSAL_API_KEY = process.env.GOOGLE_API_KEY || "AIzaSyA--rn_uJjZtyU9kGpIWDpBa-obvtPrC24";
 
-// Log environment variables for debugging (first 5 characters only for security)
-console.log('API Key Debug:');
-if (process.env.GOOGLE_GROUP1_API_KEY) {
-  console.log('GROUP1:', process.env.GOOGLE_GROUP1_API_KEY.substring(0, 5) + '...');
-}
-if (process.env.GOOGLE_GROUP2_API_KEY) {
-  console.log('GROUP2:', process.env.GOOGLE_GROUP2_API_KEY.substring(0, 5) + '...');
-}
-if (process.env.GOOGLE_GROUP3_API_KEY) {
-  console.log('GROUP3:', process.env.GOOGLE_GROUP3_API_KEY.substring(0, 5) + '...');
-}
-if (process.env.GOOGLE_API_KEY) {
-  console.log('DEFAULT:', process.env.GOOGLE_API_KEY.substring(0, 5) + '...');
-}
+// Group API keys for service distribution
+export const GROUP1_API_KEY = process.env.GOOGLE_GROUP1_API_KEY || "AIzaSyBUYoJ-RndERrcY9qkjD-2YGGY5m3Mzc0U";
+export const GROUP2_API_KEY = process.env.GOOGLE_GROUP2_API_KEY || "AIzaSyByRQcsHT0AXxLsyPK2RrBZEwhe3T11q08";
+export const GROUP3_API_KEY = process.env.GOOGLE_GROUP3_API_KEY || "AIzaSyBGWmVEy2zp6fpqaBkDOpV-Qj_FP6QkZj0";
 
-// Create an object with mutable properties
+// Service to API Key group mapping
 export const aiConfig = {
-  // Start with a prioritized key selection
-  apiKey: process.env.GOOGLE_GROUP1_API_KEY || 
-          process.env.GOOGLE_GROUP2_API_KEY || 
-          process.env.GOOGLE_GROUP3_API_KEY || 
-          process.env.GOOGLE_API_KEY || 
-          process.env.VERTEX_API_KEY || 
-          process.env.GEMINI_API_KEY,
-  projectId: 'erudite-creek-431302',
-  region: 'us-central1',
-  // Add which key name is being used
-  activeKeyName: 'default' 
+  // API Key Groups with priority (lower number = higher priority)
+  keyGroups: [
+    {
+      name: "UNIVERSAL",
+      envVariable: "GOOGLE_API_KEY",
+      key: UNIVERSAL_API_KEY,
+      services: ["texttospeech", "speech", "vision", "language", "translation"],
+      priority: 1
+    },
+    {
+      name: "GROUP1",
+      envVariable: "GOOGLE_GROUP1_API_KEY", 
+      key: GROUP1_API_KEY,
+      services: ["vertex", "gemini", "vision"],
+      priority: 2
+    },
+    {
+      name: "GROUP2",
+      envVariable: "GOOGLE_GROUP2_API_KEY",
+      key: GROUP2_API_KEY,
+      services: ["gmail", "calendar", "drive", "sheets"],
+      priority: 3
+    },
+    {
+      name: "GROUP3",
+      envVariable: "GOOGLE_GROUP3_API_KEY",
+      key: GROUP3_API_KEY,
+      services: ["firebase", "maps", "youtube"],
+      priority: 4
+    }
+  ],
+  
+  // Service definitions with default assignments
+  services: [
+    { 
+      id: "texttospeech", 
+      name: "Text-to-Speech API", 
+      description: "Convert text to natural-sounding speech for voice coaching",
+      defaultGroup: "UNIVERSAL"
+    },
+    { 
+      id: "speech", 
+      name: "Speech-to-Text API", 
+      description: "Convert spoken audio to text for voice commands",
+      defaultGroup: "UNIVERSAL"
+    },
+    { 
+      id: "vision", 
+      name: "Vision API", 
+      description: "Analyze images for workout form verification",
+      defaultGroup: "UNIVERSAL" 
+    },
+    { 
+      id: "language", 
+      name: "Natural Language API", 
+      description: "Analyze text sentiment and entities for feedback",
+      defaultGroup: "UNIVERSAL"
+    },
+    { 
+      id: "translation", 
+      name: "Translation API", 
+      description: "Translate content for international users",
+      defaultGroup: "UNIVERSAL"
+    },
+    { 
+      id: "vertex", 
+      name: "Vertex AI API", 
+      description: "Machine learning for fitness analysis and predictions",
+      defaultGroup: "GROUP1"
+    },
+    { 
+      id: "gemini", 
+      name: "Gemini API", 
+      description: "Advanced AI for workout plan generation",
+      defaultGroup: "GROUP1"
+    },
+    { 
+      id: "sheets", 
+      name: "Sheets API", 
+      description: "Manage workout data and analytics",
+      defaultGroup: "GROUP2"
+    },
+    { 
+      id: "gmail", 
+      name: "Gmail API", 
+      description: "Send workout summaries and notifications",
+      defaultGroup: "GROUP2"
+    },
+    { 
+      id: "calendar", 
+      name: "Calendar API", 
+      description: "Schedule workouts and fitness sessions",
+      defaultGroup: "GROUP2"
+    },
+    { 
+      id: "drive", 
+      name: "Drive API", 
+      description: "Store workout videos and progress photos",
+      defaultGroup: "GROUP2"
+    },
+    { 
+      id: "firebase", 
+      name: "Firebase API", 
+      description: "Real-time sync for workout data",
+      defaultGroup: "GROUP3"
+    },
+    { 
+      id: "maps", 
+      name: "Maps API", 
+      description: "Track outdoor workouts and running routes",
+      defaultGroup: "GROUP3"
+    },
+    { 
+      id: "youtube", 
+      name: "YouTube API", 
+      description: "Fetch exercise tutorial videos",
+      defaultGroup: "GROUP3"
+    }
+  ]
 };
-
-// Fitness API Configurations
-export const fitnessConfig = {
-  googleFit: {
-    clientId: process.env.GOOGLE_FIT_CLIENT_ID,
-    clientSecret: process.env.GOOGLE_FIT_CLIENT_SECRET
-  },
-  fitbit: {
-    clientId: process.env.FITBIT_CLIENT_ID,
-    clientSecret: process.env.FITBIT_CLIENT_SECRET
-  },
-  strava: {
-    clientId: process.env.STRAVA_CLIENT_ID,
-    clientSecret: process.env.STRAVA_CLIENT_SECRET
-  }
-};
-
-// Other API Configurations
-export const otherApis = {
-  openai: {
-    apiKey: process.env.OPENAI_API_KEY
-  },
-  anthropic: {
-    apiKey: process.env.ANTHROPIC_API_KEY
-  },
-  elevenLabs: {
-    apiKey: process.env.ELEVEN_LABS_API_KEY
-  },
-  rapidApi: {
-    apiKey: process.env.RAPID_API_KEY
-  }
-};
-
-/**
- * Check if a specific API key is configured
- * @param keyName The name of the environment variable for the API key
- */
-export function isApiKeyConfigured(keyName: string): boolean {
-  const key = process.env[keyName];
-  return key !== undefined && key !== '';
-}
-
-/**
- * Check which API keys are missing from the required set
- * @param requiredKeys Array of environment variable names for required API keys
- * @returns Array of missing API key names
- */
-export function getMissingApiKeys(requiredKeys: string[]): string[] {
-  return requiredKeys.filter(key => !isApiKeyConfigured(key));
-}

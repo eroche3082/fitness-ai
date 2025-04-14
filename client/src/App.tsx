@@ -3,6 +3,7 @@ import { Switch, Route, Link, useLocation } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
+import { HelmetProvider } from "react-helmet-async";
 import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
 import LandingPage from "@/pages/newlanding";
@@ -305,28 +306,30 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <UserProvider>
-          <ChatProvider>
-            {/* System initializer and main application components */}
-            <FitnessSystemInitializer />
-            <Router />
-            {/* Only show navigation for authenticated users */}
-            {useAuth().isAuthenticated && <MainNavigation />}
-            
-            {/* Content with margin for sidebar when authenticated */}
-            {useAuth().isAuthenticated && (
-              <div style={{ marginLeft: '260px' }} className="p-4">
-                {/* Additional content can go here */}
-              </div>
-            )}
-            
-            {/* Add the floating chatbot to all pages, according to MEGAPROMPT */}
-            <MiniChatbot />
-          </ChatProvider>
-        </UserProvider>
-      </AuthProvider>
-      <Toaster />
+      <HelmetProvider>
+        <AuthProvider>
+          <UserProvider>
+            <ChatProvider>
+              {/* System initializer and main application components */}
+              <FitnessSystemInitializer />
+              <Router />
+              {/* Only show navigation for authenticated users */}
+              {useAuth().isAuthenticated && <MainNavigation />}
+              
+              {/* Content with margin for sidebar when authenticated */}
+              {useAuth().isAuthenticated && (
+                <div style={{ marginLeft: '260px' }} className="p-4">
+                  {/* Additional content can go here */}
+                </div>
+              )}
+              
+              {/* Add the floating chatbot to all pages, according to MEGAPROMPT */}
+              <MiniChatbot />
+            </ChatProvider>
+          </UserProvider>
+        </AuthProvider>
+        <Toaster />
+      </HelmetProvider>
     </QueryClientProvider>
   );
 }
