@@ -1,5 +1,5 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import { aiConfig } from '../config/api-keys';
+import { aiConfig, fitnessConfig, otherApis } from '../config/api-keys';
 
 interface ApiStatusResponse {
   isActive: boolean;
@@ -18,7 +18,10 @@ export class BillingStatusService {
   
   constructor() {
     // Initialize the Generative AI client
-    this.genAI = new GoogleGenerativeAI(aiConfig.apiKey);
+    if (!aiConfig.apiKey) {
+      console.warn("Warning: No API key provided for GoogleGenerativeAI");
+    }
+    this.genAI = new GoogleGenerativeAI(aiConfig.apiKey || '');
   }
 
   /**
@@ -181,20 +184,68 @@ export class BillingStatusService {
    * Get the status of all API keys
    */
   async getApiKeyStatus() {
-    const availableApis = [
-      'Vertex AI',
-      'Gemini',
-      'Vision API',
-      'Speech API', 
-      'Text-to-Speech',
-      'Natural Language'
-    ];
-    
+    const availableApis = [];
     const missingApis = [];
     
-    // In a real implementation, you would check if each API key is configured
-    if (!aiConfig.apiKey) {
+    // Check Google Cloud APIs
+    if (aiConfig.apiKey) {
+      availableApis.push('Vertex AI');
+      availableApis.push('Gemini');
+      availableApis.push('Vision API');
+      availableApis.push('Speech API');
+      availableApis.push('Text-to-Speech');
+      availableApis.push('Natural Language');
+    } else {
       missingApis.push('Vertex AI');
+      missingApis.push('Gemini');
+      missingApis.push('Vision API');
+      missingApis.push('Speech API');
+      missingApis.push('Text-to-Speech');
+      missingApis.push('Natural Language');
+    }
+    
+    // Check fitness APIs
+    if (fitnessConfig.googleFit.clientId && fitnessConfig.googleFit.clientSecret) {
+      availableApis.push('Google Fit');
+    } else {
+      missingApis.push('Google Fit');
+    }
+    
+    if (fitnessConfig.fitbit.clientId && fitnessConfig.fitbit.clientSecret) {
+      availableApis.push('Fitbit');
+    } else {
+      missingApis.push('Fitbit');
+    }
+    
+    if (fitnessConfig.strava.clientId && fitnessConfig.strava.clientSecret) {
+      availableApis.push('Strava');
+    } else {
+      missingApis.push('Strava');
+    }
+    
+    // Check other APIs
+    if (otherApis.openai.apiKey) {
+      availableApis.push('OpenAI');
+    } else {
+      missingApis.push('OpenAI');
+    }
+    
+    if (otherApis.anthropic.apiKey) {
+      availableApis.push('Anthropic Claude');
+    } else {
+      missingApis.push('Anthropic Claude');
+    }
+    
+    if (otherApis.elevenLabs.apiKey) {
+      availableApis.push('Eleven Labs');
+    } else {
+      missingApis.push('Eleven Labs');
+    }
+    
+    if (otherApis.rapidApi.apiKey) {
+      availableApis.push('Rapid API');
+    } else {
+      missingApis.push('Rapid API');
     }
     
     return {

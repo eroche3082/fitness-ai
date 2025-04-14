@@ -27,7 +27,7 @@ export default function ApiStatusCard({
     refetch,
     isFetching
   } = useQuery({
-    queryKey: ['/api/billing-status'],
+    queryKey: [`/api/billing-status/${apiName.toLowerCase().replace(/\s+/g, '')}`],
     staleTime: 1000 * 60 * 5, // 5 minutes
     refetchOnWindowFocus: false
   });

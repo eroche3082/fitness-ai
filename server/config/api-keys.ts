@@ -3,8 +3,14 @@
  */
 
 // Google Cloud API Configuration
+// Try multiple API keys from different groups
 export const aiConfig = {
-  apiKey: process.env.GOOGLE_API_KEY || process.env.VERTEX_API_KEY || process.env.GEMINI_API_KEY,
+  apiKey: process.env.GOOGLE_API_KEY || 
+          process.env.VERTEX_API_KEY || 
+          process.env.GEMINI_API_KEY || 
+          process.env.GOOGLE_GROUP1_API_KEY || 
+          process.env.GOOGLE_GROUP2_API_KEY || 
+          process.env.GOOGLE_GROUP3_API_KEY,
   projectId: 'erudite-creek-431302',
   region: 'us-central1'
 };

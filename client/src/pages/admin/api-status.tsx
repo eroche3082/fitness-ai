@@ -14,7 +14,7 @@ export default function AdminApiStatusPage() {
     isLoading: isLoadingKeys,
     error: apiKeysError,
   } = useQuery({
-    queryKey: ['/api/api-key-status'],
+    queryKey: ['/api/billing-status/api-key-status'],
     staleTime: 1000 * 60 * 5, // 5 minutes
     refetchOnWindowFocus: false
   });
