@@ -509,6 +509,39 @@ const Dashboard: React.FC<DashboardProps> = ({ userCode }) => {
   
   // Trackers tab content
   const renderTrackersTab = () => {
+    const [trackerStatus, setTrackerStatus] = useState({
+      "google-fit": { status: "not_connected", url: "/api/fitness/google-fit/auth?userId=1" },
+      "apple-health": { status: "not_connected", url: "/api/fitness/apple-health/upload?userId=1" },
+      "fitbit": { status: "not_configured", message: "Service fitbit requires API keys that are not configured." },
+      "strava": { status: "not_connected", url: "/api/fitness/strava/auth?userId=1" }
+    });
+
+    useEffect(() => {
+      // Fetch the actual status from the server
+      fetch('/api/fitness/initialize', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: 1 })
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.results) {
+            setTrackerStatus(data.results);
+            console.log("Fitness tracker status updated:", data.results);
+          }
+        })
+        .catch(err => console.error("Error fetching tracker status:", err));
+    }, []);
+
+    const handleConnect = (service, url) => {
+      if (url) {
+        window.open(url, '_blank');
+      } else {
+        console.error(`No connection URL available for ${service}`);
+        alert(`Cannot connect to ${service}. Please check system configuration.`);
+      }
+    };
+
     return (
       <div className="space-y-6">
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
@@ -516,8 +549,8 @@ const Dashboard: React.FC<DashboardProps> = ({ userCode }) => {
           <div className="space-y-4">
             <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-md">
               <div className="flex items-center">
-                <div className="bg-blue-100 dark:bg-blue-900 p-3 rounded-md mr-4">
-                  <svg className="h-6 w-6 text-blue-700 dark:text-blue-300" fill="currentColor" viewBox="0 0 24 24">
+                <div className={`${trackerStatus["google-fit"]?.status === "connected" ? "bg-blue-100 dark:bg-blue-900" : "bg-gray-200 dark:bg-gray-600"} p-3 rounded-md mr-4`}>
+                  <svg className={`h-6 w-6 ${trackerStatus["google-fit"]?.status === "connected" ? "text-blue-700 dark:text-blue-300" : "text-gray-700 dark:text-gray-300"}`} fill="currentColor" viewBox="0 0 24 24">
                     <path d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm-1 17.5h-2.5v-9h2.5v9zm4 0h-2.5v-9h2.5v9zm-2-11.5c-.69 0-1.25-.56-1.25-1.25s.56-1.25 1.25-1.25 1.25.56 1.25 1.25-.56 1.25-1.25 1.25z" />
                   </svg>
                 </div>
@@ -526,16 +559,31 @@ const Dashboard: React.FC<DashboardProps> = ({ userCode }) => {
                   <p className="text-sm text-gray-600 dark:text-gray-400">
                     Syncs steps, activities, and heart rate
                   </p>
+                  {trackerStatus["google-fit"]?.message && (
+                    <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">
+                      {trackerStatus["google-fit"].message}
+                    </p>
+                  )}
                 </div>
               </div>
-              <button className="px-3 py-1 bg-green-600 text-white rounded-md text-sm">
-                Connected
-              </button>
+              {trackerStatus["google-fit"]?.status === "connected" ? (
+                <button className="px-3 py-1 bg-green-600 text-white rounded-md text-sm">
+                  Connected
+                </button>
+              ) : (
+                <button 
+                  onClick={() => handleConnect("google-fit", trackerStatus["google-fit"]?.url)}
+                  className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm"
+                >
+                  Connect
+                </button>
+              )}
             </div>
+            
             <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-md">
               <div className="flex items-center">
-                <div className="bg-gray-200 dark:bg-gray-600 p-3 rounded-md mr-4">
-                  <svg className="h-6 w-6 text-gray-700 dark:text-gray-300" fill="currentColor" viewBox="0 0 24 24">
+                <div className={`${trackerStatus["apple-health"]?.status === "connected" ? "bg-blue-100 dark:bg-blue-900" : "bg-gray-200 dark:bg-gray-600"} p-3 rounded-md mr-4`}>
+                  <svg className={`h-6 w-6 ${trackerStatus["apple-health"]?.status === "connected" ? "text-blue-700 dark:text-blue-300" : "text-gray-700 dark:text-gray-300"}`} fill="currentColor" viewBox="0 0 24 24">
                     <path d="M12 2c5.514 0 10 4.486 10 10s-4.486 10-10 10-10-4.486-10-10 4.486-10 10-10zm0-2c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm-2 10h-2v2h2v-2zm6 0h-4v2h4v-2z" />
                   </svg>
                 </div>
@@ -544,16 +592,31 @@ const Dashboard: React.FC<DashboardProps> = ({ userCode }) => {
                   <p className="text-sm text-gray-600 dark:text-gray-400">
                     Import your Apple Health data
                   </p>
+                  {trackerStatus["apple-health"]?.message && (
+                    <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">
+                      {trackerStatus["apple-health"].message}
+                    </p>
+                  )}
                 </div>
               </div>
-              <button className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm">
-                Connect
-              </button>
+              {trackerStatus["apple-health"]?.status === "connected" ? (
+                <button className="px-3 py-1 bg-green-600 text-white rounded-md text-sm">
+                  Connected
+                </button>
+              ) : (
+                <button 
+                  onClick={() => handleConnect("apple-health", trackerStatus["apple-health"]?.url)}
+                  className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm"
+                >
+                  Connect
+                </button>
+              )}
             </div>
+            
             <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-md">
               <div className="flex items-center">
-                <div className="bg-gray-200 dark:bg-gray-600 p-3 rounded-md mr-4">
-                  <svg className="h-6 w-6 text-gray-700 dark:text-gray-300" fill="currentColor" viewBox="0 0 24 24">
+                <div className={`${trackerStatus["fitbit"]?.status === "connected" ? "bg-blue-100 dark:bg-blue-900" : "bg-gray-200 dark:bg-gray-600"} p-3 rounded-md mr-4`}>
+                  <svg className={`h-6 w-6 ${trackerStatus["fitbit"]?.status === "connected" ? "text-blue-700 dark:text-blue-300" : "text-gray-700 dark:text-gray-300"}`} fill="currentColor" viewBox="0 0 24 24">
                     <path d="M12 2c5.514 0 10 4.486 10 10s-4.486 10-10 10-10-4.486-10-10 4.486-10 10-10zm0-2c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm-2 10h-2v2h2v-2zm-4-4h2v2h-2v-2zm10 8h-2v2h2v-2zm-6-6h-2v2h2v-2z" />
                   </svg>
                 </div>
@@ -562,16 +625,38 @@ const Dashboard: React.FC<DashboardProps> = ({ userCode }) => {
                   <p className="text-sm text-gray-600 dark:text-gray-400">
                     Sync your Fitbit activity
                   </p>
+                  {trackerStatus["fitbit"]?.message && (
+                    <p className="text-xs text-amber-600 dark:text-amber-400 mt-1">
+                      {trackerStatus["fitbit"].message}
+                    </p>
+                  )}
                 </div>
               </div>
-              <button className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm">
-                Connect
-              </button>
+              {trackerStatus["fitbit"]?.status === "connected" ? (
+                <button className="px-3 py-1 bg-green-600 text-white rounded-md text-sm">
+                  Connected
+                </button>
+              ) : trackerStatus["fitbit"]?.status === "not_configured" ? (
+                <button 
+                  className="px-3 py-1 bg-amber-600 text-white rounded-md text-sm"
+                  onClick={() => alert("Fitbit integration requires API keys. Please contact administrator.")}
+                >
+                  Needs Config
+                </button>
+              ) : (
+                <button 
+                  onClick={() => handleConnect("fitbit", trackerStatus["fitbit"]?.url)}
+                  className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm"
+                >
+                  Connect
+                </button>
+              )}
             </div>
+            
             <div className="flex items-center justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-md">
               <div className="flex items-center">
-                <div className="bg-gray-200 dark:bg-gray-600 p-3 rounded-md mr-4">
-                  <svg className="h-6 w-6 text-gray-700 dark:text-gray-300" fill="currentColor" viewBox="0 0 24 24">
+                <div className={`${trackerStatus["strava"]?.status === "connected" ? "bg-blue-100 dark:bg-blue-900" : "bg-gray-200 dark:bg-gray-600"} p-3 rounded-md mr-4`}>
+                  <svg className={`h-6 w-6 ${trackerStatus["strava"]?.status === "connected" ? "text-blue-700 dark:text-blue-300" : "text-gray-700 dark:text-gray-300"}`} fill="currentColor" viewBox="0 0 24 24">
                     <path d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm6 13h-5v5h-2v-5h-5v-2h5v-5h2v5h5v2z"/>
                   </svg>
                 </div>
@@ -580,11 +665,25 @@ const Dashboard: React.FC<DashboardProps> = ({ userCode }) => {
                   <p className="text-sm text-gray-600 dark:text-gray-400">
                     Connect your running and cycling activities
                   </p>
+                  {trackerStatus["strava"]?.message && (
+                    <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">
+                      {trackerStatus["strava"].message}
+                    </p>
+                  )}
                 </div>
               </div>
-              <button className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm">
-                Connect
-              </button>
+              {trackerStatus["strava"]?.status === "connected" ? (
+                <button className="px-3 py-1 bg-green-600 text-white rounded-md text-sm">
+                  Connected
+                </button>
+              ) : (
+                <button 
+                  onClick={() => handleConnect("strava", trackerStatus["strava"]?.url)}
+                  className="px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm"
+                >
+                  Connect
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -672,7 +771,12 @@ const Dashboard: React.FC<DashboardProps> = ({ userCode }) => {
           </p>
           
           <PremiumLevels 
-            userProfile={userProfile} 
+            userProfile={{
+              ...userProfile,
+              unlockedLevels: userProfile.unlockedLevels || [],
+              paymentStatus: userProfile.subscriptionStatus || 'free',
+              category: userProfile.category || 'BEG'
+            }} 
             onLevelUnlock={(levelId) => {
               // In a real app, this would update the user profile after payment
               const updatedProfile = {
@@ -680,6 +784,7 @@ const Dashboard: React.FC<DashboardProps> = ({ userCode }) => {
                 unlockedLevels: [...(userProfile.unlockedLevels || []), levelId]
               };
               setUserProfile(updatedProfile);
+              console.log(`Level ${levelId} unlocked successfully!`);
             }} 
           />
         </div>
