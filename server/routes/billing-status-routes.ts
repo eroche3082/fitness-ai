@@ -102,13 +102,11 @@ router.post('/switch-key', async (req, res) => {
       });
     }
     
-    // Update the aiConfig directly to use the new key
-    Object.defineProperty(aiConfig, 'apiKey', {
-      value: process.env[keyName],
-      writable: true,
-      configurable: true
-    });
+    // Update aiConfig directly (both properties)
+    aiConfig.apiKey = process.env[keyName];
+    aiConfig.activeKeyName = keyName;
     
+    // Store for reference
     activeApiKey = process.env[keyName];
     
     // Force reinitialize the service with the new key
@@ -160,6 +158,7 @@ router.get('/current-key', async (req, res) => {
     const keyInfo = {
       usingKey: !!aiConfig.apiKey,
       keySource: detectedKeySource,
+      activeKeyName: aiConfig.activeKeyName || 'Not set',
       projectId: aiConfig.projectId,
       region: aiConfig.region,
       availableKeys: apiKeys,

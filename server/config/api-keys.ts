@@ -20,8 +20,9 @@ if (process.env.GOOGLE_API_KEY) {
   console.log('DEFAULT:', process.env.GOOGLE_API_KEY.substring(0, 5) + '...');
 }
 
-// We're forcing the use of GROUP1 key for testing
+// Create an object with mutable properties
 export const aiConfig = {
+  // Start with a prioritized key selection
   apiKey: process.env.GOOGLE_GROUP1_API_KEY || 
           process.env.GOOGLE_GROUP2_API_KEY || 
           process.env.GOOGLE_GROUP3_API_KEY || 
@@ -29,7 +30,9 @@ export const aiConfig = {
           process.env.VERTEX_API_KEY || 
           process.env.GEMINI_API_KEY,
   projectId: 'erudite-creek-431302',
-  region: 'us-central1'
+  region: 'us-central1',
+  // Add which key name is being used
+  activeKeyName: 'default' 
 };
 
 // Fitness API Configurations
