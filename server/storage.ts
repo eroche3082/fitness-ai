@@ -18,6 +18,10 @@ export interface IStorage {
   getUserByAccessCode(accessCode: string): Promise<User & { profile?: any } | undefined>;
   getUserById(id: string): Promise<User & { profile?: any } | undefined>;
   createUser(user: InsertUser): Promise<User>;
+  
+  // Smart Patch System operations
+  getHealthMetrics(userId: number, type: string, days?: number): Promise<any[]>;
+  getUserPatchHistory(userId: number): Promise<any[]>;
   updateUser(id: number | string, data: Partial<InsertUser> & { 
     profile?: any, 
     unlockedLevels?: string[], 
@@ -65,6 +69,8 @@ export class MemStorage implements IStorage {
   private workouts: Map<number, Workout>;
   private progresses: Map<number, Progress>;
   private accessCodeActivities: Map<string, any[]>;
+  private healthMetrics: Map<number, any[]>;
+  private patchHistory: Map<number, any[]>;
   
   private userId: number = 1;
   private conversationId: number = 1;
@@ -79,6 +85,8 @@ export class MemStorage implements IStorage {
     this.workouts = new Map();
     this.progresses = new Map();
     this.accessCodeActivities = new Map();
+    this.healthMetrics = new Map();
+    this.patchHistory = new Map();
     
     // Create a default user for testing
     const defaultUser: User = {
@@ -273,6 +281,28 @@ export class MemStorage implements IStorage {
     this.accessCodeActivities.set(accessCode, activities);
     
     return newActivity;
+  }
+  
+  // Smart Patch System operations
+  
+  async getHealthMetrics(userId: number, type: string, days: number = 30): Promise<any[]> {
+    // Get metrics for a specific user and type, created within the specified days
+    const userMetrics = this.healthMetrics.get(userId) || [];
+    
+    // Filter by type and time range
+    const now = new Date();
+    const startDate = new Date();
+    startDate.setDate(now.getDate() - days);
+    
+    return userMetrics.filter(metric => {
+      return metric.type === type && 
+             new Date(metric.timestamp) >= startDate;
+    });
+  }
+  
+  async getUserPatchHistory(userId: number): Promise<any[]> {
+    // Return patch history for a user
+    return this.patchHistory.get(userId) || [];
   }
 }
 

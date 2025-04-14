@@ -1,0 +1,79 @@
+{
+  "modes": [
+    {
+      "id": "apollo_energy",
+      "name": "Energy",
+      "description": "Gives you a boost of energy similar to a cup of coffee but without the jitters",
+      "benefits": [
+        "Natural energy boost",
+        "Improved alertness without jitters",
+        "Enhanced focus for demanding tasks",
+        "Increased daytime wakefulness"
+      ],
+      "recommended_time": "Morning or early afternoon",
+      "duration_minutes": 30,
+      "intensity": "Medium to high",
+      "vibration_pattern": "Energizing"
+    },
+    {
+      "id": "apollo_focus",
+      "name": "Focus",
+      "description": "Helps clear your mind and sustain attention",
+      "benefits": [
+        "Enhanced mental clarity",
+        "Sustained attention during long tasks",
+        "Reduced distraction",
+        "Improved cognitive performance"
+      ],
+      "recommended_time": "When you need to focus on demanding tasks",
+      "duration_minutes": 60,
+      "intensity": "Medium",
+      "vibration_pattern": "Clear and steady"
+    },
+    {
+      "id": "apollo_calm",
+      "name": "Calm",
+      "description": "Helps you regain balance and composure in stressful situations",
+      "benefits": [
+        "Quick stress relief",
+        "Reduced anxiety",
+        "Increased emotional resilience",
+        "Improved composure under pressure"
+      ],
+      "recommended_time": "During stressful situations",
+      "duration_minutes": 15,
+      "intensity": "Low to medium",
+      "vibration_pattern": "Gentle, soothing waves"
+    },
+    {
+      "id": "apollo_sleep",
+      "name": "Sleep",
+      "description": "Helps prepare your body and mind for restful sleep",
+      "benefits": [
+        "Faster transition to sleep",
+        "Deeper sleep quality",
+        "Reduced sleep anxiety",
+        "More consistent sleep cycles"
+      ],
+      "recommended_time": "30-60 minutes before bed",
+      "duration_minutes": 60,
+      "intensity": "Low",
+      "vibration_pattern": "Slow, rhythmic pulsing"
+    },
+    {
+      "id": "apollo_recovery",
+      "name": "Recovery",
+      "description": "Aids physical recovery and balances the nervous system",
+      "benefits": [
+        "Accelerated muscle recovery",
+        "Reduced recovery time after workouts",
+        "Balanced nervous system",
+        "Decreased muscle tension"
+      ],
+      "recommended_time": "After physical exertion or workouts",
+      "duration_minutes": 30,
+      "intensity": "Medium",
+      "vibration_pattern": "Restorative waves"
+    }
+  ]
+}

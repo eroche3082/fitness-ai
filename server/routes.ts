@@ -27,6 +27,7 @@ import { registerRapidApiRoutes } from "./services/rapid-api-service";
 import { registerUserProfileRoutes } from "./services/user-profile-service";
 import billingStatusRoutes from "./routes/billing-status-routes";
 import deploymentReadinessRoutes from "./routes/deployment-readiness-routes";
+import { registerPatchRoutes } from "./routes/patch-routes";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Initialize Gemini configuration
@@ -288,6 +289,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Register deployment readiness routes
   app.use(deploymentReadinessRoutes);
   console.log("🚀 Deployment Readiness routes registered successfully");
+  
+  // Register Smart Patch System routes
+  registerPatchRoutes(app);
 
   // Stripe payment integration
   if (!process.env.STRIPE_SECRET_KEY) {

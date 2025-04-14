@@ -1,100 +1,401 @@
 {
-  "patches": [
+  "standardPatches": [
     {
-      "id": "alpha",
-      "name": "ALPHA",
-      "description": "Enhances mental clarity and cognitive focus",
+      "id": "alpha-focus",
+      "name": "Alpha Focus Patch",
+      "category": "cognitive",
+      "description": "Enhances mental clarity and cognitive function by stimulating alpha brainwave activity",
       "benefits": [
-        "Improved concentration",
+        "Improved focus",
         "Enhanced mental clarity",
-        "Reduced mental fog",
+        "Reduced mental fatigue",
         "Increased productivity"
       ],
-      "recommended_placement": "Center of forehead or behind right ear",
-      "duration_hours": 6,
-      "target_state": "focus",
-      "image": "/assets/patch-icons/alpha.svg",
-      "color": "#3B82F6"
-    },
-    {
-      "id": "soma",
-      "name": "SOMA",
-      "description": "Promotes emotional recovery and balance",
-      "benefits": [
-        "Reduced emotional volatility",
-        "Increased emotional resilience",
-        "Balanced mood",
-        "Improved stress management"
+      "placement": "Left temple or back of neck",
+      "duration": "4-6 hours",
+      "target_state": "focus_needed",
+      "contraindications": [
+        "Not recommended before sleep",
+        "Avoid with caffeine"
       ],
-      "recommended_placement": "Heart center or left wrist",
-      "duration_hours": 8,
-      "target_state": "emotional_balance",
-      "image": "/assets/patch-icons/soma.svg",
-      "color": "#EC4899"
+      "popularity": 4.8
     },
     {
-      "id": "aether",
-      "name": "AETHER",
-      "description": "Stimulates creative flow and innovative thinking",
+      "id": "soma-calm",
+      "name": "Soma Calm Patch",
+      "category": "emotional",
+      "description": "Promotes emotional balance and stress reduction through parasympathetic nervous system activation",
       "benefits": [
-        "Enhanced creativity",
-        "Increased inspiration",
-        "Improved problem-solving",
-        "Expanded perception"
+        "Stress reduction",
+        "Emotional regulation",
+        "Anxiety relief",
+        "Improved mood"
       ],
-      "recommended_placement": "Crown of head or right palm",
-      "duration_hours": 4,
-      "target_state": "creativity",
-      "image": "/assets/patch-icons/aether.svg",
-      "color": "#8B5CF6"
+      "placement": "Over heart or inside of wrist",
+      "duration": "6-8 hours",
+      "target_state": "emotional_imbalance",
+      "contraindications": [
+        "Not recommended when driving",
+        "May cause drowsiness"
+      ],
+      "popularity": 4.7
     },
     {
-      "id": "ignite",
-      "name": "IGNITE",
-      "description": "Boosts physical energy and vitality",
+      "id": "ignite-energy",
+      "name": "Ignite Energy Patch",
+      "category": "physical",
+      "description": "Optimizes cellular energy production and circulation for sustained physical vitality",
       "benefits": [
-        "Increased energy levels",
-        "Enhanced physical performance",
+        "Increased energy",
+        "Enhanced endurance",
         "Reduced fatigue",
-        "Improved stamina"
+        "Improved metabolic function"
       ],
-      "recommended_placement": "Solar plexus or between shoulder blades",
-      "duration_hours": 8,
-      "target_state": "energy",
-      "image": "/assets/patch-icons/ignite.svg",
-      "color": "#F59E0B"
+      "placement": "Upper back or solar plexus",
+      "duration": "4-6 hours",
+      "target_state": "low_energy",
+      "contraindications": [
+        "Not recommended after 4pm",
+        "Avoid with hypertension"
+      ],
+      "popularity": 4.9
     },
     {
-      "id": "drift",
-      "name": "DRIFT",
-      "description": "Facilitates deep, restorative sleep",
+      "id": "drift-sleep",
+      "name": "Drift Sleep Patch",
+      "category": "recovery",
+      "description": "Promotes deep, restorative sleep by regulating circadian rhythms and melatonin production",
       "benefits": [
         "Improved sleep quality",
-        "Easier to fall asleep",
-        "Reduced nighttime awakening",
-        "More restful sleep cycles"
+        "Easier sleep onset",
+        "Reduced night wakings",
+        "Enhanced dream recall"
       ],
-      "recommended_placement": "Base of skull or inner wrist",
-      "duration_hours": 8,
-      "target_state": "sleep",
-      "image": "/assets/patch-icons/drift.svg",
-      "color": "#6366F1"
+      "placement": "Back of neck or inside of ankle",
+      "duration": "8-10 hours",
+      "target_state": "sleep_issue",
+      "contraindications": [
+        "Not recommended during daytime",
+        "Avoid with sleeping medications"
+      ],
+      "popularity": 4.6
     },
     {
-      "id": "shield",
-      "name": "SHIELD",
-      "description": "Strengthens immune system and energetic protection",
+      "id": "aether-creative",
+      "name": "Aether Creative Patch",
+      "category": "cognitive",
+      "description": "Stimulates creative thinking and problem-solving capabilities through right-brain activation",
       "benefits": [
-        "Enhanced immune response",
-        "Increased cellular resilience",
-        "Energetic boundary support",
-        "Reduced environmental sensitivity"
+        "Enhanced creativity",
+        "New perspectives",
+        "Overcome creative blocks",
+        "Innovative thinking"
       ],
-      "recommended_placement": "Thymus (center of chest) or base of throat",
-      "duration_hours": 12,
-      "target_state": "protection",
-      "image": "/assets/patch-icons/shield.svg",
-      "color": "#10B981"
+      "placement": "Right temple or third eye position",
+      "duration": "3-5 hours",
+      "target_state": "creative_block",
+      "contraindications": [
+        "May reduce analytical focus",
+        "Not recommended for precision tasks"
+      ],
+      "popularity": 4.5
+    },
+    {
+      "id": "shield-immune",
+      "name": "Shield Immune Patch",
+      "category": "physical",
+      "description": "Supports immune system function and energetic boundaries through frequency resonance",
+      "benefits": [
+        "Immune system support",
+        "Boundary enhancement",
+        "Environmental protection",
+        "Energy conservation"
+      ],
+      "placement": "Center of chest or base of throat",
+      "duration": "12-24 hours",
+      "target_state": "recovery_needed",
+      "contraindications": [
+        "None known",
+        "Safe for daily use"
+      ],
+      "popularity": 4.4
+    },
+    {
+      "id": "terra-ground",
+      "name": "Terra Grounding Patch",
+      "category": "physical",
+      "description": "Enhances connection to earth's natural frequencies for stability and balance",
+      "benefits": [
+        "Improved stability",
+        "Enhanced grounding",
+        "Reduced electromagnetic sensitivity",
+        "Better body awareness"
+      ],
+      "placement": "Bottom of foot or base of spine",
+      "duration": "6-12 hours",
+      "target_state": "high_stress",
+      "contraindications": [
+        "None known",
+        "Safe for daily use"
+      ],
+      "popularity": 4.3
+    }
+  ],
+  "lifewaveProducts": [
+    {
+      "id": "lwx39",
+      "name": "X39 Patch",
+      "category": "lifewave",
+      "description": "Clinically proven to elevate a peptide that activates stem cells, promoting healing and regeneration",
+      "benefits": [
+        "Rapid pain relief",
+        "Faster healing",
+        "Enhanced wound recovery",
+        "Increased energy"
+      ],
+      "placement": "Specific acupuncture points",
+      "duration": "12 hours",
+      "target_state": "recovery_needed",
+      "integration": "Works synergistically with Shield and Terra patches",
+      "popularity": 4.9
+    },
+    {
+      "id": "lwglutathione",
+      "name": "Glutathione Patch",
+      "category": "lifewave",
+      "description": "Enhances the body's production of glutathione, the master antioxidant",
+      "benefits": [
+        "Detoxification support",
+        "Immune system enhancement",
+        "Reduced oxidative stress",
+        "Cellular protection"
+      ],
+      "placement": "Specific acupuncture points",
+      "duration": "12 hours",
+      "target_state": "recovery_needed",
+      "integration": "Pairs well with Shield patches for maximum immunity",
+      "popularity": 4.7
+    },
+    {
+      "id": "lwenergy",
+      "name": "Energy Enhancer Patch",
+      "category": "lifewave",
+      "description": "Increases energy production in cells using light technology, without stimulants",
+      "benefits": [
+        "Increased stamina",
+        "Enhanced physical performance",
+        "Mental clarity",
+        "No stimulant crash"
+      ],
+      "placement": "Specific acupuncture points",
+      "duration": "12 hours",
+      "target_state": "low_energy",
+      "integration": "Enhances effects of Ignite Energy patch",
+      "popularity": 4.8
+    },
+    {
+      "id": "lwicewave",
+      "name": "IceWave Patch",
+      "category": "lifewave",
+      "description": "Specifically designed for rapid pain relief through bioelectrical balancing",
+      "benefits": [
+        "Fast pain reduction",
+        "Inflammation relief",
+        "Non-drug solution",
+        "Can be used anywhere on body"
+      ],
+      "placement": "Around area of pain",
+      "duration": "12 hours",
+      "target_state": "recovery_needed",
+      "integration": "Works well with Soma patches for tension-related pain",
+      "popularity": 4.9
+    },
+    {
+      "id": "lwsilent",
+      "name": "Silent Nights Patch",
+      "category": "lifewave",
+      "description": "Stimulates the production of melatonin for improved sleep quality",
+      "benefits": [
+        "Better sleep quality",
+        "Normalized sleep patterns",
+        "Reduced sleep medications",
+        "Morning refreshment"
+      ],
+      "placement": "Specific acupuncture point",
+      "duration": "12 hours",
+      "target_state": "sleep_issue",
+      "integration": "Enhances effects of Drift Sleep patch",
+      "popularity": 4.6
+    }
+  ],
+  "healyFrequencies": [
+    {
+      "id": "healy-gold",
+      "name": "Healy Gold Program",
+      "category": "healy",
+      "description": "Comprehensive frequency therapy for physical wellbeing and energy balance",
+      "benefits": [
+        "Pain relief",
+        "Improved vitality",
+        "Immune support",
+        "Better sleep"
+      ],
+      "usage": "Daily 20-30 minute sessions",
+      "target_state": "low_energy",
+      "complementary_patches": ["Ignite Energy", "Shield Immune"],
+      "popularity": 4.7
+    },
+    {
+      "id": "healy-relax",
+      "name": "Healy Relax Program",
+      "category": "healy",
+      "description": "Specific frequencies for stress reduction and nervous system balance",
+      "benefits": [
+        "Reduced stress",
+        "Better relaxation",
+        "Mental calm",
+        "Emotional balance"
+      ],
+      "usage": "As needed, 20-30 minute sessions",
+      "target_state": "emotional_imbalance",
+      "complementary_patches": ["Soma Calm", "Terra Grounding"],
+      "popularity": 4.6
+    },
+    {
+      "id": "healy-mental",
+      "name": "Healy Mental Balance Program",
+      "category": "healy",
+      "description": "Frequencies supporting cognitive clarity and mental performance",
+      "benefits": [
+        "Improved focus",
+        "Enhanced cognitive function",
+        "Mental clarity",
+        "Better memory"
+      ],
+      "usage": "Daily or as needed, 20-30 minute sessions",
+      "target_state": "focus_needed",
+      "complementary_patches": ["Alpha Focus", "Aether Creative"],
+      "popularity": 4.5
+    },
+    {
+      "id": "healy-deep",
+      "name": "Healy Deep Relax Program",
+      "category": "healy",
+      "description": "Designed for profound relaxation and preparation for restful sleep",
+      "benefits": [
+        "Deep relaxation",
+        "Easier sleep onset",
+        "Reduced insomnia",
+        "Restorative rest"
+      ],
+      "usage": "Before sleep, 30 minute sessions",
+      "target_state": "sleep_issue",
+      "complementary_patches": ["Drift Sleep", "Soma Calm"],
+      "popularity": 4.4
+    }
+  ],
+  "apolloModes": [
+    {
+      "id": "apollo-energy",
+      "name": "Apollo Energy and Wake Up",
+      "category": "apollo",
+      "description": "Gentle vibration pattern to increase energy and alertness naturally",
+      "benefits": [
+        "Morning energy boost",
+        "Increased alertness",
+        "Reduced brain fog",
+        "Natural stimulation"
+      ],
+      "usage": "30-60 minutes in morning or afternoon",
+      "placement": "Wrist or ankle",
+      "target_state": "low_energy",
+      "complementary_patches": ["Ignite Energy", "Alpha Focus"],
+      "popularity": 4.8
+    },
+    {
+      "id": "apollo-focus",
+      "name": "Apollo Clear and Focused",
+      "category": "apollo",
+      "description": "Specific vibration pattern for sustained concentration and productivity",
+      "benefits": [
+        "Improved concentration",
+        "Sustained attention",
+        "Reduced distractibility",
+        "Enhanced productivity"
+      ],
+      "usage": "60-120 minutes during work or study",
+      "placement": "Wrist or collar",
+      "target_state": "focus_needed",
+      "complementary_patches": ["Alpha Focus", "Terra Grounding"],
+      "popularity": 4.7
+    },
+    {
+      "id": "apollo-calm",
+      "name": "Apollo Calm and Rebalance",
+      "category": "apollo",
+      "description": "Soothing vibration pattern to reduce stress and restore balance",
+      "benefits": [
+        "Stress reduction",
+        "Nervous system regulation",
+        "Emotional balance",
+        "Anxiety relief"
+      ],
+      "usage": "30-60 minutes during stressful periods",
+      "placement": "Chest or wrist",
+      "target_state": "emotional_imbalance",
+      "complementary_patches": ["Soma Calm", "Shield Immune"],
+      "popularity": 4.9
+    },
+    {
+      "id": "apollo-recover",
+      "name": "Apollo Recover and Rebuild",
+      "category": "apollo",
+      "description": "Specialized pattern to accelerate physical recovery and healing",
+      "benefits": [
+        "Faster recovery",
+        "Reduced muscle tension",
+        "Enhanced healing",
+        "Better circulation"
+      ],
+      "usage": "60-120 minutes after exercise or injury",
+      "placement": "Near recovery area",
+      "target_state": "recovery_needed",
+      "complementary_patches": ["X39", "Shield Immune"],
+      "popularity": 4.6
+    },
+    {
+      "id": "apollo-sleep",
+      "name": "Apollo Sleep and Renew",
+      "category": "apollo",
+      "description": "Gentle sleep-inducing vibration pattern that prepares body for deep rest",
+      "benefits": [
+        "Easier sleep onset",
+        "Deeper sleep quality",
+        "Reduced nighttime awakening",
+        "Morning refreshment"
+      ],
+      "usage": "30-120 minutes before and during sleep",
+      "placement": "Ankle or chest",
+      "target_state": "sleep_issue",
+      "complementary_patches": ["Drift Sleep", "Silent Nights"],
+      "popularity": 4.8
+    },
+    {
+      "id": "apollo-social",
+      "name": "Apollo Social and Open",
+      "category": "apollo",
+      "description": "Unique pattern designed to enhance social comfort and connection",
+      "benefits": [
+        "Reduced social anxiety",
+        "Enhanced communication",
+        "Greater social comfort",
+        "Improved relational ease"
+      ],
+      "usage": "30-60 minutes before and during social events",
+      "placement": "Wrist or chest",
+      "target_state": "emotional_imbalance",
+      "complementary_patches": ["Soma Calm", "Terra Grounding"],
+      "popularity": 4.5
     }
   ]
 }
