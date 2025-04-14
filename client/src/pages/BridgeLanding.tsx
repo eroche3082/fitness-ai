@@ -380,8 +380,66 @@ export default function BridgeLanding() {
       {/* QR Code Demo Section */}
       <QRCodeDemoSection />
 
-      {/* Membership Plans Section - Moved before the CTA section */}
-      <section className="py-24 bg-gradient-to-b from-black to-gray-900">
+      {/* Future of Fitness Section */}
+      <section className="py-24 bg-black text-white">
+        <div className="container mx-auto px-4 md:px-6">
+          <div className="text-center mb-16">
+            <p className="text-sm uppercase tracking-wider mb-3">AI-POWERED FITNESS</p>
+            <h2 className="text-5xl md:text-7xl font-bold mb-8 tracking-tight">FUTURE OF FITNESS</h2>
+            <div className="w-24 h-1 bg-white mx-auto mb-8"></div>
+            <p className="text-xl max-w-3xl mx-auto text-gray-300">
+              Our cutting-edge AI technology delivers personalized workouts, nutrition plans, and real-time feedback tailored specifically to your body, goals, and progress
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+            <div className="bg-gray-900 bg-opacity-50 p-8 text-center">
+              <div className="w-16 h-16 bg-black rounded-full flex items-center justify-center mx-auto mb-6 border border-gray-700">
+                <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M9 4L5 8L9 12" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M5 8H14C17.314 8 20 10.686 20 14C20 17.314 17.314 20 14 20H9" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </div>
+              <h3 className="uppercase text-lg font-bold tracking-wide mb-4">SMART WORKOUT ANALYSIS</h3>
+              <div className="w-12 h-0.5 bg-white mx-auto mb-4"></div>
+              <p className="text-gray-400">
+                Our AI analyzes your form, counts reps, and provides real-time feedback to optimize your training and prevent injuries.
+              </p>
+            </div>
+            
+            <div className="bg-gray-900 bg-opacity-50 p-8 text-center">
+              <div className="w-16 h-16 bg-black rounded-full flex items-center justify-center mx-auto mb-6 border border-gray-700">
+                <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M22 12H18L15 21L9 3L6 12H2" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </div>
+              <h3 className="uppercase text-lg font-bold tracking-wide mb-4">ADAPTIVE TRAINING</h3>
+              <div className="w-12 h-0.5 bg-white mx-auto mb-4"></div>
+              <p className="text-gray-400">
+                As you progress, our system automatically adjusts your workout intensity and exercises to keep you challenged and growing.
+              </p>
+            </div>
+            
+            <div className="bg-gray-900 bg-opacity-50 p-8 text-center">
+              <div className="w-16 h-16 bg-black rounded-full flex items-center justify-center mx-auto mb-6 border border-gray-700">
+                <svg className="w-8 h-8" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M4.93 19.07C7.84 21.98 12.16 21.98 15.07 19.07C16.31 17.83 16.93 16.2 16.93 14.57C16.93 12.94 16.31 11.31 15.07 10.07" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M19.07 15.07C21.98 12.16 21.98 7.84 19.07 4.93C17.83 3.69 16.2 3.07 14.57 3.07C12.94 3.07 11.31 3.69 10.07 4.93" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M10.59 13.41C9.80777 12.6278 9.80777 11.3722 10.59 10.59C11.3722 9.80777 12.6278 9.80777 13.41 10.59C14.1922 11.3722 14.1922 12.6278 13.41 13.41C12.6278 14.1922 11.3722 14.1922 10.59 13.41Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </svg>
+              </div>
+              <h3 className="uppercase text-lg font-bold tracking-wide mb-4">HEALTH INTEGRATION</h3>
+              <div className="w-12 h-0.5 bg-white mx-auto mb-4"></div>
+              <p className="text-gray-400">
+                Connect with Apple Health, Google Fit, Fitbit, and other platforms to get a comprehensive view of your health and fitness data.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Membership Plans Section */}
+      <section className="py-24 bg-black text-white">
         <div className="container mx-auto px-4 md:px-6">
           <div className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold mb-4 animate-fade-in-up">Choose Your <span className="text-green-500">Fitness Journey</span></h2>
