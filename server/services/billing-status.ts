@@ -23,6 +23,22 @@ export class BillingStatusService {
     }
     this.genAI = new GoogleGenerativeAI(aiConfig.apiKey || '');
   }
+  
+  /**
+   * Reinitialize the service with a new API key
+   * @param apiKey The new API key to use
+   */
+  reinitialize(apiKey: string | undefined): void {
+    if (!apiKey) {
+      console.warn("Warning: Attempted to reinitialize with undefined API key");
+      return;
+    }
+    
+    console.log(`Reinitializing service with new API key (starts with ${apiKey.substring(0, 5)}...)`);
+    
+    // Create a new instance of the GoogleGenerativeAI client with the new key
+    this.genAI = new GoogleGenerativeAI(apiKey);
+  }
 
   /**
    * Check if the Vertex AI API is active and get quota information

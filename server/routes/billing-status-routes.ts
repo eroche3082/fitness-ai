@@ -5,6 +5,9 @@ import { aiConfig } from '../config/api-keys';
 const router = Router();
 const billingStatusService = new BillingStatusService();
 
+// Global variable to store the current active API key for testing
+let activeApiKey: string | undefined;
+
 // Get the status of Vertex AI API
 router.get('/vertex', async (req, res) => {
   try {
@@ -74,6 +77,56 @@ router.get('/api-key-status', async (req, res) => {
     console.error('Error checking API key status:', error);
     res.status(500).json({
       message: 'Failed to check API key status',
+      error: error.message
+    });
+  }
+});
+
+// Endpoint to switch to a specific API key for testing
+router.post('/switch-key', async (req, res) => {
+  try {
+    const { keyName } = req.body;
+    
+    if (!keyName || typeof keyName !== 'string') {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid or missing keyName parameter'
+      });
+    }
+    
+    // Check if the requested key exists in the environment
+    if (!process.env[keyName]) {
+      return res.status(404).json({
+        success: false,
+        message: `API key ${keyName} not found in environment variables`
+      });
+    }
+    
+    // Update the aiConfig directly to use the new key
+    Object.defineProperty(aiConfig, 'apiKey', {
+      value: process.env[keyName],
+      writable: true,
+      configurable: true
+    });
+    
+    activeApiKey = process.env[keyName];
+    
+    // Force reinitialize the service with the new key
+    billingStatusService.reinitialize(activeApiKey);
+    
+    console.log(`Switched to API key: ${keyName}`);
+    
+    res.json({
+      success: true,
+      message: `Switched to API key: ${keyName}`,
+      keyName: keyName,
+      keyPrefix: process.env[keyName]?.substring(0, 5) + '...'
+    });
+  } catch (error: any) {
+    console.error('Error switching API key:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to switch API key',
       error: error.message
     });
   }

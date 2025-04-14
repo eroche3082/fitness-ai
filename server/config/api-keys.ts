@@ -4,8 +4,24 @@
 
 // Google Cloud API Configuration
 // Try multiple API keys from different groups
+
+// Log environment variables for debugging (first 5 characters only for security)
+console.log('API Key Debug:');
+if (process.env.GOOGLE_GROUP1_API_KEY) {
+  console.log('GROUP1:', process.env.GOOGLE_GROUP1_API_KEY.substring(0, 5) + '...');
+}
+if (process.env.GOOGLE_GROUP2_API_KEY) {
+  console.log('GROUP2:', process.env.GOOGLE_GROUP2_API_KEY.substring(0, 5) + '...');
+}
+if (process.env.GOOGLE_GROUP3_API_KEY) {
+  console.log('GROUP3:', process.env.GOOGLE_GROUP3_API_KEY.substring(0, 5) + '...');
+}
+if (process.env.GOOGLE_API_KEY) {
+  console.log('DEFAULT:', process.env.GOOGLE_API_KEY.substring(0, 5) + '...');
+}
+
+// We're forcing the use of GROUP1 key for testing
 export const aiConfig = {
-  // Force use of GROUP1 API key first for testing
   apiKey: process.env.GOOGLE_GROUP1_API_KEY || 
           process.env.GOOGLE_GROUP2_API_KEY || 
           process.env.GOOGLE_GROUP3_API_KEY || 
