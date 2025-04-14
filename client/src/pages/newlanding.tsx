@@ -870,7 +870,7 @@ export default function LandingPage() {
             <div>
               <h3 className="font-semibold mb-4 text-white">Company</h3>
               <ul className="space-y-2">
-                <li><a href="#" className="text-gray-400 hover:text-primary">About Us</a></li>
+
                 <li><a href="#" className="text-gray-400 hover:text-primary">Careers</a></li>
                 <li><a href="#" className="text-gray-400 hover:text-primary">Blog</a></li>
                 <li><a href="#" className="text-gray-400 hover:text-primary">Press</a></li>
