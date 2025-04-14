@@ -614,7 +614,11 @@ const FitnessRoutineSocialStudio: React.FC<FitnessRoutineSocialStudioProps> = ({
                       mode="single"
                       selected={scheduledDate}
                       onSelect={(date) => {
-                        setScheduledDate(date);
+                        if (date instanceof Date) {
+                          setScheduledDate(date);
+                        } else {
+                          setScheduledDate(null);
+                        }
                       }}
                       initialFocus
                     />
