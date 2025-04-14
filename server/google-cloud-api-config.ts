@@ -88,25 +88,26 @@ const mapsClient = new MapsClient({});
 // 12. Dialogflow - For conversational fitness coaching
 const dialogflowClient = new SessionsClient({
   keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS,
-  apiKey: process.env.GOOGLE_API_KEY,
+  apiKey: VERTEX_API_KEY,
 });
 
 // 13. Cloud Storage - For storing workout videos, progress photos
 const storageClient = new Storage({
   keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS,
-  apiKey: process.env.GOOGLE_API_KEY,
+  apiKey: VERTEX_API_KEY,
 });
 
 // 14. DLP - For protecting sensitive health data
 const dlpClient = new DlpServiceClient({
   keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS,
-  apiKey: process.env.GOOGLE_API_KEY,
+  apiKey: VERTEX_API_KEY,
 });
 
 // 15. Monitoring - For tracking application performance
+// Note: MonitoringClient import needs to be fixed
 const monitoringClient = new MonitoringClient({
   keyFilename: process.env.GOOGLE_APPLICATION_CREDENTIALS,
-  apiKey: process.env.GOOGLE_API_KEY,
+  apiKey: VERTEX_API_KEY,
 });
 
 // Export all configured clients
@@ -146,7 +147,7 @@ export async function initializeAndTestApis() {
     await mapsClient.geocode({
       params: {
         address: 'Fitness Center',
-        key: process.env.GOOGLE_API_KEY || '',
+        key: VERTEX_API_KEY,
       },
     }).catch(() => null);
     

@@ -12,13 +12,9 @@ import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/ge
  */
 export async function generateGeminiResponse(messages: { role: string; content: string }[]): Promise<string> {
   try {
-    // Usar GEMINI_API_KEY si está disponible, sino usar GOOGLE_API_KEY como fallback
-    const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || process.env.GOOGLE_GROUP3_API_KEY;
-    
-    if (!apiKey) {
-      console.error('No API key found for Gemini in environment variables');
-      throw new Error('Gemini API key not configured');
-    }
+    // Use the Vertex API Key which has access to Gemini API
+    const VERTEX_API_KEY = 'AIzaSyDnmNNHrQ-xpnOozOZgVv4F9qQpiU-GfdA';
+    const apiKey = VERTEX_API_KEY;
     
     // Initialize the Google Generative AI SDK with the API key
     const genAI = new GoogleGenerativeAI(apiKey);
@@ -118,19 +114,16 @@ export async function generateGeminiResponse(messages: { role: string; content: 
  * Configure the Gemini API and verify that it's working
  */
 export function configureGemini(): void {
-  const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY || process.env.GOOGLE_GROUP3_API_KEY;
-  if (!apiKey) {
-    console.warn('WARNING: No Gemini API key found. Gemini integration will not work correctly.');
-  } else {
-    try {
-      // Initialize the Google Generative AI SDK to verify configuration
-      const genAI = new GoogleGenerativeAI(apiKey);
-      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-      console.log('Gemini 1.5 Flash integration configured successfully');
-    } catch (error) {
-      console.error('Error configuring Gemini:', error);
-      console.warn('Gemini integration may not work correctly due to configuration error');
-    }
+  // Use the Vertex API Key which has access to Gemini API
+  const VERTEX_API_KEY = 'AIzaSyDnmNNHrQ-xpnOozOZgVv4F9qQpiU-GfdA';
+  try {
+    // Initialize the Google Generative AI SDK to verify configuration
+    const genAI = new GoogleGenerativeAI(VERTEX_API_KEY);
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    console.log('Gemini 1.5 Flash integration configured successfully with Vertex API Key');
+  } catch (error) {
+    console.error('Error configuring Gemini:', error);
+    console.warn('Gemini integration may not work correctly due to configuration error');
   }
 }
 
