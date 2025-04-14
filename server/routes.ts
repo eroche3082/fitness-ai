@@ -292,6 +292,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // Register Smart Patch System routes
   registerPatchRoutes(app);
+  console.log("🩹 Smart Patch System routes registered successfully");
 
   // Stripe payment integration
   if (!process.env.STRIPE_SECRET_KEY) {
