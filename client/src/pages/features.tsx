@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { 
   Activity, 
   ArrowRight, 
+  Award,
   BarChart2, 
   Calendar, 
   Clock, 
@@ -12,7 +13,9 @@ import {
   Heart, 
   Layout, 
   MessageSquare, 
+  Share2,
   Smartphone, 
+  Trophy,
   Users, 
   Zap
 } from 'lucide-react';
