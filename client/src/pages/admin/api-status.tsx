@@ -2,6 +2,7 @@ import React from 'react';
 import AdminLayout from '../../components/layout/AdminLayout';
 import ApiStatusCard from '@/components/ApiStatusCard';
 import { ApiKeyManager } from '@/components/ApiKeyManager';
+import { ServiceAssignmentManager } from '@/components/ServiceAssignmentManager';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { useQuery } from '@tanstack/react-query';
@@ -160,6 +161,7 @@ export default function AdminApiStatusPage() {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               <div className="lg:col-span-2">
                 <ApiKeyManager />
+                <ServiceAssignmentManager className="mt-6" />
               </div>
               <div>
                 <Card>

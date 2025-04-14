@@ -1,9 +1,11 @@
 import { Router } from 'express';
 import { BillingStatusService } from '../services/billing-status';
+import { ApiKeyManager } from '../services/api-key-manager';
 import { aiConfig } from '../config/api-keys';
 
 const router = Router();
 const billingStatusService = new BillingStatusService();
+const apiKeyManager = ApiKeyManager.getInstance();
 
 // Global variable to store the current active API key for testing
 let activeApiKey: string | undefined;
@@ -171,6 +173,53 @@ router.get('/current-key', async (req, res) => {
     console.error('Error checking current API key:', error);
     res.status(500).json({
       message: 'Failed to check current API key',
+      error: error.message
+    });
+  }
+});
+
+// Route to initialize services with optimal API keys
+router.post('/initialize-services', async (req, res) => {
+  try {
+    const { services } = req.body;
+    
+    if (!services || !Array.isArray(services) || services.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Missing or invalid services array'
+      });
+    }
+    
+    const result = await apiKeyManager.initializeAllServices(services);
+    
+    res.json({
+      success: result.success,
+      message: `Initialized ${result.assignments.filter(a => a.status === 'active').length} out of ${services.length} services`,
+      assignments: result.assignments
+    });
+  } catch (error: any) {
+    console.error('Error initializing services:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to initialize services',
+      error: error.message
+    });
+  }
+});
+
+// Route to get service assignments
+router.get('/service-assignments', (req, res) => {
+  try {
+    const assignments = apiKeyManager.getServiceAssignmentSummary();
+    
+    res.json({
+      count: assignments.length,
+      assignments
+    });
+  } catch (error: any) {
+    console.error('Error getting service assignments:', error);
+    res.status(500).json({
+      message: 'Failed to get service assignments',
       error: error.message
     });
   }
