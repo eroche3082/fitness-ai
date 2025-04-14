@@ -88,6 +88,7 @@
     "firebase-admin": "^13.2.0",
     "framer-motion": "^11.13.1",
     "googleapis": "^148.0.0",
+    "html2canvas": "^1.4.1",
     "input-otp": "^1.2.4",
     "lucide-react": "^0.453.0",
     "memorystore": "^1.6.7",

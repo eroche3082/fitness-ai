@@ -1,6 +1,5 @@
 import { AchievementBadge, UserBadges } from '../shared/types';
 import { ACHIEVEMENT_BADGES, getBadgeById } from '../data/badges';
-import { apiRequest } from '@/lib/queryClient';
 
 /**
  * Fetch user badges from the server
@@ -8,23 +7,30 @@ import { apiRequest } from '@/lib/queryClient';
  */
 export async function fetchUserBadges(userId: string): Promise<UserBadges> {
   try {
-    const response = await apiRequest('GET', `/api/badges/${userId}`);
+    // For now, we simulate a server response with a fixed set of badges
+    // In a real implementation, this would make an API call
     
-    if (!response.ok) {
-      // If user doesn't have badges yet, return default structure
-      if (response.status === 404) {
-        return {
-          userId,
-          earnedBadges: ['special-early-adopter'], // Early adopter badge by default
-          progress: {},
-          sharedBadges: {}
-        };
-      }
-      throw new Error(`Error fetching badges: ${response.statusText}`);
-    }
+    // Simulate a network request
+    await new Promise(resolve => setTimeout(resolve, 500));
     
-    const data = await response.json();
-    return data;
+    // Return a default badges object
+    return {
+      userId,
+      earnedBadges: ['special-early-adopter'], // Early adopter badge by default
+      progress: {
+        'strength-intermediate': {
+          currentValue: 3,
+          targetValue: 10,
+          updatedAt: new Date().toISOString()
+        },
+        'cardio-intermediate': {
+          currentValue: 12,
+          targetValue: 25,
+          updatedAt: new Date().toISOString()
+        }
+      },
+      sharedBadges: {}
+    };
   } catch (error) {
     console.error('Error fetching user badges:', error);
     
@@ -46,10 +52,9 @@ export async function fetchUserBadges(userId: string): Promise<UserBadges> {
  */
 export async function updateBadgeProgress(userId: string, badgeId: string, progressValue: number): Promise<void> {
   try {
-    await apiRequest('PATCH', `/api/badges/${userId}/progress`, {
-      badgeId,
-      currentValue: progressValue
-    });
+    // For demo purposes, we just log the progress update
+    console.log(`[Badge Service] Updated progress for badge ${badgeId}: ${progressValue}`);
+    // In a real implementation, this would make an API call
   } catch (error) {
     console.error(`Error updating badge progress for ${badgeId}:`, error);
     throw error;
@@ -63,10 +68,9 @@ export async function updateBadgeProgress(userId: string, badgeId: string, progr
  */
 export async function unlockBadge(userId: string, badgeId: string): Promise<void> {
   try {
-    await apiRequest('POST', `/api/badges/${userId}/unlock`, {
-      badgeId,
-      unlockedAt: new Date().toISOString()
-    });
+    // For demo purposes, we just log the badge unlock
+    console.log(`[Badge Service] Unlocked badge ${badgeId} for user ${userId}`);
+    // In a real implementation, this would make an API call
   } catch (error) {
     console.error(`Error unlocking badge ${badgeId}:`, error);
     throw error;
@@ -85,11 +89,9 @@ export async function recordBadgeShare(
   platform: 'twitter' | 'facebook' | 'instagram' | 'whatsapp' | 'email'
 ): Promise<void> {
   try {
-    await apiRequest('POST', `/api/badges/${userId}/share`, {
-      badgeId,
-      platform,
-      sharedAt: new Date().toISOString()
-    });
+    // For demo purposes, we just log the badge share
+    console.log(`[Badge Service] Shared badge ${badgeId} on ${platform}`);
+    // In a real implementation, this would make an API call
   } catch (error) {
     console.error(`Error recording share for badge ${badgeId}:`, error);
     throw error;

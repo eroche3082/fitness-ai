@@ -18,6 +18,7 @@ import ChatPage from "@/pages/chat";
 import DashboardPage from "./pages/DashboardPage";
 import AccessCodePage from "./pages/AccessCodePage";
 import AdminPanelPage from "./pages/AdminPanelPage";
+import BadgesPage from "./pages/BadgesPage";
 import LoginPage from "./pages/login";
 import SignupPage from "./pages/signup";
 import AboutPage from "./pages/about";
@@ -49,7 +50,9 @@ import {
   Utensils,
   Target,
   Users,
-  Settings as SettingsIcon
+  Settings as SettingsIcon,
+  Award,
+  Medal
 } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 
@@ -108,6 +111,12 @@ function MainNavigation() {
             <a className="flex items-center px-3 py-2 rounded-md hover:bg-accent">
               <History className="h-5 w-5 mr-3" />
               <span>Workout History</span>
+            </a>
+          </Link>
+          <Link href="/badges">
+            <a className="flex items-center px-3 py-2 rounded-md hover:bg-accent">
+              <Medal className="h-5 w-5 mr-3" />
+              <span>Insignias</span>
             </a>
           </Link>
           <Link href="/meal-plans">
@@ -256,6 +265,7 @@ function Router() {
           <Route path="/fitness-trackers" component={FitnessTrackersPage}/>
           <Route path="/voice-coaching" component={VoiceCoachingPage}/>
           <Route path="/workout-history" component={WorkoutHistoryPage}/>
+          <Route path="/badges" component={BadgesPage}/>
           <Route path="/meal-plans" component={MealPlansPage}/>
           <Route path="/goals" component={GoalsPage}/>
           <Route path="/community" component={CommunityPage}/>
