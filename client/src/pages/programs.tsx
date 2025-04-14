@@ -97,13 +97,7 @@ export default function ProgramsPage() {
             >
               Home
             </Button>
-            <Button 
-              variant="link" 
-              onClick={() => setLocation('/about')}
-              className="text-white hover:text-green-500 transition-colors uppercase font-medium"
-            >
-              About Us
-            </Button>
+
             <Button 
               variant="link" 
               onClick={() => setLocation('/programs')}
@@ -354,13 +348,7 @@ export default function ProgramsPage() {
               >
                 Home
               </Button>
-              <Button 
-                variant="link" 
-                onClick={() => setLocation('/about')}
-                className="text-gray-300 hover:text-white"
-              >
-                About Us
-              </Button>
+
               <Button 
                 variant="link" 
                 onClick={() => setLocation('/programs')}
