@@ -20,8 +20,16 @@ const __dirname = path.dirname(__filename);
 const patchesDataPath = path.join(__dirname, '../data/patch_data/patches.json');
 const patchesData = JSON.parse(fs.readFileSync(patchesDataPath, 'utf8'));
 
+// Define the type for patch states
+type PatchState = 'focus_needed' | 'low_energy' | 'emotional_imbalance' | 'creative_block' | 'sleep_issue' | 'recovery_needed' | 'high_stress';
+
+// Define the type for statePatches
+interface StatePatchesMap {
+  [key: string]: string[];
+}
+
 // Mapping of states to recommended patches
-const statePatches = {
+const statePatches: StatePatchesMap = {
   focus_needed: [
     'alpha-focus', 
     'healy-mental', 
@@ -148,11 +156,18 @@ async function getFitnessMetrics(userId: number) {
   }
 }
 
+// Define a type for the patch object
+interface Patch {
+  id: string;
+  name: string;
+  [key: string]: any;
+}
+
 /**
  * Find best matching patches based on user state
  * @param states Array of detected states
  */
-function findMatchingPatches(states: string[]) {
+function findMatchingPatches(states: string[]): Patch[] {
   if (!states || states.length === 0) {
     // Default recommendations if no states detected
     return [
@@ -162,33 +177,33 @@ function findMatchingPatches(states: string[]) {
     ];
   }
   
-  const recommendations = [];
+  const recommendations: Patch[] = [];
   
   // For each detected state, add relevant patches
   for (const state of states) {
-    const patchIds = statePatches[state] || [];
+    const patchIds = statePatches[state as keyof typeof statePatches] || [];
     
     for (const patchId of patchIds) {
       // Check in standard patches
-      const standardPatch = patchesData.standardPatches.find(p => p.id === patchId);
+      const standardPatch = patchesData.standardPatches.find((p: Patch) => p.id === patchId);
       if (standardPatch && !recommendations.includes(standardPatch)) {
         recommendations.push(standardPatch);
       }
       
       // Check in LifeWave products
-      const lifewavePatch = patchesData.lifewaveProducts.find(p => p.id === patchId);
+      const lifewavePatch = patchesData.lifewaveProducts.find((p: Patch) => p.id === patchId);
       if (lifewavePatch && !recommendations.includes(lifewavePatch)) {
         recommendations.push(lifewavePatch);
       }
       
       // Check in Healy frequencies
-      const healyPatch = patchesData.healyFrequencies.find(p => p.id === patchId);
+      const healyPatch = patchesData.healyFrequencies.find((p: Patch) => p.id === patchId);
       if (healyPatch && !recommendations.includes(healyPatch)) {
         recommendations.push(healyPatch);
       }
       
       // Check in Apollo modes
-      const apolloPatch = patchesData.apolloModes.find(p => p.id === patchId);
+      const apolloPatch = patchesData.apolloModes.find((p: Patch) => p.id === patchId);
       if (apolloPatch && !recommendations.includes(apolloPatch)) {
         recommendations.push(apolloPatch);
       }
@@ -261,10 +276,19 @@ export async function diagnosePatchNeeds(userId: number, userInput: string) {
   }
 }
 
+// Define an interface for diagnosis history
+interface DiagnosisHistory {
+  timestamp: string;
+  userInput: string;
+  detectedStates: string[];
+  recommendations: string[];
+  [key: string]: any;
+}
+
 /**
  * Save diagnosis history to storage
  */
-async function saveDiagnosisHistory(userId: number, diagnosis: any) {
+async function saveDiagnosisHistory(userId: number, diagnosis: DiagnosisHistory) {
   // This would normally be saved to a database
   console.log(`Saved diagnosis for user ${userId}:`, diagnosis);
   

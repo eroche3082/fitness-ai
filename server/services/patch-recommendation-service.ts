@@ -10,6 +10,16 @@ import { storage } from '../storage';
 import { diagnosePatchNeeds, getAllPatches } from './patch-diagnosis-service';
 import { generateGeminiResponse } from '../gemini';
 
+// Define the Patch interface
+interface Patch {
+  id: string;
+  name: string;
+  description?: string;
+  benefits?: string[];
+  target_state?: string;
+  [key: string]: any;
+}
+
 // Recommendation context templates
 const recommendationContextTemplates = {
   focus: "This patch is designed to enhance your mental clarity and focus. The ALPHA patch works by stimulating specific neural pathways responsible for attention and cognitive processing. Apply it when you need to concentrate on important tasks or feel mentally foggy.",
@@ -41,10 +51,10 @@ async function generatePersonalizedRecommendation(userId: number, patchId: strin
     let patch = null;
     
     // Search in all patch categories
-    if (!patch) patch = allPatches.standardPatches.find(p => p.id === patchId);
-    if (!patch) patch = allPatches.lifewaveProducts.find(p => p.id === patchId);
-    if (!patch) patch = allPatches.healyFrequencies.find(p => p.id === patchId);
-    if (!patch) patch = allPatches.apolloModes.find(p => p.id === patchId);
+    if (!patch) patch = allPatches.standardPatches.find((p: Patch) => p.id === patchId);
+    if (!patch) patch = allPatches.lifewaveProducts.find((p: Patch) => p.id === patchId);
+    if (!patch) patch = allPatches.healyFrequencies.find((p: Patch) => p.id === patchId);
+    if (!patch) patch = allPatches.apolloModes.find((p: Patch) => p.id === patchId);
     
     if (!patch) {
       throw new Error(`Patch with ID ${patchId} not found`);
@@ -159,10 +169,17 @@ export async function recommendPatches(userId: number, userInput: string) {
   }
 }
 
+// Define a history entry interface
+interface PatchHistoryEntry {
+  patchId: string;
+  effectiveness: number;
+  [key: string]: any;
+}
+
 /**
  * Calculate relevance score based on user history and detected states
  */
-function calculateRelevanceScore(patch: any, detectedStates: string[], patchHistory: any[]) {
+function calculateRelevanceScore(patch: Patch, detectedStates: string[], patchHistory: PatchHistoryEntry[]): number {
   let score = 0;
   
   // Base score from the number of matching states
@@ -192,10 +209,18 @@ function calculateRelevanceScore(patch: any, detectedStates: string[], patchHist
   return score;
 }
 
+// Define recommendation history interface
+interface RecommendationHistory {
+  timestamp: string;
+  userInput: string;
+  recommendations: string[];
+  [key: string]: any;
+}
+
 /**
  * Save recommendation history
  */
-async function saveRecommendationHistory(userId: number, recommendation: any) {
+async function saveRecommendationHistory(userId: number, recommendation: RecommendationHistory): Promise<boolean> {
   try {
     // This would save to a database in a real implementation
     console.log(`Saved recommendation for user ${userId}:`, recommendation);
@@ -218,10 +243,10 @@ export function getPatchDetails(patchId: string) {
   
   // Search in all patch categories
   let patch = null;
-  if (!patch) patch = allPatches.standardPatches.find(p => p.id === patchId);
-  if (!patch) patch = allPatches.lifewaveProducts.find(p => p.id === patchId);
-  if (!patch) patch = allPatches.healyFrequencies.find(p => p.id === patchId);
-  if (!patch) patch = allPatches.apolloModes.find(p => p.id === patchId);
+  if (!patch) patch = allPatches.standardPatches.find((p: Patch) => p.id === patchId);
+  if (!patch) patch = allPatches.lifewaveProducts.find((p: Patch) => p.id === patchId);
+  if (!patch) patch = allPatches.healyFrequencies.find((p: Patch) => p.id === patchId);
+  if (!patch) patch = allPatches.apolloModes.find((p: Patch) => p.id === patchId);
   
   return patch;
 }
