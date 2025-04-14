@@ -509,7 +509,17 @@ const Dashboard: React.FC<DashboardProps> = ({ userCode }) => {
   
   // Trackers tab content
   const renderTrackersTab = () => {
-    const [trackerStatus, setTrackerStatus] = useState({
+    interface TrackerStatusItem {
+      status: string;
+      url?: string;
+      message?: string;
+    }
+    
+    interface TrackerStatusMap {
+      [key: string]: TrackerStatusItem;
+    }
+    
+    const [trackerStatus, setTrackerStatus] = useState<TrackerStatusMap>({
       "google-fit": { status: "not_connected", url: "/api/fitness/google-fit/auth?userId=1" },
       "apple-health": { status: "not_connected", url: "/api/fitness/apple-health/upload?userId=1" },
       "fitbit": { status: "not_configured", message: "Service fitbit requires API keys that are not configured." },
@@ -526,14 +536,14 @@ const Dashboard: React.FC<DashboardProps> = ({ userCode }) => {
         .then(res => res.json())
         .then(data => {
           if (data.results) {
-            setTrackerStatus(data.results);
+            setTrackerStatus(data.results as TrackerStatusMap);
             console.log("Fitness tracker status updated:", data.results);
           }
         })
         .catch(err => console.error("Error fetching tracker status:", err));
     }, []);
 
-    const handleConnect = (service, url) => {
+    const handleConnect = (service: string, url?: string) => {
       if (url) {
         window.open(url, '_blank');
       } else {
@@ -774,7 +784,7 @@ const Dashboard: React.FC<DashboardProps> = ({ userCode }) => {
             userProfile={{
               ...userProfile,
               unlockedLevels: userProfile.unlockedLevels || [],
-              paymentStatus: userProfile.subscriptionStatus || 'free',
+              paymentStatus: userProfile.paymentStatus || 'free',
               category: userProfile.category || 'BEG'
             }} 
             onLevelUnlock={(levelId) => {
