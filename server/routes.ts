@@ -21,10 +21,12 @@ import {
   handleVoiceResponse 
 } from "./services/voice-coaching";
 import { registerApiStatusRoutes } from "./services/api-status-service";
+import { getAllApiStatus } from "./services/api-status-service";
 import { registerSystemAuditRoutes } from "./services/system-audit";
 import { registerRapidApiRoutes } from "./services/rapid-api-service";
 import { registerUserProfileRoutes } from "./services/user-profile-service";
 import billingStatusRoutes from "./routes/billing-status-routes";
+import deploymentReadinessRoutes from "./routes/deployment-readiness-routes";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Initialize Gemini configuration
@@ -282,6 +284,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Register billing status routes
   app.use(billingStatusRoutes);
   console.log("💰 Billing Status routes registered successfully");
+  
+  // Register deployment readiness routes
+  app.use(deploymentReadinessRoutes);
+  console.log("🚀 Deployment Readiness routes registered successfully");
 
   // Stripe payment integration
   if (!process.env.STRIPE_SECRET_KEY) {

@@ -1,0 +1,159 @@
+MEGAPROMPT – FITNESS AI | PHASE 4: SYSTEM FINALIZATION & DEPLOYMENT READINESS
+You are the assigned AI Operations Agent for the Fitness AI platform. Your mission is to finalize the implementation of all systems, verify and connect all active Google Cloud services, and elevate the platform toward production-ready deployment.
+
+📌 PROJECT CONTEXT
+Project ID: erudite-creek-431302-q3
+
+API Key:
+
+js
+Copiar
+Editar
+process.env.GOOGLE_API_KEY = "AIzaSyA--rn_uJjZtyU9kGpIWDpBa-obvtPrC24";
+Deployment Target: Cross-platform Fitness Coaching AI System
+
+Active API Services:
+
+Gemini / Vertex AI
+
+Vision API
+
+Speech-to-Text API
+
+Text-to-Speech API
+
+Natural Language API
+
+Translation API (partial)
+
+Firebase / Firestore (partial)
+
+Google Calendar API
+
+✅ MISSION OBJECTIVES
+Verify that all API connections are properly active and responding
+
+Complete all partially implemented components
+
+Implement final multilingual and mobile responsiveness systems
+
+Finalize Stripe + Access Code logic
+
+Prepare the system for public deployment
+
+Return with a detailed status report including:
+
+What’s working
+
+What’s missing
+
+Final suggestions for product elevation
+
+🔍 CURRENT STATE SNAPSHOT
+Area	Status
+AI + NLP APIs	✅ Fully Active
+Speech APIs (TTS, STT)	✅ Fully Active
+Vision API	⚠️ Partial (improve motion tracking)
+Firebase / Firestore	⚠️ Partial (auth + sync issues)
+Fitbit Integration	❌ Missing credentials
+SendGrid Email System	❌ Not Implemented
+Multilingual Coverage	⚠️ Partial (UI only)
+Chatbot Onboarding Flow	⚠️ 7/10 Steps
+Membership Tiers	✅ Stripe working, QR logic partial
+Mobile UX Optimization	⚠️ Needs attention
+Admin Dashboard	✅ Accessible
+🔧 TASKS TO EXECUTE
+1. 🧠 API VALIDATION
+Ensure all the following services are verified:
+
+Text-to-Speech API → test voice coaching flows
+
+Speech-to-Text API → rep counter and audio commands
+
+Vision API → form detection on mobile and desktop
+
+Natural Language API → interpret user sentiment during workout logs
+
+Translation API → translate all UI + chatbot flow
+
+Firebase → full auth + Firestore data write/read
+
+Fitbit API → use ENV FITBIT_CLIENT_ID, FITBIT_CLIENT_SECRET when available
+
+SendGrid → connect email verification + onboarding emails
+
+📍 If a service is not responding, report the error type and suggest fallback.
+
+2. 🧩 FRONTEND SYSTEM COMPLETION
+Finish onboarding wizard (steps 8–10)
+
+Improve feature discovery with tabs, cards, or highlights
+
+Add remaining 5 features to Feature Section
+
+Fully implement footer with newsletter signup, sitemap, and language selector
+
+Optimize responsive layout for iOS + Android
+
+3. 🧾 MEMBERSHIP & ACCESS SYSTEM
+Verify that the 4 tiers: Basic, Premium, VIP, Elite are:
+
+Shown in UI
+
+Connected to Stripe checkout
+
+Mapped to access codes (FITNESS-[TIER]-XXXX)
+
+QR codes correctly stylized and scannable
+
+Admin Dashboard must show user code tier, payment status, and activity history
+
+4. 🤖 CHATBOT + AI FEATURES
+Enable full memory context across sessions
+
+Make chatbot multilingual (use Translation API)
+
+Ensure AI can:
+
+Recommend workouts
+
+Provide corrections
+
+Track user preferences
+
+Respond to progress milestones
+
+5. 📈 SUGGESTED ENHANCEMENTS (PRIORITY)
+Enable the following advanced features before public launch if possible:
+
+Personalized Nutrition Tracking
+
+Gamified Challenges and Leaderboards
+
+AI-Generated Form Correction Feedback
+
+Mental Wellness Integrations (meditation, sleep)
+
+Voice-Activated Coaching Sessions
+
+QR Code onboarding for mobile switching
+
+Real quota usage dashboard in Admin Panel
+
+📊 DEPLOYMENT READINESS SCORE
+You must return:
+
+✅ Confirmed APIs that are active
+
+❌ Services still not functioning (or blocked by config/auth)
+
+⚠️ Areas with degraded performance or missing content
+
+💡 At least 10 product improvement recommendations
+
+📦 Status of payment, access codes, onboarding, multilingual support
+
+🚀 Deployment readiness score (percentage)
+
+🔐 Any compliance/security suggestions (user data, health info)
+

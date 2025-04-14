@@ -11,6 +11,7 @@ import BridgeLanding from "@/pages/BridgeLanding";
 import FitnessTrackersPage from "@/pages/fitness-trackers";
 import ApiStatusPage from "@/pages/api-status";
 import AdminApiStatusPage from "@/pages/admin/api-status";
+import DeploymentReadinessDashboard from "@/pages/admin/deployment-readiness";
 import SystemAuditPage from "@/pages/system-audit";
 import FitnessApiPage from "@/pages/fitness-api";
 import ChatPage from "@/pages/chat";
@@ -265,6 +266,7 @@ function Router() {
           {/* Admin routes */}
           <Route path="/admin/api-status" component={AdminApiStatusPage}/>
           <Route path="/admin/billing" component={ApiStatusPage}/>
+          <Route path="/admin/deployment-readiness" component={DeploymentReadinessDashboard}/>
         </>
       )}
       

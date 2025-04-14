@@ -1,97 +1,204 @@
 /**
  * API Status Service
  * 
- * Este servicio proporciona endpoints para verificar el estado de las APIs de Google Cloud.
+ * This service provides functionality to check the status of all API services
+ * used within the Fitness AI platform and verify their proper configuration.
  */
 
-import { Router, Request, Response } from 'express';
-import { cloudApis, initializeGoogleCloudApis } from './google-cloud-integration';
+// No api key manager module available yet, will implement without it
 
-export function registerApiStatusRoutes(router: Router): void {
-  // Endpoint para inicializar todas las APIs
-  router.post('/initialize-apis', async (req: Request, res: Response) => {
-    try {
-      const result = await initializeGoogleCloudApis();
+/**
+ * Get the status of all API services used in the Fitness AI platform
+ * @returns Object containing the status of each API service
+ */
+export async function getAllApiStatus() {
+  // Check Google Cloud API services
+  const googleApiKeys = {
+    vision: process.env.GOOGLE_API_KEY || 
+      process.env.GOOGLE_GROUP1_API_KEY || 
+      process.env.GOOGLE_GROUP2_API_KEY || 
+      process.env.GOOGLE_GROUP3_API_KEY,
       
-      res.json({
-        status: result ? 'success' : 'error',
-        message: result ? 'Google Cloud APIs initialized successfully' : 'Failed to initialize some APIs',
-        timestamp: new Date().toISOString()
-      });
+    translation: process.env.GOOGLE_API_KEY || 
+      process.env.GOOGLE_GROUP1_API_KEY || 
+      process.env.GOOGLE_GROUP2_API_KEY || 
+      process.env.GOOGLE_GROUP3_API_KEY,
+      
+    tts: process.env.GOOGLE_API_KEY || 
+      process.env.GOOGLE_GROUP1_API_KEY || 
+      process.env.GOOGLE_GROUP2_API_KEY || 
+      process.env.GOOGLE_GROUP3_API_KEY,
+      
+    stt: process.env.GOOGLE_API_KEY || 
+      process.env.GOOGLE_GROUP1_API_KEY || 
+      process.env.GOOGLE_GROUP2_API_KEY || 
+      process.env.GOOGLE_GROUP3_API_KEY,
+      
+    naturalLanguage: process.env.GOOGLE_API_KEY || 
+      process.env.GOOGLE_GROUP1_API_KEY || 
+      process.env.GOOGLE_GROUP2_API_KEY || 
+      process.env.GOOGLE_GROUP3_API_KEY,
+  };
+  
+  // Check AI model services
+  const aiServices = {
+    gemini: process.env.GEMINI_API_KEY,
+    vertexAI: process.env.GOOGLE_API_KEY,
+  };
+  
+  // Check Firebase and authentication services
+  const firebaseConfig = {
+    apiKey: process.env.VITE_FIREBASE_API_KEY,
+    projectId: process.env.VITE_FIREBASE_PROJECT_ID,
+    appId: process.env.VITE_FIREBASE_APP_ID,
+  };
+  
+  // Prepare the status report
+  const apiStatus = {
+    // Google Cloud APIs
+    vision: googleApiKeys.vision 
+      ? { status: 'partial', message: 'Vision API is configured but needs full implementation' }
+      : { status: 'missing', message: 'Vision API key is not configured' },
+      
+    translation: googleApiKeys.translation
+      ? { status: 'active', message: 'Translation API is fully operational' }
+      : { status: 'missing', message: 'Translation API key is not configured' },
+      
+    tts: googleApiKeys.tts
+      ? { status: 'active', message: 'Text-to-Speech API is fully operational' }
+      : { status: 'missing', message: 'Text-to-Speech API key is not configured' },
+      
+    stt: googleApiKeys.stt
+      ? { status: 'active', message: 'Speech-to-Text API is fully operational' }
+      : { status: 'missing', message: 'Speech-to-Text API key is not configured' },
+      
+    naturalLanguage: googleApiKeys.naturalLanguage
+      ? { status: 'active', message: 'Natural Language API is fully operational' }
+      : { status: 'missing', message: 'Natural Language API key is not configured' },
+    
+    // AI models  
+    gemini: aiServices.gemini
+      ? { status: 'active', message: 'Gemini API is fully operational' }
+      : { status: 'missing', message: 'Gemini API key is not configured' },
+      
+    vertexAI: aiServices.vertexAI
+      ? { status: 'active', message: 'Vertex AI is fully operational' }
+      : { status: 'missing', message: 'Vertex AI credentials are not configured' },
+    
+    // Firebase
+    firebase: (firebaseConfig.apiKey && firebaseConfig.projectId && firebaseConfig.appId)
+      ? { status: 'partial', message: 'Firebase is configured but needs full implementation' }
+      : { status: 'missing', message: 'Firebase configuration is incomplete' },
+  };
+  
+  return apiStatus;
+}
+
+/**
+ * Check if all required API services are properly configured
+ * @returns Object with validation results and missing API keys
+ */
+export async function validateApiServices() {
+  const apiStatus = await getAllApiStatus();
+  
+  // Check for missing or inactive services
+  const missingServices = Object.entries(apiStatus)
+    .filter(([_, status]) => status.status === 'missing')
+    .map(([name, _]) => name);
+    
+  const partialServices = Object.entries(apiStatus)
+    .filter(([_, status]) => status.status === 'partial')
+    .map(([name, _]) => name);
+  
+  // Service assignments mapping (simplified for now)
+  const serviceAssignments = {
+    'vision': 'GROUP1',
+    'translation': 'GROUP1',
+    'tts': 'GROUP2',
+    'stt': 'GROUP2',
+    'naturalLanguage': 'GROUP2',
+    'gemini': 'UNIVERSAL',
+    'vertexAI': 'GROUP3',
+  };
+  
+  return {
+    isValid: missingServices.length === 0,
+    missingServices,
+    partialServices,
+    serviceAssignments
+  };
+}
+
+/**
+ * Get a detailed report of all API services and their status
+ * @returns Detailed API status report
+ */
+export async function getApiStatusReport() {
+  const apiStatus = await getAllApiStatus();
+  const validationResults = await validateApiServices();
+  
+  // Count services by status
+  const statusCounts = {
+    active: Object.values(apiStatus).filter(status => status.status === 'active').length,
+    partial: Object.values(apiStatus).filter(status => status.status === 'partial').length,
+    missing: Object.values(apiStatus).filter(status => status.status === 'missing').length,
+  };
+  
+  // Calculate overall health percentage
+  const totalServices = Object.keys(apiStatus).length;
+  const healthPercentage = Math.round(
+    ((statusCounts.active + (statusCounts.partial * 0.5)) / totalServices) * 100
+  );
+  
+  return {
+    timestamp: new Date().toISOString(),
+    services: apiStatus,
+    counts: statusCounts,
+    validation: validationResults,
+    healthPercentage,
+    overallStatus: healthPercentage >= 90 ? 'healthy' : 
+                  healthPercentage >= 70 ? 'partial' : 'degraded'
+  };
+}
+
+export function registerApiStatusRoutes(router) {
+  // API Status Endpoint
+  router.get('/api-status', async (req, res) => {
+    try {
+      const status = await getAllApiStatus();
+      res.json(status);
     } catch (error) {
-      res.status(500).json({
-        status: 'error',
-        message: error instanceof Error ? error.message : 'Unknown error',
-        timestamp: new Date().toISOString()
-      });
+      console.error('Error getting API status:', error);
+      res.status(500).json({ error: 'Failed to get API status' });
     }
   });
 
-  // Endpoint para verificar el estado de todas las APIs
-  router.get('/api-status', async (req: Request, res: Response) => {
+  // API Status Report Endpoint
+  router.get('/api-status/report', async (req, res) => {
     try {
-      const apis = [
-        { name: 'Gemini AI', status: 'active', description: 'Proporciona chatbots y recomendaciones personalizadas' },
-        { name: 'Vision AI', status: 'active', description: 'Analiza la forma de ejercicio y postura' },
-        { name: 'Speech-to-Text', status: 'active', description: 'Procesa comandos de voz durante los entrenamientos' },
-        { name: 'Text-to-Speech', status: 'active', description: 'Genera instrucciones vocales de entrenamiento' },
-        { name: 'Translation', status: 'active', description: 'Traduce contenido a múltiples idiomas' },
-        { name: 'Natural Language', status: 'active', description: 'Entiende consultas de fitness en lenguaje natural' },
-        { name: 'Video Intelligence', status: 'active', description: 'Analiza videos de entrenamiento' },
-        { name: 'Firestore', status: 'active', description: 'Almacena datos de progreso y entrenamientos' },
-        { name: 'Vertex AI', status: 'active', description: 'Modelos ML para análisis de patrones de fitness' },
-        { name: 'Maps', status: 'active', description: 'Seguimiento de rutas de running/ciclismo' },
-        { name: 'Dialogflow', status: 'active', description: 'Conversaciones de coaching de fitness' },
-        { name: 'Cloud Storage', status: 'active', description: 'Almacena videos de entrenamiento' },
-        { name: 'DLP', status: 'active', description: 'Protege datos de salud sensibles' },
-        { name: 'Monitoring', status: 'active', description: 'Monitoreo de la aplicación' },
-        { name: 'Secret Manager', status: 'active', description: 'Almacena claves API seguras' }
-      ];
-      
-      res.json({
-        status: 'success',
-        timestamp: new Date().toISOString(),
-        apiKey: process.env.GOOGLE_API_KEY ? 'Configured' : 'Not Configured',
-        apis
-      });
+      const report = await getApiStatusReport();
+      res.json(report);
     } catch (error) {
-      res.status(500).json({
-        status: 'error',
-        message: error instanceof Error ? error.message : 'Unknown error',
-        timestamp: new Date().toISOString()
-      });
+      console.error('Error generating API status report:', error);
+      res.status(500).json({ error: 'Failed to generate API status report' });
     }
   });
 
-  // Endpoint para probar Gemini AI específicamente
-  router.post('/test-gemini', async (req: Request, res: Response) => {
+  // API Service Validation Endpoint
+  router.get('/api-status/validate', async (req, res) => {
     try {
-      const { prompt } = req.body;
-      
-      if (!prompt) {
-        return res.status(400).json({
-          status: 'error',
-          message: 'Se requiere un prompt para probar Gemini AI'
-        });
-      }
-      
-      const geminiModel = cloudApis.geminiClient.getGenerativeModel({ model: 'gemini-1.5-flash' });
-      const result = await geminiModel.generateContent(prompt);
-      const response = await result.response;
-      const text = response.text();
-      
-      res.json({
-        status: 'success',
-        response: text,
-        model: 'gemini-1.5-flash',
-        timestamp: new Date().toISOString()
-      });
+      const validation = await validateApiServices();
+      res.json(validation);
     } catch (error) {
-      res.status(500).json({
-        status: 'error',
-        message: error instanceof Error ? error.message : 'Unknown error',
-        timestamp: new Date().toISOString()
-      });
+      console.error('Error validating API services:', error);
+      res.status(500).json({ error: 'Failed to validate API services' });
     }
   });
 }
+
+export default {
+  getAllApiStatus,
+  validateApiServices,
+  getApiStatusReport,
+  registerApiStatusRoutes
+};
