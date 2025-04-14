@@ -176,7 +176,7 @@ export function ApiKeyManager({ className }: ApiKeyManagerProps) {
                   {currentKey.activeKeyName}
                 </Badge>
                 {currentKey.usingKey ? (
-                  <Badge variant="success" className="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                  <Badge variant="outline" className="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
                     <CheckCircle className="w-3 h-3 mr-1" />
                     Active
                   </Badge>
