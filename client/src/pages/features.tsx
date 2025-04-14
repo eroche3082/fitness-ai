@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button';
 import { 
   Activity, 
   ArrowRight, 
-  Award,
   BarChart2, 
   Calendar, 
   Clock, 
@@ -13,9 +12,7 @@ import {
   Heart, 
   Layout, 
   MessageSquare, 
-  Share2,
   Smartphone, 
-  Trophy,
   Users, 
   Zap
 } from 'lucide-react';
@@ -287,145 +284,6 @@ export default function Features() {
                   <span className="inline-block px-3 py-1 bg-green-500/20 text-green-500 rounded-full text-sm font-semibold">
                     Premium
                   </span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Achievement Badge System Section */}
-        <section className="py-16 bg-gray-900">
-          <div className="container mx-auto px-4 md:px-6">
-            <div className="max-w-3xl mx-auto text-center mb-16">
-              <h2 className="text-3xl font-bold mb-4">Achievement Badge System</h2>
-              <p className="text-lg text-gray-300">
-                Track your fitness journey milestones and celebrate your accomplishments with our comprehensive badge system
-              </p>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-              {/* Badge 1 */}
-              <div className="bg-gray-800 rounded-lg p-8 transform transition-all duration-300 hover:scale-105 hover:shadow-lg">
-                <div className="w-14 h-14 rounded-full bg-amber-600/20 flex items-center justify-center mb-6">
-                  <Award className="h-7 w-7 text-amber-600" />
-                </div>
-                <h3 className="text-xl font-bold mb-3">Strength Badges</h3>
-                <p className="text-gray-300">
-                  Earn badges for completing strength training milestones, from your first workout to impressive lifting achievements.
-                </p>
-              </div>
-
-              {/* Badge 2 */}
-              <div className="bg-gray-800 rounded-lg p-8 transform transition-all duration-300 hover:scale-105 hover:shadow-lg">
-                <div className="w-14 h-14 rounded-full bg-blue-500/20 flex items-center justify-center mb-6">
-                  <Activity className="h-7 w-7 text-blue-500" />
-                </div>
-                <h3 className="text-xl font-bold mb-3">Cardio Achievements</h3>
-                <p className="text-gray-300">
-                  Track your running, cycling, and cardio progress with badges that celebrate distance, speed, and endurance goals.
-                </p>
-              </div>
-
-              {/* Badge 3 */}
-              <div className="bg-gray-800 rounded-lg p-8 transform transition-all duration-300 hover:scale-105 hover:shadow-lg">
-                <div className="w-14 h-14 rounded-full bg-green-500/20 flex items-center justify-center mb-6">
-                  <Trophy className="h-7 w-7 text-green-500" />
-                </div>
-                <h3 className="text-xl font-bold mb-3">Nutrition Excellence</h3>
-                <p className="text-gray-300">
-                  Earn recognition for maintaining balanced nutrition, staying hydrated, and achieving dietary milestones.
-                </p>
-              </div>
-
-              {/* Badge 4 */}
-              <div className="bg-gray-800 rounded-lg p-8 transform transition-all duration-300 hover:scale-105 hover:shadow-lg">
-                <div className="w-14 h-14 rounded-full bg-purple-500/20 flex items-center justify-center mb-6">
-                  <Share2 className="h-7 w-7 text-purple-500" />
-                </div>
-                <h3 className="text-xl font-bold mb-3">Shareable Badges</h3>
-                <p className="text-gray-300">
-                  Share your achievements on social media, download badge images, and inspire your friends with your progress.
-                </p>
-              </div>
-            </div>
-
-            <div className="mt-16 bg-gradient-to-r from-gray-800 to-gray-900 rounded-lg p-8 border border-green-500/30">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-                <div>
-                  <h3 className="text-2xl font-bold mb-4">Unlock Your Achievement Potential</h3>
-                  <p className="text-gray-300 mb-6">
-                    Our badge system features multiple levels for each achievement type, from Bronze to Diamond, with visual progress tracking and personalized recommendations to help you reach the next tier.
-                  </p>
-                  <ul className="space-y-3">
-                    <li className="flex items-center">
-                      <div className="w-6 h-6 rounded-full bg-amber-600 flex items-center justify-center mr-3">
-                        <span className="text-xs text-white font-bold">B</span>
-                      </div>
-                      <span>Bronze - First steps in your journey</span>
-                    </li>
-                    <li className="flex items-center">
-                      <div className="w-6 h-6 rounded-full bg-gray-400 flex items-center justify-center mr-3">
-                        <span className="text-xs text-white font-bold">S</span>
-                      </div>
-                      <span>Silver - Building consistency</span>
-                    </li>
-                    <li className="flex items-center">
-                      <div className="w-6 h-6 rounded-full bg-yellow-500 flex items-center justify-center mr-3">
-                        <span className="text-xs text-white font-bold">G</span>
-                      </div>
-                      <span>Gold - Achieving excellence</span>
-                    </li>
-                    <li className="flex items-center">
-                      <div className="w-6 h-6 rounded-full bg-cyan-500 flex items-center justify-center mr-3">
-                        <span className="text-xs text-white font-bold">P</span>
-                      </div>
-                      <span>Platinum - Advanced milestones</span>
-                    </li>
-                    <li className="flex items-center">
-                      <div className="w-6 h-6 rounded-full bg-purple-500 flex items-center justify-center mr-3">
-                        <span className="text-xs text-white font-bold">D</span>
-                      </div>
-                      <span>Diamond - Elite achievements</span>
-                    </li>
-                  </ul>
-                </div>
-                <div className="grid grid-cols-3 gap-4">
-                  <div className="bg-card rounded-lg p-4 flex flex-col items-center text-center">
-                    <div className="w-12 h-12 rounded-full bg-amber-600 flex items-center justify-center mb-2">
-                      <Award className="h-6 w-6 text-white" />
-                    </div>
-                    <h4 className="text-sm font-medium">Fuerza Inicial</h4>
-                  </div>
-                  <div className="bg-card rounded-lg p-4 flex flex-col items-center text-center">
-                    <div className="w-12 h-12 rounded-full bg-yellow-500 flex items-center justify-center mb-2">
-                      <Award className="h-6 w-6 text-white" />
-                    </div>
-                    <h4 className="text-sm font-medium">Maratonista</h4>
-                  </div>
-                  <div className="bg-card rounded-lg p-4 flex flex-col items-center text-center">
-                    <div className="w-12 h-12 rounded-full bg-gray-400 flex items-center justify-center mb-2">
-                      <Award className="h-6 w-6 text-white" />
-                    </div>
-                    <h4 className="text-sm font-medium">Nutrición</h4>
-                  </div>
-                  <div className="bg-card rounded-lg p-4 flex flex-col items-center text-center">
-                    <div className="w-12 h-12 rounded-full bg-cyan-500 flex items-center justify-center mb-2">
-                      <Award className="h-6 w-6 text-white" />
-                    </div>
-                    <h4 className="text-sm font-medium">Consistencia</h4>
-                  </div>
-                  <div className="bg-card rounded-lg p-4 flex flex-col items-center text-center">
-                    <div className="w-12 h-12 rounded-full bg-green-500 flex items-center justify-center mb-2">
-                      <Award className="h-6 w-6 text-white" />
-                    </div>
-                    <h4 className="text-sm font-medium">Hitos</h4>
-                  </div>
-                  <div className="bg-card rounded-lg p-4 flex flex-col items-center text-center">
-                    <div className="w-12 h-12 rounded-full bg-purple-500 flex items-center justify-center mb-2">
-                      <Award className="h-6 w-6 text-white" />
-                    </div>
-                    <h4 className="text-sm font-medium">Elite</h4>
-                  </div>
                 </div>
               </div>
             </div>
