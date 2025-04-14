@@ -1,73 +1,60 @@
-type ApiKeyType = 'vertex' | 'gemini' | 'maps' | 'youtube' | 'rapid';
-
 /**
- * Get API key from environment variables based on type
- * @param type Type of API key to retrieve
- * @returns API key string or undefined if not found
+ * Configuration for various API keys used by the application
  */
-export function getApiKey(type: ApiKeyType): string | undefined {
-  switch (type) {
-    case 'vertex':
-      return process.env.GOOGLE_API_KEY || 
-             process.env.GOOGLE_GROUP1_API_KEY || 
-             process.env.GEMINI_API_KEY;
-    case 'gemini':
-      return process.env.GEMINI_API_KEY || 
-             process.env.GOOGLE_API_KEY || 
-             process.env.GOOGLE_GROUP1_API_KEY;
-    case 'maps':
-      return process.env.GOOGLE_MAPS_API_KEY || 
-             process.env.GOOGLE_GROUP2_API_KEY;
-    case 'youtube':
-      return process.env.YOUTUBE_API_KEY || 
-             process.env.GOOGLE_GROUP3_API_KEY;
-    case 'rapid':
-      return process.env.RAPID_API_KEY;
-    default:
-      return undefined;
+
+// Google Cloud API Configuration
+export const aiConfig = {
+  apiKey: process.env.GOOGLE_API_KEY || process.env.VERTEX_API_KEY || process.env.GEMINI_API_KEY,
+  projectId: 'erudite-creek-431302',
+  region: 'us-central1'
+};
+
+// Fitness API Configurations
+export const fitnessConfig = {
+  googleFit: {
+    clientId: process.env.GOOGLE_FIT_CLIENT_ID,
+    clientSecret: process.env.GOOGLE_FIT_CLIENT_SECRET
+  },
+  fitbit: {
+    clientId: process.env.FITBIT_CLIENT_ID,
+    clientSecret: process.env.FITBIT_CLIENT_SECRET
+  },
+  strava: {
+    clientId: process.env.STRAVA_CLIENT_ID,
+    clientSecret: process.env.STRAVA_CLIENT_SECRET
   }
+};
+
+// Other API Configurations
+export const otherApis = {
+  openai: {
+    apiKey: process.env.OPENAI_API_KEY
+  },
+  anthropic: {
+    apiKey: process.env.ANTHROPIC_API_KEY
+  },
+  elevenLabs: {
+    apiKey: process.env.ELEVEN_LABS_API_KEY
+  },
+  rapidApi: {
+    apiKey: process.env.RAPID_API_KEY
+  }
+};
+
+/**
+ * Check if a specific API key is configured
+ * @param keyName The name of the environment variable for the API key
+ */
+export function isApiKeyConfigured(keyName: string): boolean {
+  const key = process.env[keyName];
+  return key !== undefined && key !== '';
 }
 
 /**
- * Check if all required API keys are available in the environment
- * @returns Object indicating which API keys are available
+ * Check which API keys are missing from the required set
+ * @param requiredKeys Array of environment variable names for required API keys
+ * @returns Array of missing API key names
  */
-export function checkApiKeysAvailability(): Record<string, boolean> {
-  return {
-    vertex: !!getApiKey('vertex'),
-    gemini: !!getApiKey('gemini'),
-    maps: !!getApiKey('maps'),
-    youtube: !!getApiKey('youtube'),
-    rapid: !!getApiKey('rapid')
-  };
-}
-
-/**
- * Get missing API keys that should be configured
- * @returns Array of API key names that are missing
- */
-export function getMissingApiKeys(): string[] {
-  const availability = checkApiKeysAvailability();
-  
-  return Object.entries(availability)
-    .filter(([_, isAvailable]) => !isAvailable)
-    .map(([key]) => key.toUpperCase() + '_API_KEY');
-}
-
-/**
- * Get a summary of API key status for diagnostic purposes
- * @returns Object with API key status information
- */
-export function getApiKeysStatus(): Record<string, any> {
-  const availability = checkApiKeysAvailability();
-  
-  return {
-    isConfigured: Object.values(availability).some(available => available),
-    availableApis: Object.entries(availability)
-      .filter(([_, isAvailable]) => isAvailable)
-      .map(([key]) => key),
-    missingApis: Object.entries(availability)
-      .filter(([_, isAvailable]) => !isAvailable)
-      .map(([key]) => key),
-  };
+export function getMissingApiKeys(requiredKeys: string[]): string[] {
+  return requiredKeys.filter(key => !isApiKeyConfigured(key));
 }
