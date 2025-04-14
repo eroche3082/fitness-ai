@@ -69,11 +69,15 @@ export class ApiKeyManager {
         priority: 3
       },
       {
-        name: 'GROUP4',
+        name: 'GOOGLE_API',
         envVariable: 'GOOGLE_API_KEY',
         key: process.env.GOOGLE_API_KEY,
-        services: ['firebase', 'realtime-db', 'hosting', 'messaging', 'in-app-config'],
-        priority: 4
+        services: [
+          'texttospeech', 'speech', 'vision', 'language', 'translation',
+          'vertex', 'gemini', 'sheets', 'gmail', 'calendar', 'drive',
+          'firebase', 'realtime-db', 'hosting', 'messaging', 'in-app-config'
+        ],
+        priority: 1 // Make this the highest priority since it's the universal key
       }
     ];
 
@@ -100,8 +104,8 @@ export class ApiKeyManager {
     }
 
     // If no matching groups, return the default fallback
-    // Following the fallback logic: GROUP2 → GROUP3 → GROUP4 → GROUP1
-    const fallbackOrder = ['GROUP2', 'GROUP3', 'GROUP4', 'GROUP1'];
+    // Following the fallback logic, starting with the universal API key: GOOGLE_API → GROUP1 → GROUP2 → GROUP3
+    const fallbackOrder = ['GOOGLE_API', 'GROUP1', 'GROUP2', 'GROUP3'];
     
     for (const groupName of fallbackOrder) {
       const group = this.keyGroups.find(g => g.name === groupName);

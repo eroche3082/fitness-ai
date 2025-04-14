@@ -42,14 +42,18 @@ interface ServiceAssignmentManagerProps {
 }
 
 const availableServices = [
-  { id: 'gemini', label: 'Gemini AI' },
+  { id: 'texttospeech', label: 'Text-to-Speech' },
+  { id: 'speech', label: 'Speech-to-Text' },
+  { id: 'vision', label: 'Vision API' },
+  { id: 'language', label: 'Natural Language' },
+  { id: 'translation', label: 'Translation API' },
   { id: 'vertex', label: 'Vertex AI' },
-  { id: 'vision', label: 'Vision AI' },
-  { id: 'speech', label: 'Speech Services' },
-  { id: 'maps', label: 'Maps Platform' },
-  { id: 'firebase', label: 'Firebase' },
-  { id: 'bigquery', label: 'BigQuery' },
-  { id: 'storage', label: 'Cloud Storage' },
+  { id: 'gemini', label: 'Gemini AI' },
+  { id: 'sheets', label: 'Google Sheets' },
+  { id: 'gmail', label: 'Gmail API' },
+  { id: 'calendar', label: 'Calendar API' },
+  { id: 'drive', label: 'Drive API' },
+  { id: 'firebase', label: 'Firebase' }
 ];
 
 export function ServiceAssignmentManager({ className }: ServiceAssignmentManagerProps) {
