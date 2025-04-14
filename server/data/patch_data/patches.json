@@ -1,0 +1,100 @@
+{
+  "patches": [
+    {
+      "id": "alpha",
+      "name": "ALPHA",
+      "description": "Enhances mental clarity and cognitive focus",
+      "benefits": [
+        "Improved concentration",
+        "Enhanced mental clarity",
+        "Reduced mental fog",
+        "Increased productivity"
+      ],
+      "recommended_placement": "Center of forehead or behind right ear",
+      "duration_hours": 6,
+      "target_state": "focus",
+      "image": "/assets/patch-icons/alpha.svg",
+      "color": "#3B82F6"
+    },
+    {
+      "id": "soma",
+      "name": "SOMA",
+      "description": "Promotes emotional recovery and balance",
+      "benefits": [
+        "Reduced emotional volatility",
+        "Increased emotional resilience",
+        "Balanced mood",
+        "Improved stress management"
+      ],
+      "recommended_placement": "Heart center or left wrist",
+      "duration_hours": 8,
+      "target_state": "emotional_balance",
+      "image": "/assets/patch-icons/soma.svg",
+      "color": "#EC4899"
+    },
+    {
+      "id": "aether",
+      "name": "AETHER",
+      "description": "Stimulates creative flow and innovative thinking",
+      "benefits": [
+        "Enhanced creativity",
+        "Increased inspiration",
+        "Improved problem-solving",
+        "Expanded perception"
+      ],
+      "recommended_placement": "Crown of head or right palm",
+      "duration_hours": 4,
+      "target_state": "creativity",
+      "image": "/assets/patch-icons/aether.svg",
+      "color": "#8B5CF6"
+    },
+    {
+      "id": "ignite",
+      "name": "IGNITE",
+      "description": "Boosts physical energy and vitality",
+      "benefits": [
+        "Increased energy levels",
+        "Enhanced physical performance",
+        "Reduced fatigue",
+        "Improved stamina"
+      ],
+      "recommended_placement": "Solar plexus or between shoulder blades",
+      "duration_hours": 8,
+      "target_state": "energy",
+      "image": "/assets/patch-icons/ignite.svg",
+      "color": "#F59E0B"
+    },
+    {
+      "id": "drift",
+      "name": "DRIFT",
+      "description": "Facilitates deep, restorative sleep",
+      "benefits": [
+        "Improved sleep quality",
+        "Easier to fall asleep",
+        "Reduced nighttime awakening",
+        "More restful sleep cycles"
+      ],
+      "recommended_placement": "Base of skull or inner wrist",
+      "duration_hours": 8,
+      "target_state": "sleep",
+      "image": "/assets/patch-icons/drift.svg",
+      "color": "#6366F1"
+    },
+    {
+      "id": "shield",
+      "name": "SHIELD",
+      "description": "Strengthens immune system and energetic protection",
+      "benefits": [
+        "Enhanced immune response",
+        "Increased cellular resilience",
+        "Energetic boundary support",
+        "Reduced environmental sensitivity"
+      ],
+      "recommended_placement": "Thymus (center of chest) or base of throat",
+      "duration_hours": 12,
+      "target_state": "protection",
+      "image": "/assets/patch-icons/shield.svg",
+      "color": "#10B981"
+    }
+  ]
+}

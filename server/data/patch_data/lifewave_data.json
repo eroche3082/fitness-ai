@@ -1,0 +1,46 @@
+{
+  "products": [
+    {
+      "id": "lwx3",
+      "name": "X39",
+      "description": "Activate stem cells to support natural wound healing, rapid pain relief, and more youthful skin appearance",
+      "benefits": [
+        "Activates stem cells",
+        "Supports natural wound healing",
+        "Provides rapid pain relief",
+        "Promotes more youthful skin appearance"
+      ],
+      "recommended_placement": "Specific acupuncture points based on condition",
+      "duration_hours": 12,
+      "image": "/assets/patch-icons/lifewave-x39.svg"
+    },
+    {
+      "id": "lwenergy",
+      "name": "Energy Enhancer",
+      "description": "Increases energy and stamina, supporting increased physical activity",
+      "benefits": [
+        "Increases energy",
+        "Improves stamina",
+        "Supports increased physical activity",
+        "Reduces fatigue"
+      ],
+      "recommended_placement": "Acupuncture points for energy",
+      "duration_hours": 12,
+      "image": "/assets/patch-icons/lifewave-energy.svg"
+    },
+    {
+      "id": "lwsleep",
+      "name": "Silent Nights",
+      "description": "Promotes quality sleep by helping the body produce more melatonin naturally",
+      "benefits": [
+        "Promotes quality sleep",
+        "Helps produce melatonin naturally",
+        "Reduces insomnia",
+        "Supports deep sleep cycles"
+      ],
+      "recommended_placement": "Sleep-related acupuncture points",
+      "duration_hours": 8,
+      "image": "/assets/patch-icons/lifewave-sleep.svg"
+    }
+  ]
+}

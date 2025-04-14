@@ -1,0 +1,69 @@
+{
+  "frequencies": [
+    {
+      "id": "healy_balance",
+      "name": "Balance",
+      "description": "Helps maintain physical and emotional equilibrium",
+      "benefits": [
+        "Promotes overall wellbeing",
+        "Supports emotional stability",
+        "Encourages physical balance",
+        "Relieves stress and tension"
+      ],
+      "recommended_use": "10-15 minutes, 1-2 times daily",
+      "category": "Wellbeing"
+    },
+    {
+      "id": "healy_energy",
+      "name": "Energy",
+      "description": "Stimulates physical and mental energy levels",
+      "benefits": [
+        "Boosts vitality",
+        "Increases alertness",
+        "Enhances stamina",
+        "Fights fatigue"
+      ],
+      "recommended_use": "15-20 minutes in the morning",
+      "category": "Fitness"
+    },
+    {
+      "id": "healy_relax",
+      "name": "Relax",
+      "description": "Reduces stress and promotes relaxation",
+      "benefits": [
+        "Calms overactive mind",
+        "Eases tension",
+        "Supports peaceful state",
+        "Releases physical discomfort"
+      ],
+      "recommended_use": "20-30 minutes in the evening",
+      "category": "Wellbeing"
+    },
+    {
+      "id": "healy_sleep",
+      "name": "Sleep",
+      "description": "Supports quality, restorative sleep",
+      "benefits": [
+        "Eases falling asleep",
+        "Promotes deep sleep cycles",
+        "Reduces nighttime awakening",
+        "Improves morning energy"
+      ],
+      "recommended_use": "30 minutes before bedtime",
+      "category": "Sleep"
+    },
+    {
+      "id": "healy_focus",
+      "name": "Focus",
+      "description": "Enhances mental clarity and concentration",
+      "benefits": [
+        "Sharpens attention",
+        "Improves cognitive processing",
+        "Supports productivity",
+        "Reduces mental fog"
+      ],
+      "recommended_use": "15-20 minutes before mentally demanding tasks",
+      "category": "Learning"
+    }
+  ]
+}
