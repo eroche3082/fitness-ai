@@ -369,25 +369,7 @@ export default function BridgeLanding() {
         </div>
       </section>
 
-      {/* Call to Action */}
-      <section className="py-24 bg-white text-black relative overflow-hidden">
-        <div className="container mx-auto px-4 md:px-6 relative z-10">
-          <div className="max-w-3xl mx-auto text-center">
-            <h2 className="bridge-subheading text-3xl md:text-5xl font-bold mb-6 uppercase">JOIN THE REVOLUTION</h2>
-            <p className="text-xl mb-8">
-              Experience the future of fitness with our AI-powered platform. Transform your body, track your progress, and achieve your goals like never before.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button className="bridge-button bg-black text-white hover:bg-gray-900 py-6 px-8 text-lg rounded-none">
-                Start Free Trial
-              </Button>
-              <Button variant="outline" className="bridge-button bridge-button-outline border-black text-black hover:bg-black hover:text-white py-6 px-8 text-lg rounded-none">
-                Learn More
-              </Button>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* Join the Revolution section has been removed as requested */}
 
       {/* Membership Plans Section */}
       <section className="py-24 bg-gradient-to-b from-black to-gray-900">
