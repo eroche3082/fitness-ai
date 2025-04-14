@@ -7,11 +7,12 @@
 
 import { diagnosePatchNeeds, getAllPatches, getPatchHistory } from '../services/patch-diagnosis-service';
 import { recommendPatches, getPatchDetails } from '../services/patch-recommendation-service';
+import { Request, Response, Express } from 'express';
 
 /**
  * Get all available patches
  */
-async function handleGetAllPatches(req, res) {
+async function handleGetAllPatches(req: Request, res: Response) {
   try {
     // Get all available patches
     const allPatches = getAllPatches();
@@ -33,7 +34,7 @@ async function handleGetAllPatches(req, res) {
 /**
  * Get details for a specific patch
  */
-async function handleGetPatchDetails(req, res) {
+async function handleGetPatchDetails(req: Request, res: Response) {
   try {
     const { patchId } = req.params;
     
@@ -71,7 +72,7 @@ async function handleGetPatchDetails(req, res) {
 /**
  * Diagnose user's current state
  */
-async function handleDiagnosis(req, res) {
+async function handleDiagnosis(req: Request, res: Response) {
   try {
     const { userId, userInput } = req.body;
     
@@ -102,7 +103,7 @@ async function handleDiagnosis(req, res) {
 /**
  * Get personalized patch recommendations
  */
-async function handleRecommendations(req, res) {
+async function handleRecommendations(req: Request, res: Response) {
   try {
     const { userId, userInput } = req.body;
     
@@ -133,7 +134,7 @@ async function handleRecommendations(req, res) {
 /**
  * Get user's patch history
  */
-async function handleGetPatchHistory(req, res) {
+async function handleGetPatchHistory(req: Request, res: Response) {
   try {
     const { userId } = req.params;
     
@@ -164,7 +165,7 @@ async function handleGetPatchHistory(req, res) {
 /**
  * Save user feedback on patch effectiveness
  */
-async function handleSaveFeedback(req, res) {
+async function handleSaveFeedback(req: Request, res: Response) {
   try {
     const { userId, patchId, effectiveness, notes } = req.body;
     
@@ -197,7 +198,7 @@ async function handleSaveFeedback(req, res) {
 /**
  * Register all patch system routes
  */
-export function registerPatchRoutes(app) {
+export function registerPatchRoutes(app: Express) {
   // Get all available patches
   app.get('/api/patches', handleGetAllPatches);
   
