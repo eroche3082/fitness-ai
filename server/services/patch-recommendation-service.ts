@@ -76,41 +76,117 @@ async function generatePersonalizedRecommendation(userId: number, patchId: strin
       contextTemplate = recommendationContextTemplates.protection;
     }
     
-    // Generate personalized recommendation using Gemini
-    const geminiPrompt = `
-      You are an intelligent fitness and wellness AI assistant specializing in personalized patch therapy.
-      
-      USER PROFILE:
-      Name: ${user?.name || 'User'}
-      Fitness Goal: ${user?.fitnessGoal || 'General wellness'}
-      
-      CURRENT STATE:
-      ${userState}
-      
-      RECOMMENDATION CONTEXT:
-      ${contextTemplate}
-      
-      PATCH DETAILS:
-      Name: ${patch.name}
-      Description: ${patch.description}
-      Benefits: ${patch.benefits ? patch.benefits.join(', ') : 'Various benefits'}
-      
-      Please generate a personalized recommendation for using this patch that addresses the user's current state.
-      The recommendation should be motivating, grounded, and slightly mystical in tone.
-      Include specific placement instructions and expected effects.
-      Keep your response between 3-4 sentences only.
-    `;
+    // First prepare a good fallback message in case the AI fails
+    const fallbackMessage = generateFallbackMessage(patch, userState);
     
-    const personalizedRecommendation = await generateGeminiResponse([
-      { role: "user", content: geminiPrompt }
-    ]);
-    
-    return personalizedRecommendation;
+    try {
+      // Try to generate personalized recommendation using Gemini
+      const geminiPrompt = `
+        You are an intelligent fitness and wellness AI assistant specializing in personalized patch therapy.
+        
+        USER PROFILE:
+        Name: ${user?.name || 'User'}
+        Fitness Goal: ${user?.fitnessGoal || 'General wellness'}
+        
+        CURRENT STATE:
+        ${userState}
+        
+        RECOMMENDATION CONTEXT:
+        ${contextTemplate}
+        
+        PATCH DETAILS:
+        Name: ${patch.name}
+        Description: ${patch.description}
+        Benefits: ${patch.benefits ? patch.benefits.join(', ') : 'Various benefits'}
+        
+        Please generate a personalized recommendation for using this patch that addresses the user's current state.
+        The recommendation should be motivating, grounded, and slightly mystical in tone.
+        Include specific placement instructions and expected effects.
+        Keep your response between 3-4 sentences only.
+      `;
+      
+      const personalizedRecommendation = await generateGeminiResponse([
+        { role: "user", content: geminiPrompt }
+      ]);
+      
+      return personalizedRecommendation;
+    } catch (aiError) {
+      console.error('Error with Gemini API:', aiError);
+      // Return the prepared fallback message
+      return fallbackMessage;
+    }
   } catch (error) {
     console.error('Error generating personalized recommendation:', error);
-    // Fallback to generic recommendation if AI generation fails
+    // Fallback to generic recommendation if everything else fails
     return `Apply the patch on the recommended placement area for optimal results. It should help address your current needs and restore balance to your system. Follow the instructions provided with the patch for best results.`;
   }
+}
+
+/**
+ * Generate a fallback message when AI services are unavailable
+ * @param patch The patch details
+ * @param userState The user's current state description
+ */
+function generateFallbackMessage(patch: Patch, userState: string): string {
+  // Determine which state the user is likely experiencing
+  const lowercaseState = userState.toLowerCase();
+  let detectedState = 'general';
+  
+  if (lowercaseState.includes('tired') || lowercaseState.includes('fatigue') || 
+      lowercaseState.includes('energy') || lowercaseState.includes('exhausted')) {
+    detectedState = 'energy';
+  } else if (lowercaseState.includes('focus') || lowercaseState.includes('concentrate') || 
+      lowercaseState.includes('attention') || lowercaseState.includes('distract')) {
+    detectedState = 'focus';
+  } else if (lowercaseState.includes('sleep') || lowercaseState.includes('insomnia') || 
+      lowercaseState.includes('rest') || lowercaseState.includes('tired')) {
+    detectedState = 'sleep';
+  } else if (lowercaseState.includes('stress') || lowercaseState.includes('anxious') || 
+      lowercaseState.includes('nervous') || lowercaseState.includes('overwhelm')) {
+    detectedState = 'stress';
+  } else if (lowercaseState.includes('pain') || lowercaseState.includes('sore') || 
+      lowercaseState.includes('recover') || lowercaseState.includes('heal')) {
+    detectedState = 'recovery';
+  }
+  
+  // Predefined template messages for different states
+  const templates: {[key: string]: string[]} = {
+    energy: [
+      `Based on how you're feeling, the ${patch.name} can help restore your natural energy flow. Apply it to the ${patch.placement || 'recommended area'} for 4-6 hours daily, preferably in the morning.`,
+      `The ${patch.name} is particularly effective for boosting vitality when you're feeling depleted. Place it on the ${patch.placement || 'recommended area'} and you should notice effects within 30-60 minutes.`,
+      `For your current low energy state, I recommend using the ${patch.name} on the ${patch.placement || 'recommended area'} first thing in the morning. This may help sustain your energy throughout the day.`
+    ],
+    focus: [
+      `To enhance concentration, apply the ${patch.name} to the ${patch.placement || 'recommended area'} about 30 minutes before you need peak mental performance. It works by supporting optimal neural communication.`,
+      `The ${patch.name} can help clear mental fog and sharpen focus. Place it on the ${patch.placement || 'recommended area'} during work or study sessions for best results.`,
+      `When attention is scattered, the ${patch.name} may help center your thoughts. Apply to the ${patch.placement || 'recommended area'} and practice a few deep breaths to activate its full potential.`
+    ],
+    sleep: [
+      `For improved rest, apply the ${patch.name} to the ${patch.placement || 'recommended area'} about an hour before bedtime. It helps signal to your body that it's time to transition to sleep mode.`,
+      `The ${patch.name} works with your body's natural rhythm to promote deeper sleep. Place it on the ${patch.placement || 'recommended area'} and establish a calming bedtime routine for best results.`,
+      `To address your sleep concerns, the ${patch.name} can be applied to the ${patch.placement || 'recommended area'} in the evening. It's designed to support your body's natural sleep cycle.`
+    ],
+    stress: [
+      `During stressful periods, the ${patch.name} can help restore emotional balance. Apply to the ${patch.placement || 'recommended area'} and take a few moments to breathe deeply.`,
+      `The ${patch.name} supports your body's ability to respond to stress more effectively. Place it on the ${patch.placement || 'recommended area'} during challenging situations.`,
+      `For emotional harmony, the ${patch.name} works by regulating your nervous system response. Apply to the ${patch.placement || 'recommended area'} at the first sign of tension.`
+    ],
+    recovery: [
+      `To support your body's healing process, apply the ${patch.name} to the ${patch.placement || 'recommended area or near the affected region'}. It's most effective when used consistently over several days.`,
+      `The ${patch.name} can accelerate your recovery by supporting cellular regeneration. Place on the ${patch.placement || 'recommended area'} and ensure you're staying hydrated.`,
+      `For recovery support, the ${patch.name} works best when applied to the ${patch.placement || 'recommended area'} after exertion. Combine with adequate rest for optimal results.`
+    ],
+    general: [
+      `The ${patch.name} is designed to help restore balance to your system. Apply to the ${patch.placement || 'recommended area'} according to the included instructions for best results.`,
+      `For optimal benefits, place the ${patch.name} on the ${patch.placement || 'recommended area'} at a time when you can be mindful of the subtle shifts in your wellbeing.`,
+      `The ${patch.name} works in harmony with your body's natural processes. Apply to the ${patch.placement || 'recommended area'} and notice how your body responds over the next few hours.`
+    ]
+  };
+  
+  // Select a random template from the appropriate category
+  const categoryTemplates = templates[detectedState];
+  const randomIndex = Math.floor(Math.random() * categoryTemplates.length);
+  return categoryTemplates[randomIndex];
 }
 
 /**
@@ -237,12 +313,13 @@ async function saveRecommendationHistory(userId: number, recommendation: Recomme
 /**
  * Get specific patch details
  * @param patchId Patch ID
+ * @returns The patch details or null if not found
  */
-export function getPatchDetails(patchId: string) {
+export function getPatchDetails(patchId: string): Patch | null {
   const allPatches = getAllPatches();
   
   // Search in all patch categories
-  let patch = null;
+  let patch: Patch | null = null;
   if (!patch) patch = allPatches.standardPatches.find((p: Patch) => p.id === patchId);
   if (!patch) patch = allPatches.lifewaveProducts.find((p: Patch) => p.id === patchId);
   if (!patch) patch = allPatches.healyFrequencies.find((p: Patch) => p.id === patchId);

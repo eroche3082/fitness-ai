@@ -76,37 +76,43 @@ const statePatches: StatePatchesMap = {
  */
 async function analyzeSentiment(text: string) {
   try {
-    // Use Gemini to analyze sentiment
-    const prompt = `
-      Analyze the following text and determine the emotional state of the user.
-      Consider phrases that indicate fatigue, stress, anxiety, mental fog, difficulty sleeping, or other physical/emotional states.
-      
-      User text: "${text}"
-      
-      Respond with a JSON object with two fields:
-      1. sentiment: a number from -1 (very negative) to 1 (very positive)
-      2. states: an array of states detected from the following options: focus_needed, low_energy, emotional_imbalance, creative_block, sleep_issue, recovery_needed, high_stress
-      
-      Format the response as valid JSON only, with no additional text.
-    `;
+    // Use basic keyword analysis as fallback or when API is unavailable
+    const keywordAnalysis = performKeywordAnalysis(text);
     
-    const response = await generateGeminiResponse([
-      { role: "user", content: prompt }
-    ]);
-    
-    // Parse the response to extract sentiment and emotional states
     try {
-      const parsedResponse = JSON.parse(response);
-      return {
-        sentiment: parsedResponse.sentiment,
-        detectedStates: parsedResponse.states
-      };
-    } catch (err) {
-      console.error('Error parsing Gemini sentiment response:', err);
-      return {
-        sentiment: 0,
-        detectedStates: []
-      };
+      // Try to use Gemini for more advanced analysis if available
+      const prompt = `
+        Analyze the following text and determine the emotional state of the user.
+        Consider phrases that indicate fatigue, stress, anxiety, mental fog, difficulty sleeping, or other physical/emotional states.
+        
+        User text: "${text}"
+        
+        Respond with a JSON object with two fields:
+        1. sentiment: a number from -1 (very negative) to 1 (very positive)
+        2. states: an array of states detected from the following options: focus_needed, low_energy, emotional_imbalance, creative_block, sleep_issue, recovery_needed, high_stress
+        
+        Format the response as valid JSON only, with no additional text.
+      `;
+      
+      const response = await generateGeminiResponse([
+        { role: "user", content: prompt }
+      ]);
+      
+      try {
+        const parsedResponse = JSON.parse(response);
+        return {
+          sentiment: parsedResponse.sentiment,
+          detectedStates: parsedResponse.states
+        };
+      } catch (err) {
+        console.error('Error parsing Gemini sentiment response:', err);
+        // Fallback to keyword analysis if parsing fails
+        return keywordAnalysis;
+      }
+    } catch (error) {
+      console.error('Error with Gemini sentiment analysis, using fallback:', error);
+      // Fallback to keyword analysis if API call fails
+      return keywordAnalysis;
     }
   } catch (error) {
     console.error('Error analyzing sentiment:', error);
@@ -115,6 +121,54 @@ async function analyzeSentiment(text: string) {
       detectedStates: []
     };
   }
+}
+
+/**
+ * Simple keyword-based analysis as a fallback when AI services are unavailable
+ * @param text Text to analyze
+ */
+function performKeywordAnalysis(text: string): { sentiment: number, detectedStates: string[] } {
+  const lowercaseText = text.toLowerCase();
+  const detectedStates: string[] = [];
+  let sentiment = 0;
+  
+  // Detect states based on keywords
+  const stateKeywords = {
+    focus_needed: ['focus', 'concentrate', 'distracted', 'attention', 'unfocused', 'scattered'],
+    low_energy: ['tired', 'exhausted', 'fatigue', 'drained', 'sluggish', 'no energy', 'low energy'],
+    emotional_imbalance: ['anxious', 'stressed', 'overwhelmed', 'emotional', 'upset', 'mood', 'irritable'],
+    creative_block: ['stuck', 'ideas', 'creative', 'inspiration', 'blocked'],
+    sleep_issue: ['sleep', 'insomnia', 'waking up', 'tired', 'restless', 'dream'],
+    recovery_needed: ['sore', 'pain', 'recover', 'healing', 'injured', 'workout'],
+    high_stress: ['stress', 'pressure', 'tense', 'anxiety', 'worried', 'panic']
+  };
+  
+  // Check for each state
+  Object.entries(stateKeywords).forEach(([state, keywords]) => {
+    if (keywords.some(keyword => lowercaseText.includes(keyword))) {
+      detectedStates.push(state);
+    }
+  });
+  
+  // Basic sentiment analysis
+  const positiveWords = ['good', 'great', 'happy', 'excited', 'positive', 'energetic', 'excellent'];
+  const negativeWords = ['bad', 'sad', 'depressed', 'unhappy', 'negative', 'terrible', 'awful'];
+  
+  const positiveScore = positiveWords.filter(word => lowercaseText.includes(word)).length;
+  const negativeScore = negativeWords.filter(word => lowercaseText.includes(word)).length;
+  
+  sentiment = (positiveScore - negativeScore) / 5; // Normalize to range roughly between -1 and 1
+  sentiment = Math.max(-1, Math.min(1, sentiment)); // Clamp between -1 and 1
+  
+  // If no states detected but negative sentiment, default to low energy
+  if (detectedStates.length === 0 && sentiment < 0) {
+    detectedStates.push('low_energy');
+  }
+  
+  return {
+    sentiment,
+    detectedStates
+  };
 }
 
 /**
