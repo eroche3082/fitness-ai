@@ -14,7 +14,7 @@ interface ApiStatusResponse {
  * Service to check the billing status of Google Cloud APIs
  */
 export class BillingStatusService {
-  private readonly genAI: GoogleGenerativeAI;
+  private genAI: GoogleGenerativeAI;
   
   constructor() {
     // Initialize the Generative AI client

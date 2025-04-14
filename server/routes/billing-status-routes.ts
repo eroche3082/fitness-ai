@@ -145,16 +145,21 @@ router.get('/current-key', async (req, res) => {
       GOOGLE_GROUP3_API_KEY: !!process.env.GOOGLE_GROUP3_API_KEY
     };
     
+    // Get the key name based on the actual API key value
+    let detectedKeySource = 'Unknown';
+    if (aiConfig.apiKey) {
+      if (process.env.GOOGLE_API_KEY && aiConfig.apiKey === process.env.GOOGLE_API_KEY) detectedKeySource = 'GOOGLE_API_KEY';
+      else if (process.env.VERTEX_API_KEY && aiConfig.apiKey === process.env.VERTEX_API_KEY) detectedKeySource = 'VERTEX_API_KEY';
+      else if (process.env.GEMINI_API_KEY && aiConfig.apiKey === process.env.GEMINI_API_KEY) detectedKeySource = 'GEMINI_API_KEY';
+      else if (process.env.GOOGLE_GROUP1_API_KEY && aiConfig.apiKey === process.env.GOOGLE_GROUP1_API_KEY) detectedKeySource = 'GOOGLE_GROUP1_API_KEY';
+      else if (process.env.GOOGLE_GROUP2_API_KEY && aiConfig.apiKey === process.env.GOOGLE_GROUP2_API_KEY) detectedKeySource = 'GOOGLE_GROUP2_API_KEY';
+      else if (process.env.GOOGLE_GROUP3_API_KEY && aiConfig.apiKey === process.env.GOOGLE_GROUP3_API_KEY) detectedKeySource = 'GOOGLE_GROUP3_API_KEY';
+    }
+    
     // Get the API key currently being used
     const keyInfo = {
       usingKey: !!aiConfig.apiKey,
-      keySource: aiConfig.apiKey ? 
-        process.env.GOOGLE_API_KEY && aiConfig.apiKey === process.env.GOOGLE_API_KEY ? 'GOOGLE_API_KEY' :
-        process.env.VERTEX_API_KEY && aiConfig.apiKey === process.env.VERTEX_API_KEY ? 'VERTEX_API_KEY' : 
-        process.env.GEMINI_API_KEY && aiConfig.apiKey === process.env.GEMINI_API_KEY ? 'GEMINI_API_KEY' :
-        process.env.GOOGLE_GROUP1_API_KEY && aiConfig.apiKey === process.env.GOOGLE_GROUP1_API_KEY ? 'GOOGLE_GROUP1_API_KEY' :
-        process.env.GOOGLE_GROUP2_API_KEY && aiConfig.apiKey === process.env.GOOGLE_GROUP2_API_KEY ? 'GOOGLE_GROUP2_API_KEY' :
-        process.env.GOOGLE_GROUP3_API_KEY && aiConfig.apiKey === process.env.GOOGLE_GROUP3_API_KEY ? 'GOOGLE_GROUP3_API_KEY' : 'Unknown' : 'None',
+      keySource: detectedKeySource,
       projectId: aiConfig.projectId,
       region: aiConfig.region,
       availableKeys: apiKeys,
