@@ -88,9 +88,18 @@ export default function LoginPage() {
 
           <div className="bg-gray-900 p-8 rounded-lg shadow-lg border border-gray-800">
             <form onSubmit={handleSubmit} className="space-y-6">
-              {error && (
+              {error ? (
                 <div className="bg-red-900/40 text-red-200 p-3 rounded-md text-sm">
                   {error}
+                </div>
+              ) : (
+                <div className="bg-blue-900/40 text-blue-200 p-3 rounded-md text-sm mb-4">
+                  <p className="font-semibold mb-1">Login with any of these accounts:</p>
+                  <ul className="list-disc list-inside text-xs space-y-1">
+                    <li><strong>Username:</strong> demo | <strong>Password:</strong> demo123</li>
+                    <li><strong>Username:</strong> admin | <strong>Password:</strong> admin123456</li>
+                    <li><strong>Username:</strong> testuser | <strong>Password:</strong> password</li>
+                  </ul>
                 </div>
               )}
 
