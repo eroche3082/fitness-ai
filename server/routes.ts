@@ -24,6 +24,7 @@ import { registerApiStatusRoutes } from "./services/api-status-service";
 import { registerSystemAuditRoutes } from "./services/system-audit";
 import { registerRapidApiRoutes } from "./services/rapid-api-service";
 import { registerUserProfileRoutes } from "./services/user-profile-service";
+import billingStatusRoutes from "./routes/billing-status-routes";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Initialize Gemini configuration
@@ -277,6 +278,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Register user profile routes
   registerUserProfileRoutes(apiRouter);
   console.log("👤 User Profile routes registered successfully");
+  
+  // Register billing status routes
+  apiRouter.use('/billing-status', billingStatusRoutes);
+  console.log("💰 Billing Status routes registered successfully");
 
   // Stripe payment integration
   if (!process.env.STRIPE_SECRET_KEY) {

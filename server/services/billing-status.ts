@@ -78,13 +78,7 @@ async function testGeminiAPIAccess(): Promise<{isActive: boolean, message: strin
     const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
     
     // Send a simple test prompt
-    const result = await model.generateContent({
-      contents: [
-        {
-          parts: [{ text: "Hello, this is a billing status check test. Please respond with 'OK'." }]
-        }
-      ]
-    });
+    const result = await model.generateContent("Hello, this is a billing status check test. Please respond with 'OK'.");
     
     // Extract and check the response
     const response = await result.response;
