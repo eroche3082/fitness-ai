@@ -82,18 +82,31 @@ router.get('/api-key-status', async (req, res) => {
 // Check the current API key being used
 router.get('/current-key', async (req, res) => {
   try {
-    // Get the API key (only returning information about which key is being used, not the actual key)
+    // List all API keys present in the environment
+    const apiKeys = {
+      GOOGLE_API_KEY: !!process.env.GOOGLE_API_KEY,
+      VERTEX_API_KEY: !!process.env.VERTEX_API_KEY,
+      GEMINI_API_KEY: !!process.env.GEMINI_API_KEY,
+      GOOGLE_GROUP1_API_KEY: !!process.env.GOOGLE_GROUP1_API_KEY,
+      GOOGLE_GROUP2_API_KEY: !!process.env.GOOGLE_GROUP2_API_KEY,
+      GOOGLE_GROUP3_API_KEY: !!process.env.GOOGLE_GROUP3_API_KEY
+    };
+    
+    // Get the API key currently being used
     const keyInfo = {
       usingKey: !!aiConfig.apiKey,
       keySource: aiConfig.apiKey ? 
-        process.env.GOOGLE_API_KEY ? 'GOOGLE_API_KEY' :
-        process.env.VERTEX_API_KEY ? 'VERTEX_API_KEY' : 
-        process.env.GEMINI_API_KEY ? 'GEMINI_API_KEY' :
-        process.env.GOOGLE_GROUP1_API_KEY ? 'GOOGLE_GROUP1_API_KEY' :
-        process.env.GOOGLE_GROUP2_API_KEY ? 'GOOGLE_GROUP2_API_KEY' :
-        process.env.GOOGLE_GROUP3_API_KEY ? 'GOOGLE_GROUP3_API_KEY' : 'Unknown' : 'None',
+        process.env.GOOGLE_API_KEY && aiConfig.apiKey === process.env.GOOGLE_API_KEY ? 'GOOGLE_API_KEY' :
+        process.env.VERTEX_API_KEY && aiConfig.apiKey === process.env.VERTEX_API_KEY ? 'VERTEX_API_KEY' : 
+        process.env.GEMINI_API_KEY && aiConfig.apiKey === process.env.GEMINI_API_KEY ? 'GEMINI_API_KEY' :
+        process.env.GOOGLE_GROUP1_API_KEY && aiConfig.apiKey === process.env.GOOGLE_GROUP1_API_KEY ? 'GOOGLE_GROUP1_API_KEY' :
+        process.env.GOOGLE_GROUP2_API_KEY && aiConfig.apiKey === process.env.GOOGLE_GROUP2_API_KEY ? 'GOOGLE_GROUP2_API_KEY' :
+        process.env.GOOGLE_GROUP3_API_KEY && aiConfig.apiKey === process.env.GOOGLE_GROUP3_API_KEY ? 'GOOGLE_GROUP3_API_KEY' : 'Unknown' : 'None',
       projectId: aiConfig.projectId,
-      region: aiConfig.region
+      region: aiConfig.region,
+      availableKeys: apiKeys,
+      envData: process.env.GOOGLE_GROUP1_API_KEY ? 'GROUP1 set' : 'GROUP1 missing',
+      configValue: aiConfig.apiKey ? aiConfig.apiKey.substring(0, 5) + "..." : 'No key'
     };
     
     res.json(keyInfo);
