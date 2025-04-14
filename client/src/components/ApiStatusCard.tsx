@@ -128,7 +128,7 @@ export function ApiStatusCard() {
             )}
             Google Cloud API Status
           </CardTitle>
-          <Badge variant={status.isActive ? "success" : "destructive"}>
+          <Badge variant={status.isActive ? "outline" : "destructive"} className={status.isActive ? "bg-green-100 text-green-800 border-green-200" : ""}>
             {status.isActive ? "Active" : "Inactive"}
           </Badge>
         </div>

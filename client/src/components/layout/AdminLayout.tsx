@@ -1,84 +1,135 @@
 import React from 'react';
-import { Link, useLocation } from 'wouter';
-import { Button } from '@/components/ui/button';
+import { Link } from 'wouter';
+import { useAuth } from '../../context/AuthContext';
 import { 
-  LayoutDashboard, 
-  Users, 
-  Dumbbell, 
-  LineChart, 
-  Settings, 
-  Activity, 
+  LayoutGrid, 
+  BarChart3, 
   CreditCard,
-  Database,
-  Terminal,
+  Users,
+  Settings, 
+  Database, 
+  FileCode
 } from 'lucide-react';
 
 interface AdminLayoutProps {
   children: React.ReactNode;
+  title: string;
 }
 
-export function AdminLayout({ children }: AdminLayoutProps) {
-  const [location] = useLocation();
+export function AdminLayout({ children, title }: AdminLayoutProps) {
+  const { isAuthenticated } = useAuth();
 
-  const navigation = [
-    { name: 'Dashboard', href: '/admin', icon: LayoutDashboard },
-    { name: 'Users', href: '/admin/users', icon: Users },
-    { name: 'Workouts', href: '/admin/workouts', icon: Dumbbell },
-    { name: 'Analytics', href: '/admin/analytics', icon: LineChart },
-    { name: 'API Status', href: '/admin/api-status', icon: Terminal },
-    { name: 'Billing', href: '/admin/billing', icon: CreditCard },
-    { name: 'Database', href: '/admin/database', icon: Database },
-    { name: 'Activity Log', href: '/admin/activity', icon: Activity },
-    { name: 'Settings', href: '/admin/settings', icon: Settings },
-  ];
+  if (!isAuthenticated) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold mb-4">Admin Access Required</h1>
+          <p className="mb-4">You need to be logged in to access the admin area.</p>
+          <Link href="/login">
+            <a className="bg-primary text-white py-2 px-4 rounded hover:bg-primary/90">
+              Log In
+            </a>
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex h-screen bg-gray-100 dark:bg-gray-900">
       {/* Sidebar */}
-      <div className="hidden md:flex flex-col w-64 bg-background border-r">
-        <div className="p-4 flex items-center border-b">
-          <span className="font-bold text-xl">Admin Panel</span>
+      <div className="w-64 bg-white dark:bg-gray-800 border-r dark:border-gray-700 p-4 flex flex-col">
+        <div className="text-xl font-bold mb-8 mt-4 flex items-center">
+          <LayoutGrid className="mr-2 h-6 w-6 text-primary" />
+          <span>Fitness AI Admin</span>
         </div>
-        <nav className="flex-1 p-4 space-y-1">
-          {navigation.map((item) => {
-            const isActive = location === item.href;
-            const Icon = item.icon;
-            
-            return (
-              <Link key={item.name} href={item.href}>
-                <Button
-                  variant={isActive ? "secondary" : "ghost"}
-                  className={`w-full justify-start ${isActive ? 'font-medium' : ''}`}
-                >
-                  <Icon className="h-4 w-4 mr-3" />
-                  {item.name}
-                </Button>
-              </Link>
-            );
-          })}
-        </nav>
-        <div className="p-4 border-t">
-          <div className="flex items-center space-x-3">
-            <div className="h-8 w-8 rounded-full bg-primary flex items-center justify-center text-primary-foreground">
-              A
-            </div>
-            <div>
-              <p className="text-sm font-medium">Admin User</p>
-              <p className="text-xs text-muted-foreground">admin@fitness.ai</p>
-            </div>
+        
+        <nav className="flex-1">
+          <div className="mb-4">
+            <p className="text-gray-500 uppercase text-xs font-semibold mb-2 dark:text-gray-400">
+              System
+            </p>
+            <ul className="space-y-2">
+              <li>
+                <Link href="/admin/dashboard">
+                  <a className="flex items-center p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md">
+                    <BarChart3 className="h-5 w-5 mr-3 text-gray-500 dark:text-gray-400" />
+                    Dashboard
+                  </a>
+                </Link>
+              </li>
+              <li>
+                <Link href="/admin/api-status">
+                  <a className="flex items-center p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md">
+                    <FileCode className="h-5 w-5 mr-3 text-gray-500 dark:text-gray-400" />
+                    API Status
+                  </a>
+                </Link>
+              </li>
+              <li>
+                <Link href="/admin/billing">
+                  <a className="flex items-center p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md">
+                    <CreditCard className="h-5 w-5 mr-3 text-gray-500 dark:text-gray-400" />
+                    Billing
+                  </a>
+                </Link>
+              </li>
+              <li>
+                <Link href="/admin/database">
+                  <a className="flex items-center p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md">
+                    <Database className="h-5 w-5 mr-3 text-gray-500 dark:text-gray-400" />
+                    Database
+                  </a>
+                </Link>
+              </li>
+            </ul>
           </div>
+          
+          <div className="mb-4">
+            <p className="text-gray-500 uppercase text-xs font-semibold mb-2 dark:text-gray-400">
+              Management
+            </p>
+            <ul className="space-y-2">
+              <li>
+                <Link href="/admin/users">
+                  <a className="flex items-center p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md">
+                    <Users className="h-5 w-5 mr-3 text-gray-500 dark:text-gray-400" />
+                    Users
+                  </a>
+                </Link>
+              </li>
+              <li>
+                <Link href="/admin/settings">
+                  <a className="flex items-center p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md">
+                    <Settings className="h-5 w-5 mr-3 text-gray-500 dark:text-gray-400" />
+                    Settings
+                  </a>
+                </Link>
+              </li>
+            </ul>
+          </div>
+        </nav>
+        
+        <div className="mt-auto pb-4">
+          <Link href="/">
+            <a className="flex items-center p-2 text-primary hover:bg-gray-100 dark:hover:bg-gray-700 rounded-md">
+              ← Return to Main Site
+            </a>
+          </Link>
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col">
-        <header className="bg-background border-b h-16 flex items-center px-6 md:hidden">
-          <span className="font-bold text-xl">Admin Panel</span>
+      {/* Main content */}
+      <div className="flex-1 overflow-auto">
+        <header className="bg-white dark:bg-gray-800 shadow-sm p-4 border-b dark:border-gray-700">
+          <h1 className="text-2xl font-bold">{title}</h1>
         </header>
-        <main className="flex-1 p-6 overflow-auto">
+        <main className="p-6">
           {children}
         </main>
       </div>
     </div>
   );
 }
+
+export default AdminLayout;

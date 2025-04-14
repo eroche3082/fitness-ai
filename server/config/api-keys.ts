@@ -1,31 +1,73 @@
+type ApiKeyType = 'vertex' | 'gemini' | 'maps' | 'youtube' | 'rapid';
+
 /**
- * API Keys Configuration
- * 
- * This file centralizes all API keys used in the application
- * to make them easier to manage and update.
+ * Get API key from environment variables based on type
+ * @param type Type of API key to retrieve
+ * @returns API key string or undefined if not found
  */
+export function getApiKey(type: ApiKeyType): string | undefined {
+  switch (type) {
+    case 'vertex':
+      return process.env.GOOGLE_API_KEY || 
+             process.env.GOOGLE_GROUP1_API_KEY || 
+             process.env.GEMINI_API_KEY;
+    case 'gemini':
+      return process.env.GEMINI_API_KEY || 
+             process.env.GOOGLE_API_KEY || 
+             process.env.GOOGLE_GROUP1_API_KEY;
+    case 'maps':
+      return process.env.GOOGLE_MAPS_API_KEY || 
+             process.env.GOOGLE_GROUP2_API_KEY;
+    case 'youtube':
+      return process.env.YOUTUBE_API_KEY || 
+             process.env.GOOGLE_GROUP3_API_KEY;
+    case 'rapid':
+      return process.env.RAPID_API_KEY;
+    default:
+      return undefined;
+  }
+}
 
-// Vertex API Key for Google Cloud services
-export const VERTEX_API_KEY = 'AIzaSyDnmNNHrQ-xpnOozOZgVv4F9qQpiU-GfdA';
+/**
+ * Check if all required API keys are available in the environment
+ * @returns Object indicating which API keys are available
+ */
+export function checkApiKeysAvailability(): Record<string, boolean> {
+  return {
+    vertex: !!getApiKey('vertex'),
+    gemini: !!getApiKey('gemini'),
+    maps: !!getApiKey('maps'),
+    youtube: !!getApiKey('youtube'),
+    rapid: !!getApiKey('rapid')
+  };
+}
 
-// Fitness tracker API keys
-export const STRAVA_CLIENT_ID = process.env.STRAVA_CLIENT_ID;
-export const STRAVA_CLIENT_SECRET = process.env.STRAVA_CLIENT_SECRET;
+/**
+ * Get missing API keys that should be configured
+ * @returns Array of API key names that are missing
+ */
+export function getMissingApiKeys(): string[] {
+  const availability = checkApiKeysAvailability();
+  
+  return Object.entries(availability)
+    .filter(([_, isAvailable]) => !isAvailable)
+    .map(([key]) => key.toUpperCase() + '_API_KEY');
+}
 
-// These are currently missing and need to be provided by the user
-export const FITBIT_CLIENT_ID = process.env.FITBIT_CLIENT_ID;
-export const FITBIT_CLIENT_SECRET = process.env.FITBIT_CLIENT_SECRET;
-
-// Payment processing
-export const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY;
-export const STRIPE_PUBLIC_KEY = process.env.VITE_STRIPE_PUBLIC_KEY;
-
-// Maps and geolocation
-export const GOOGLE_MAPS_API_KEY = process.env.GOOGLE_MAPS_API_KEY;
-
-// Legacy/backup API keys for Google services - Vertex key is now preferred
-export const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY;
-export const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-export const GOOGLE_GROUP1_API_KEY = process.env.GOOGLE_GROUP1_API_KEY;
-export const GOOGLE_GROUP2_API_KEY = process.env.GOOGLE_GROUP2_API_KEY;
-export const GOOGLE_GROUP3_API_KEY = process.env.GOOGLE_GROUP3_API_KEY;
+/**
+ * Get a summary of API key status for diagnostic purposes
+ * @returns Object with API key status information
+ */
+export function getApiKeysStatus(): Record<string, any> {
+  const availability = checkApiKeysAvailability();
+  
+  return {
+    isConfigured: Object.values(availability).some(available => available),
+    availableApis: Object.entries(availability)
+      .filter(([_, isAvailable]) => isAvailable)
+      .map(([key]) => key),
+    missingApis: Object.entries(availability)
+      .filter(([_, isAvailable]) => !isAvailable)
+      .map(([key]) => key),
+  };
+}
