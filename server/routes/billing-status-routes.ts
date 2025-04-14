@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { BillingStatusService } from '../services/billing-status';
+import { aiConfig } from '../config/api-keys';
 
 const router = Router();
 const billingStatusService = new BillingStatusService();
@@ -73,6 +74,33 @@ router.get('/api-key-status', async (req, res) => {
     console.error('Error checking API key status:', error);
     res.status(500).json({
       message: 'Failed to check API key status',
+      error: error.message
+    });
+  }
+});
+
+// Check the current API key being used
+router.get('/current-key', async (req, res) => {
+  try {
+    // Get the API key (only returning information about which key is being used, not the actual key)
+    const keyInfo = {
+      usingKey: !!aiConfig.apiKey,
+      keySource: aiConfig.apiKey ? 
+        process.env.GOOGLE_API_KEY ? 'GOOGLE_API_KEY' :
+        process.env.VERTEX_API_KEY ? 'VERTEX_API_KEY' : 
+        process.env.GEMINI_API_KEY ? 'GEMINI_API_KEY' :
+        process.env.GOOGLE_GROUP1_API_KEY ? 'GOOGLE_GROUP1_API_KEY' :
+        process.env.GOOGLE_GROUP2_API_KEY ? 'GOOGLE_GROUP2_API_KEY' :
+        process.env.GOOGLE_GROUP3_API_KEY ? 'GOOGLE_GROUP3_API_KEY' : 'Unknown' : 'None',
+      projectId: aiConfig.projectId,
+      region: aiConfig.region
+    };
+    
+    res.json(keyInfo);
+  } catch (error: any) {
+    console.error('Error checking current API key:', error);
+    res.status(500).json({
+      message: 'Failed to check current API key',
       error: error.message
     });
   }

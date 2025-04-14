@@ -32,9 +32,13 @@ export class BillingStatusService {
       // Try to make a basic API call to verify the API is working
       const model = this.genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
       
-      const result = await model.generateContent("Hello, are you operational?");
+      console.log("Testing Vertex AI API with key:", aiConfig.apiKey ? "Key provided" : "No key provided");
+      
+      const result = await model.generateContent("Hello, are you operational? Please provide today's date.");
       const response = result.response;
       const text = response.text();
+      
+      console.log("Vertex AI API Response:", text);
       
       if (text) {
         return {
