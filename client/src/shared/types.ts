@@ -129,6 +129,48 @@ export interface ProgressMilestone {
 }
 
 /**
+ * Achievement badge interface
+ * Represents achievement badges that users can earn and share
+ */
+export interface AchievementBadge {
+  id: string;
+  name: string;
+  description: string;
+  category: 'strength' | 'cardio' | 'nutrition' | 'consistency' | 'milestone' | 'special';
+  tier: 'bronze' | 'silver' | 'gold' | 'platinum' | 'diamond';
+  imageUrl: string;
+  unlockedAt?: string;
+  locked: boolean;
+  progress?: number; // Progress towards unlocking (0-100)
+  progressDescription?: string; // Description of progress (e.g. "3/5 workouts completed")
+  requirements: string; // Description of what is required to earn the badge
+  shareable: boolean; // Whether this badge can be shared on social media
+  socialShareImage?: string; // URL of the image optimized for social sharing
+}
+
+/**
+ * User badges collection
+ * Tracks badges earned by the user
+ */
+export interface UserBadges {
+  userId: string;
+  earnedBadges: string[]; // List of badge IDs that have been earned
+  progress: {
+    [badgeId: string]: {
+      currentValue: number;
+      targetValue: number;
+      updatedAt: string;
+    }
+  };
+  sharedBadges: {
+    [badgeId: string]: {
+      platform: 'twitter' | 'facebook' | 'instagram' | 'whatsapp' | 'email';
+      sharedAt: string;
+    }[]
+  };
+}
+
+/**
  * Notification interface
  * Used for system notifications and reminders
  */

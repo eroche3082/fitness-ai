@@ -1,0 +1,166 @@
+MEGAPROMPT – FITNESS AI (HOME, NAV, LOGIN, FEATURES)
+Plataforma: FitnessAI
+Objetivo: Habilitar una experiencia poderosa desde el primer clic: homepage activo, menús funcionando, rutinas generadas con AI, y rutas internas protegidas hasta login.
+
+✅ 1. HOMEPAGE STRUCTURE
+Secciones obligatorias:
+
+Hero Title:
+Train Smarter. Recover Faster. Live Stronger.
+
+Subheadline:
+AI-generated workouts, real-time progress tracking, and connected biometrics designed for peak performance.
+
+Botones principales:
+
+Start My Fitness Journey → redirige a /login
+
+Explore Features → redirige a /features
+
+Incluir módulo interactivo:
+
+🤖 AI Workout Generator Demo
+
+Usuario elige objetivo (Ej. ganar masa, bajar grasa, etc.)
+
+AI genera rutina corta de ejemplo
+
+Máximo 3 pruebas sin login
+
+Mostrar 3 funciones destacadas:
+
+Smart Workout Plans
+
+Real-time Progress Tracker
+
+Connected Biometrics (wearables API)
+
+Chat Assistant flotante (abajo a la derecha):
+
+Debe estar activo en todo momento
+
+También accesible desde menú como AI Assistant
+
+✅ 2. MAIN MENU STRUCTURE
+FitnessAI debe tener este Navbar estándar:
+
+Tab	Acción
+Home	Vuelve al homepage
+Features	Redirige a /features
+Workout Planner	Página pública con rutina AI demo (1 demo visible)
+Pricing	Scroll hasta la sección de membresías o página /pricing
+AI Assistant	Abre el chat asistente desde ícono o directo desde el menú
+Login	Abre página de login con credenciales + access code
+Sign Up	Abre formulario de registro
+Condiciones lógicas:
+
+Si el usuario NO ha iniciado sesión → mostrar Login, Sign Up
+
+Si el usuario ya está logueado → ocultar login/signup, mostrar Logout
+
+No permitir acceso al Dashboard sin autenticación
+
+✅ 3. LOGIN / SIGNUP FLOW
+Login Page (/login):
+
+Dos métodos:
+
+Credentials: usuario + contraseña
+
+Access Code: entrada especial para invitados o coaches
+
+Sign Up Page (/signup):
+
+Formulario:
+
+Username
+
+Email
+
+Password + Confirm Password
+
+Default login para testeo:
+
+Username: admin
+
+Password: admin123456
+
+✅ 4. FEATURES PAGE (/features)
+Página pública donde se explican los 20+ features de FitnessAI.
+Cada feature debe tener:
+
+Nombre
+
+Descripción clara
+
+Icono o imagen representativa
+
+Ejemplos de Features:
+
+AI Workout Generator
+
+Progress Tracker
+
+Calorie & Macro Analyzer
+
+Integration with Apple/Google Fit
+
+Sleep Optimization
+
+Rest Day Scheduling
+
+Dynamic Goal Adjustment
+
+Video Tutorials Generator
+
+Daily Motivation Engine
+
+Wearable Device Sync
+
+Exercise Form Analyzer (Vision AI)
+
+Health Condition Adjustments
+
+Injury Prevention Alerts
+
+Personalized Stretching Plans
+
+Voice-Controlled Routine Guide
+
+Water & Supplement Reminders
+
+Stress Recovery Plans
+
+Heart Rate Tracking
+
+Breathing Coach AI
+
+Dashboard with Smart Suggestions
+
+✅ 5. SEGURIDAD Y ACCESO
+Dashboard, rutina diaria, progreso, historial, etc. deben estar protegidos
+
+Si el usuario no está autenticado → redirigir a /login
+
+Navbar debe reaccionar al estado de sesión (mostrar u ocultar botones)
+
+✅ 6. INFORME DE VERIFICACIÓN OBLIGATORIO
+Cada sección debe confirmar:
+
+Elemento	Estado Esperado
+Homepage funcional	✅ Hero, botones, AI demo
+Botones funcionando	✅ Navegación correcta
+Menú activo	✅ Todos los tabs operativos
+AI Assistant	✅ Flotante + vía menú
+Login y Signup operativos	✅ Sin errores
+Dashboard protegido	✅ No accesible sin login
+Features Page conectada	✅ Muestra 20+ features
+Workout demo (3 intentos)	✅ En homepage
+Logout dinámico	✅ Sustituye login/signup
+❌ COSAS A REMOVER O AJUSTAR
+❌ Cualquier acceso anticipado a dashboard sin login
+
+❌ Tabs como “About” o “Trainers” si no están activos
+
+❌ Asegurar que el sistema no muestre rutinas reales hasta login
+
