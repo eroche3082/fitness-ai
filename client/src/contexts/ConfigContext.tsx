@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { FitnessConfig, getConfig, setConfig, subscribeToConfig } from '../services/fitnessConfigService';
+import { FitnessConfig, getConfig, setConfig, DEFAULT_CONFIG } from '../services/fitnessConfigService';
 
 interface ConfigContextType {
   config: FitnessConfig | null;
@@ -45,7 +45,7 @@ export const ConfigProvider = ({ children }: { children: ReactNode }) => {
   // Actualizar la configuración
   const updateConfig = async (newConfig: Partial<FitnessConfig>) => {
     if (!config) return;
-    
+
     try {
       const updatedConfig = { ...config, ...newConfig };
       await setConfig(updatedConfig);
@@ -60,12 +60,12 @@ export const ConfigProvider = ({ children }: { children: ReactNode }) => {
   // Efecto para cargar la configuración inicial y suscribirse a cambios
   useEffect(() => {
     loadConfig();
-    
+
     // Suscribirse a los cambios en la configuración
     const unsubscribe = subscribeToConfig((updatedConfig) => {
       setLocalConfig(updatedConfig);
     });
-    
+
     // Limpiar suscripción al desmontar
     return () => {
       unsubscribe();
