@@ -186,4 +186,46 @@ router.post('/avatars/generate', isAuthenticated, async (req, res) => {
   }
 });
 
+// Ruta para importar avatares de Ready Player Me
+router.post('/avatars/rpm', isAuthenticated, async (req, res) => {
+  try {
+    const { userId, name, avatarUrl, avatarType = 'readyplayerme' } = req.body;
+    
+    if (!userId || !avatarUrl) {
+      return res.status(400).json({ message: 'ID de usuario y URL de avatar son requeridos' });
+    }
+    
+    // Validar que la URL sea de Ready Player Me
+    if (!avatarUrl.includes('readyplayer.me') && !avatarUrl.includes('wolf3d.io')) {
+      return res.status(400).json({ message: 'La URL debe ser de Ready Player Me (readyplayer.me o wolf3d.io)' });
+    }
+    
+    // Crear un ID único para el avatar
+    const avatarId = uuidv4();
+    
+    // Imagen de vista previa del avatar
+    const imageUrl = `${avatarUrl}.png`;
+    
+    // Crear el avatar en la base de datos
+    const avatar = await storage.createAvatar({
+      id: avatarId,
+      userId: parseInt(userId.toString()),
+      name: name || 'Avatar 3D',
+      imageUrl,
+      generatedOn: new Date(),
+      modelUrl: avatarUrl,
+      avatarType
+    });
+    
+    res.json({ 
+      success: true, 
+      message: 'Avatar 3D importado correctamente',
+      avatar
+    });
+  } catch (error) {
+    console.error('Error al importar avatar 3D:', error);
+    res.status(500).json({ message: 'Error al importar avatar 3D' });
+  }
+});
+
 export default router;
