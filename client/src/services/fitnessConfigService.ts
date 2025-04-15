@@ -68,6 +68,24 @@ const DEFAULT_CONFIG: FitnessConfig = {
 const CONFIG_PATH = 'config/fitnessai';
 
 /**
+ * Se suscribe a cambios en la configuración
+ */
+export function subscribeToConfig(callback: (config: FitnessConfig) => void): Unsubscribe {
+  const docRef = doc(db, CONFIG_PATH);
+  
+  return onSnapshot(docRef, (docSnap) => {
+    if (docSnap.exists()) {
+      callback(docSnap.data() as FitnessConfig);
+    } else {
+      // Si no existe, usar valores por defecto
+      callback(DEFAULT_CONFIG);
+    }
+  }, (error) => {
+    console.error('Error al escuchar cambios en la configuración:', error);
+  });
+}
+
+/**
  * Obtiene la configuración actual desde Firestore
  */
 export async function getConfig(): Promise<FitnessConfig> {
