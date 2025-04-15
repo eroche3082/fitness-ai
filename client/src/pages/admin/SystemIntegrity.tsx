@@ -325,8 +325,7 @@ export default function SystemIntegrityPage() {
                 </div>
                 <Progress 
                   value={metrics.cpuUsage} 
-                  className="h-2 bg-gray-700" 
-                  indicatorClassName={metrics.cpuUsage > 80 ? 'bg-red-500' : 'bg-green-500'} 
+                  className={`h-2 bg-gray-700 ${metrics.cpuUsage > 80 ? 'text-red-500' : 'text-green-500'}`}
                 />
               </div>
               <div className="bg-gray-800 rounded-lg p-4">
@@ -338,8 +337,7 @@ export default function SystemIntegrityPage() {
                 </div>
                 <Progress 
                   value={metrics.memoryUsage} 
-                  className="h-2 bg-gray-700" 
-                  indicatorClassName={metrics.memoryUsage > 80 ? 'bg-red-500' : 'bg-green-500'} 
+                  className={`h-2 bg-gray-700 ${metrics.memoryUsage > 80 ? 'text-red-500' : 'text-green-500'}`}
                 />
               </div>
               <div className="bg-gray-800 rounded-lg p-4">
@@ -351,8 +349,7 @@ export default function SystemIntegrityPage() {
                 </div>
                 <Progress 
                   value={metrics.diskUsage} 
-                  className="h-2 bg-gray-700" 
-                  indicatorClassName={metrics.diskUsage > 80 ? 'bg-red-500' : 'bg-green-500'} 
+                  className={`h-2 bg-gray-700 ${metrics.diskUsage > 80 ? 'text-red-500' : 'text-green-500'}`}
                 />
               </div>
             </div>

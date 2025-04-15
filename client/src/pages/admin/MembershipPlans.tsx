@@ -20,7 +20,7 @@ import {
   AlertTriangle,
   PlusCircle,
   Settings,
-  Toggle,
+  ToggleRight,
   Lock
 } from 'lucide-react';
 
@@ -601,7 +601,7 @@ export default function MembershipPlansPage() {
                               className={`h-8 w-8 p-0 ${feature.included ? 'text-green-500' : 'text-gray-500'}`}
                               onClick={() => handleToggleFeature(selectedPlan.id, feature.id)}
                             >
-                              <Toggle className="h-4 w-4" />
+                              <ToggleRight className="h-4 w-4" />
                               <span className="sr-only">Toggle feature</span>
                             </Button>
                           </div>
