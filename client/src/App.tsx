@@ -70,12 +70,14 @@ import { createContext, useContext } from "react";
 
 interface AuthContextType {
   isAuthenticated: boolean;
+  userRole: 'admin' | 'manager' | 'user' | null;
   login: (username: string, password: string) => boolean;
   logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType>({
   isAuthenticated: false,
+  userRole: null,
   login: () => false,
   logout: () => {},
 });
@@ -86,16 +88,81 @@ export { useAuth };
 
 // Main navigation for the app
 function MainNavigation() {
-  const { logout } = useAuth();
+  const { logout, userRole } = useAuth();
   
   return (
     <div className="fixed left-0 top-0 h-full w-[260px] z-40 bg-background shadow-lg border-r overflow-y-auto">
       <div className="flex items-center p-4 border-b">
-        <Activity className="h-6 w-6 text-primary mr-2" />
-        <h1 className="font-bold text-xl">Fitness AI</h1>
+        <Activity className="h-6 w-6 text-green-500 mr-2" />
+        <h1 className="font-bold text-xl">
+          Fitness AI
+          {userRole === 'manager' && <span className="text-xs ml-2 bg-green-100 text-green-800 px-1 rounded">Admin Manager</span>}
+          {userRole === 'admin' && <span className="text-xs ml-2 bg-blue-100 text-blue-800 px-1 rounded">Admin</span>}
+        </h1>
       </div>
       
       <div className="p-2">
+        {/* Panel de administración - solo visible para admin y manager */}
+        {(userRole === 'admin' || userRole === 'manager') && (
+          <div className="space-y-1 mb-6">
+            <h3 className="text-xs font-medium px-3 py-2 text-green-500">Panel de Administración</h3>
+            <Link href="/admin">
+              <a className="flex items-center px-3 py-2 rounded-md hover:bg-accent bg-black text-green-500">
+                <LayoutDashboard className="h-5 w-5 mr-3" />
+                <span>Admin Dashboard</span>
+              </a>
+            </Link>
+            
+            {userRole === 'manager' && (
+              <>
+                <Link href="/admin/platform-operations">
+                  <a className="flex items-center px-3 py-2 rounded-md hover:bg-accent">
+                    <SettingsIcon className="h-5 w-5 mr-3" />
+                    <span>Platform Operations</span>
+                  </a>
+                </Link>
+                <Link href="/admin/membership-plans">
+                  <a className="flex items-center px-3 py-2 rounded-md hover:bg-accent">
+                    <Award className="h-5 w-5 mr-3" />
+                    <span>Membership Plans</span>
+                  </a>
+                </Link>
+                <Link href="/admin/users">
+                  <a className="flex items-center px-3 py-2 rounded-md hover:bg-accent">
+                    <Users className="h-5 w-5 mr-3" />
+                    <span>User Management</span>
+                  </a>
+                </Link>
+                <Link href="/admin/feature-toggles">
+                  <a className="flex items-center px-3 py-2 rounded-md hover:bg-accent">
+                    <BarChart2 className="h-5 w-5 mr-3" />
+                    <span>Feature Toggles</span>
+                  </a>
+                </Link>
+                <Link href="/admin/system-integrity">
+                  <a className="flex items-center px-3 py-2 rounded-md hover:bg-accent">
+                    <Activity className="h-5 w-5 mr-3" />
+                    <span>System Integrity</span>
+                  </a>
+                </Link>
+              </>
+            )}
+            
+            <Link href="/admin/api-status">
+              <a className="flex items-center px-3 py-2 rounded-md hover:bg-accent">
+                <FileDigit className="h-5 w-5 mr-3" />
+                <span>API Status</span>
+              </a>
+            </Link>
+            <Link href="/admin/deployment-readiness">
+              <a className="flex items-center px-3 py-2 rounded-md hover:bg-accent">
+                <BarChart2 className="h-5 w-5 mr-3" />
+                <span>Deployment Readiness</span>
+              </a>
+            </Link>
+          </div>
+        )}
+      
         <div className="space-y-1">
           <h3 className="text-xs font-medium px-3 py-2">Dashboard</h3>
           <Link href="/">
@@ -158,27 +225,29 @@ function MainNavigation() {
           </Link>
         </div>
         
-        <div className="mt-6 space-y-1">
-          <h3 className="text-xs font-medium px-3 py-2">System</h3>
-          <Link href="/api-status">
-            <a className="flex items-center px-3 py-2 rounded-md hover:bg-accent">
-              <FileDigit className="h-5 w-5 mr-3" />
-              <span>API Status</span>
-            </a>
-          </Link>
-          <Link href="/agent-status">
-            <a className="flex items-center px-3 py-2 rounded-md hover:bg-accent">
-              <BarChart2 className="h-5 w-5 mr-3" />
-              <span>System Status</span>
-            </a>
-          </Link>
-          <Link href="/fitness-api">
-            <a className="flex items-center px-3 py-2 rounded-md hover:bg-accent">
-              <SettingsIcon className="h-5 w-5 mr-3" />
-              <span>Settings</span>
-            </a>
-          </Link>
-        </div>
+        {userRole !== 'manager' && (
+          <div className="mt-6 space-y-1">
+            <h3 className="text-xs font-medium px-3 py-2">System</h3>
+            <Link href="/api-status">
+              <a className="flex items-center px-3 py-2 rounded-md hover:bg-accent">
+                <FileDigit className="h-5 w-5 mr-3" />
+                <span>API Status</span>
+              </a>
+            </Link>
+            <Link href="/agent-status">
+              <a className="flex items-center px-3 py-2 rounded-md hover:bg-accent">
+                <BarChart2 className="h-5 w-5 mr-3" />
+                <span>System Status</span>
+              </a>
+            </Link>
+            <Link href="/fitness-api">
+              <a className="flex items-center px-3 py-2 rounded-md hover:bg-accent">
+                <SettingsIcon className="h-5 w-5 mr-3" />
+                <span>Settings</span>
+              </a>
+            </Link>
+          </div>
+        )}
         
         <div className="mt-6 space-y-1">
           <h3 className="text-xs font-medium px-3 py-2">Account</h3>
@@ -208,7 +277,7 @@ function StatusRoute({ path, statusInfo }: { path: string, statusInfo: string })
 }
 
 function Router() {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, userRole } = useAuth();
   const [location, setLocation] = useLocation();
   
   // Check auth status and redirect if needed
@@ -235,10 +304,30 @@ function Router() {
                           location.startsWith('/workout') ||
                           location.startsWith('/workout-details/');
                           
+    // Redirigir a login si no está autenticado y la ruta no es pública
     if (!isAuthenticated && !isPublicRoute) {
       setLocation('/bridge');
+      return;
     }
-  }, [isAuthenticated, location, setLocation]);
+    
+    // Verificar permisos específicos para administradores
+    if (isAuthenticated && location.startsWith('/admin/')) {
+      // Restringir acceso a rutas financieras para Admin Managers
+      const restrictedRoutesForManagers = [
+        '/admin/billing',
+        '/admin/payments',
+        '/admin/financial',
+        '/admin/bank',
+        '/admin/revenue'
+      ];
+      
+      if (userRole === 'manager' && restrictedRoutesForManagers.some(route => location.startsWith(route))) {
+        console.log(`[ADMIN SECURITY] Manager attempted to access restricted financial route: ${location}`);
+        setLocation('/admin');
+        return;
+      }
+    }
+  }, [isAuthenticated, userRole, location, setLocation]);
   
   return (
     <Switch>
@@ -310,17 +399,42 @@ function Router() {
 
 function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [userRole, setUserRole] = useState<'admin' | 'manager' | 'user' | null>(null);
+  
+  // Función para registrar la actividad del administrador
+  const logAdminActivity = (activity: string) => {
+    console.log(`[ADMIN LOG] ${new Date().toISOString()}: ${activity}`);
+    // En un escenario real, esto enviaría los datos a un endpoint de API
+    // para almacenar en una base de datos y posiblemente notificar al SuperAdmin
+  };
   
   const login = (username: string, password: string): boolean => {
-    // Check if it's the admin account
+    // Check if it's the standard admin manager account
+    if (username === 'admin' && password === 'Admin3082#') {
+      setIsAuthenticated(true);
+      setUserRole('manager');
+      logAdminActivity(`Admin Manager login: ${username}`);
+      return true;
+    }
+    
+    // Check if it's the regular admin account (legacy)
     if (username === 'admin' && password === 'admin123456') {
       setIsAuthenticated(true);
+      setUserRole('admin');
       return true;
     }
     
     // Check if it's the demo account (case insensitive username for better UX)
     if (username.toLowerCase() === 'demo' && password === 'demo123') {
       setIsAuthenticated(true);
+      setUserRole('user');
+      return true;
+    }
+    
+    // Check if it's the test user account
+    if (username === 'testuser' && password === 'password') {
+      setIsAuthenticated(true);
+      setUserRole('user');
       return true;
     }
     
@@ -328,11 +442,15 @@ function AuthProvider({ children }: { children: React.ReactNode }) {
   };
   
   const logout = () => {
+    if (userRole === 'manager') {
+      logAdminActivity(`Admin Manager logout`);
+    }
     setIsAuthenticated(false);
+    setUserRole(null);
   };
   
   return (
-    <AuthContext.Provider value={{ isAuthenticated, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, userRole, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
