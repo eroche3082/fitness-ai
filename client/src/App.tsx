@@ -36,6 +36,8 @@ import { UserProvider } from "./contexts/UserContext";
 import { ChatProvider } from "./contexts/ChatContext";
 import FitnessSystemInitializer from "./components/FitnessSystemInitializer";
 import MiniChatbot from "./components/MiniChatbot";
+import MobileNavigation from "./components/MobileNavigation";
+import MobileAppLoader from "./components/MobileAppLoader";
 
 // Import CSS para el tema Bridge
 import "./assets/bridge-styles.css";
@@ -332,6 +334,9 @@ function App() {
         <AuthProvider>
           <UserProvider>
             <ChatProvider>
+              {/* App Loading Screen for Mobile */}
+              <MobileAppLoader />
+              
               {/* System initializer and main application components */}
               <FitnessSystemInitializer />
               <Router />
@@ -347,6 +352,9 @@ function App() {
               
               {/* Add the floating chatbot to all pages, according to MEGAPROMPT */}
               <MiniChatbot />
+              
+              {/* Add mobile navigation for responsive design */}
+              <MobileNavigation />
             </ChatProvider>
           </UserProvider>
         </AuthProvider>
