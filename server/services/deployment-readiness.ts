@@ -23,7 +23,7 @@ import { getBillingStatus } from '../routes/billing-status-routes';
 // Define the deployment readiness report interface
 export interface DeploymentReadinessReport {
   timestamp: string;
-  
+
   // API Services Status
   apiStatus: {
     vision: string;
@@ -36,7 +36,7 @@ export interface DeploymentReadinessReport {
     firebase: string;
     fitbit: string;
   };
-  
+
   // Core Features Status
   chatbot: string;
   dashboard: string;
@@ -45,15 +45,15 @@ export interface DeploymentReadinessReport {
   paymentIntegration: string;
   multilingual: string;
   mobileResponsiveness: string;
-  
+
   // Issues and Improvements
   missing: string[];
   improvements: string[];
-  
+
   // Overall System Status
   deploymentReadiness: string;
   readyForLaunch: boolean;
-  
+
   // Security and Compliance
   securitySuggestions: string[];
 }
@@ -67,7 +67,7 @@ export async function checkFitnessTrackerStatus() {
     clientId: process.env.FITBIT_CLIENT_ID,
     clientSecret: process.env.FITBIT_CLIENT_SECRET
   };
-  
+
   const trackerStatus = {
     googleFit: { status: 'active', message: 'Google Fit service is operational' },
     appleHealth: { status: 'active', message: 'Apple Health service is operational' },
@@ -76,7 +76,7 @@ export async function checkFitnessTrackerStatus() {
       : { status: 'missing', message: 'Fitbit service requires API credentials' },
     strava: { status: 'active', message: 'Strava service is operational' }
   };
-  
+
   return trackerStatus;
 }
 
@@ -85,7 +85,7 @@ export async function checkFitnessTrackerStatus() {
  */
 export async function checkMultilingualStatus() {
   const supportedLanguages = ['en', 'es', 'fr', 'pt'];
-  
+
   // Determine which languages have full UI translation
   const uiTranslationStatus = {
     en: 'complete',
@@ -93,7 +93,7 @@ export async function checkMultilingualStatus() {
     fr: 'partial',
     pt: 'minimal'
   };
-  
+
   // Determine which languages have chatbot support
   const chatbotSupportStatus = {
     en: 'complete',
@@ -101,7 +101,7 @@ export async function checkMultilingualStatus() {
     fr: 'minimal',
     pt: 'minimal'
   };
-  
+
   return {
     supportedLanguages,
     uiTranslationStatus,
@@ -117,14 +117,14 @@ export async function checkMultilingualStatus() {
 export async function checkMobileResponsiveness() {
   // Get estimated percentage of UI components that are mobile responsive
   const mobileResponsivenessScore = 70;
-  
+
   const specificIssues = [
     'Navigation menu overflow on small screens',
     'Workout tracker controls too small on mobile',
     'Form check camera view not optimized for portrait mode',
     'Progress charts not scaling properly on mobile'
   ];
-  
+
   return {
     score: mobileResponsivenessScore,
     specificIssues,
@@ -138,7 +138,7 @@ export async function checkMobileResponsiveness() {
 export async function checkOnboardingStatus() {
   const totalSteps = 10;
   const completedSteps = 7;
-  
+
   const implementedSteps = [
     'User goals selection',
     'Fitness level assessment',
@@ -148,13 +148,13 @@ export async function checkOnboardingStatus() {
     'Physical limitations',
     'Language preferences'
   ];
-  
+
   const pendingSteps = [
     'Nutrition preferences',
     'Fitness tracker integration',
     'Payment tier selection'
   ];
-  
+
   return {
     completedSteps,
     totalSteps,
@@ -173,17 +173,17 @@ export async function checkAccessCodeSystem() {
   const qrCodeGenerationWorks = true;
   const codeVerificationWorks = true;
   const codeTrackingWorks = true;
-  
+
   // Check for incomplete functionality
   const incompleteFeatures = [];
-  
+
   if (!tierAssignmentWorks) incompleteFeatures.push('Tier assignment not working properly');
   if (!qrCodeGenerationWorks) incompleteFeatures.push('QR code generation has visual issues');
   if (!codeVerificationWorks) incompleteFeatures.push('Code verification needs improvement');
   if (!codeTrackingWorks) incompleteFeatures.push('Code tracking in admin dashboard incomplete');
-  
+
   const implementationPercentage = 100 - (incompleteFeatures.length * 25);
-  
+
   return {
     tierAssignmentWorks,
     qrCodeGenerationWorks,
@@ -201,62 +201,63 @@ export async function checkAccessCodeSystem() {
 export async function generateDeploymentReadinessReport(): Promise<DeploymentReadinessReport> {
   // Check API status
   const apiStatus = await getAllApiStatus();
-  
+
   // Get API key assignments
   const apiKeyAssignments = serviceAssignments;
-  
+
   // Check fitness tracker status
   const fitnessTrackerStatus = await checkFitnessTrackerStatus();
-  
+
   // Check multilingual support
   const multilingualStatus = await checkMultilingualStatus();
-  
+
   // Check mobile responsiveness
   const mobileResponsivenessStatus = await checkMobileResponsiveness();
-  
+
   // Check onboarding flow
   const onboardingStatus = await checkOnboardingStatus();
-  
+
   // Check access code system
   const accessCodeStatus = await checkAccessCodeSystem();
-  
+
   // Check for missing Fitbit credentials
   const fitbitCredentials = {
     clientId: process.env.FITBIT_CLIENT_ID,
-    clientSecret: process.env.FITBIT_CLIENT_SECRET
+    clientSecret: process.env.FITBIT_CLIENT_SECRET,
+    isConfigured: Boolean(process.env.FITBIT_CLIENT_ID && process.env.FITBIT_CLIENT_SECRET)
   };
-  
+
   // Compile list of missing components
   const missingComponents = [];
-  
+
   if (!fitbitCredentials.clientId || !fitbitCredentials.clientSecret) {
     missingComponents.push('Fitbit integration');
   }
-  
+
   if (multilingualStatus.overallStatus !== 'complete') {
     missingComponents.push('Complete multilingual support');
   }
-  
+
   if (onboardingStatus.completedSteps < onboardingStatus.totalSteps) {
     missingComponents.push(`Complete onboarding flow (${onboardingStatus.pendingSteps.length} steps remaining)`);
   }
-  
+
   if (mobileResponsivenessStatus.score < 90) {
     missingComponents.push('Mobile responsiveness optimization');
   }
-  
+
   // Email verification is not implemented
   missingComponents.push('SendGrid email verification system');
-  
+
   // Add any API-specific issues
   if (apiStatus.vision && apiStatus.vision.status !== 'active') {
     missingComponents.push('Complete Vision API integration');
   }
-  
+
   if (apiStatus.firebase && apiStatus.firebase.status !== 'active') {
     missingComponents.push('Complete Firebase/Firestore integration');
   }
-  
+
   // Product improvement recommendations
   const improvementRecommendations = [
     'Complete Fitbit integration with API keys',
@@ -275,7 +276,7 @@ export async function generateDeploymentReadinessReport(): Promise<DeploymentRea
     'Create injury prevention system with AI movement detection',
     'Implement personalized music integration matched to workout intensity'
   ];
-  
+
   // Security and compliance suggestions
   const securitySuggestions = [
     'Implement GDPR-compliant data retention policies',
@@ -286,7 +287,7 @@ export async function generateDeploymentReadinessReport(): Promise<DeploymentRea
     'Create regular security audit scheduling',
     'Implement rate limiting for API key usage'
   ];
-  
+
   // Calculate overall deployment readiness
   const componentWeights = {
     apiStatus: 0.25,
@@ -297,7 +298,7 @@ export async function generateDeploymentReadinessReport(): Promise<DeploymentRea
     multilingual: 0.15,
     mobileResponsiveness: 0.10
   };
-  
+
   // Calculate component scores
   const componentScores = {
     apiStatus: Object.values(apiStatus).filter(api => api && api.status === 'active').length / Object.keys(apiStatus).length * 100,
@@ -308,15 +309,15 @@ export async function generateDeploymentReadinessReport(): Promise<DeploymentRea
     multilingual: multilingualStatus.overallStatus === 'complete' ? 100 : 60,
     mobileResponsiveness: mobileResponsivenessStatus.score
   };
-  
+
   // Calculate weighted total
   const deploymentReadiness = Object.entries(componentWeights).reduce((total, [component, weight]) => {
     return total + (componentScores[component] * weight);
   }, 0);
-  
+
   // Is the system ready for launch?
   const readyForLaunch = deploymentReadiness >= 90;
-  
+
   // Compile the final report
   return {
     timestamp: new Date().toISOString(),
