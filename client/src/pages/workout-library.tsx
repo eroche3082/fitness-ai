@@ -341,8 +341,26 @@ const WorkoutLibrary: React.FC = () => {
   
   return (
     <div className="min-h-screen bg-black text-white">
-      {/* Hero Section */}
-      <section className="relative bg-black py-20">
+      {/* Fixed Header for Mobile - App-like experience */}
+      <header className="md:hidden sticky top-0 z-50 bg-black border-b border-gray-800 p-4">
+        <div className="flex justify-between items-center">
+          <h1 className="text-xl font-bold flex items-center">
+            <Activity className="h-5 w-5 text-green-500 mr-2" />
+            <span>Workouts</span>
+          </h1>
+          <div className="flex items-center space-x-2">
+            <Button variant="ghost" size="icon" className="text-gray-400">
+              <Search className="h-5 w-5" />
+            </Button>
+            <Button variant="ghost" size="icon" className="text-gray-400">
+              <Filter className="h-5 w-5" />
+            </Button>
+          </div>
+        </div>
+      </header>
+      
+      {/* Hero Section - Desktop Only */}
+      <section className="relative bg-black py-20 hidden md:block">
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-b from-green-900/20 to-black"></div>
         </div>
@@ -371,8 +389,18 @@ const WorkoutLibrary: React.FC = () => {
         </div>
       </section>
       
-      {/* Search and Filter Section */}
-      <section className="py-12 bg-gray-900">
+      {/* Mobile Hero - Compact Version */}
+      <section className="md:hidden pt-4 pb-6 px-4">
+        <h2 className="text-2xl font-bold mb-2">
+          <span className="text-green-500">Discover</span> Workouts
+        </h2>
+        <p className="text-gray-300 text-sm mb-4">
+          Personalized plans adapted to your fitness level and goals.
+        </p>
+      </section>
+      
+      {/* Search and Filter Section for Desktop */}
+      <section className="py-12 bg-gray-900 hidden md:block">
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row gap-4 items-center">
             <div className="relative w-full md:w-1/3">
@@ -432,6 +460,71 @@ const WorkoutLibrary: React.FC = () => {
             </div>
           </div>
         </div>
+      </section>
+      
+      {/* Mobile Search and Filter - App-Like */}
+      <section className="md:hidden px-4 pt-0 pb-4">
+        <div className="relative w-full mb-4">
+          <Search className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+          <Input
+            placeholder="Search workouts..."
+            className="pl-10 bg-black border-gray-700 text-white"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+        
+        <div className="flex gap-2 overflow-x-auto py-2 no-scrollbar">
+          {/* Level Filters */}
+          {workoutLevels.map(level => (
+            <Badge 
+              key={level}
+              variant={selectedLevels.includes(level) ? "default" : "outline"}
+              className={`
+                whitespace-nowrap
+                ${selectedLevels.includes(level) 
+                  ? "bg-green-500 text-black hover:bg-green-600 cursor-pointer" 
+                  : "border-gray-600 text-gray-400 hover:border-green-500 hover:text-green-500 cursor-pointer"}
+              `}
+              onClick={() => toggleLevelFilter(level)}
+            >
+              {level.charAt(0).toUpperCase() + level.slice(1)}
+            </Badge>
+          ))}
+          
+          {/* Type Filters */}
+          {workoutTypes.map(type => (
+            <Badge 
+              key={type}
+              variant={selectedTypes.includes(type) ? "default" : "outline"}
+              className={`
+                whitespace-nowrap
+                ${selectedTypes.includes(type) 
+                  ? "bg-green-500 text-black hover:bg-green-600 cursor-pointer" 
+                  : "border-gray-600 text-gray-400 hover:border-green-500 hover:text-green-500 cursor-pointer"}
+              `}
+              onClick={() => toggleTypeFilter(type)}
+            >
+              {type.charAt(0).toUpperCase() + type.slice(1)}
+            </Badge>
+          ))}
+        </div>
+        
+        {/* Reset Filters Button */}
+        {(selectedTypes.length > 0 || selectedLevels.length > 0 || searchTerm) && (
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="text-green-500 px-2 py-1 h-8 mt-2"
+            onClick={() => {
+              setSearchTerm('');
+              setSelectedLevels([]);
+              setSelectedTypes([]);
+            }}
+          >
+            Clear Filters
+          </Button>
+        )}
       </section>
       
       {/* Featured Workouts */}

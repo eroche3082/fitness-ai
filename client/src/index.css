@@ -2,6 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Import app-specific mobile styles */
+@import './styles/app-mobile.css';
+
 :root {
   /* Fitness AI Theme Colors */
   --fitness-primary: #10b981;     /* Green 500 - Main brand color */
