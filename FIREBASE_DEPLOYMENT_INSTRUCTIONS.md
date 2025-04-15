@@ -13,7 +13,25 @@ Fitness AI está configurado para ser desplegado como un sitio específico dentr
 
 2. **Credenciales Firebase**: Debes tener acceso al proyecto Firebase `erudite-creek-431302-q3`.
 
-3. **Configuración de Secretos**: Asegúrate de que todas las variables de entorno necesarias estén configuradas en Firebase Functions y en Firebase Hosting.
+3. **Configuración de Secretos**: Para configurar las variables de entorno en Firebase, sigue estos pasos:
+
+   a. Para Firebase Functions:
+   ```bash
+   firebase functions:config:set google.api_key=TU_API_KEY_DE_GOOGLE
+   firebase functions:config:set stripe.secret_key=TU_STRIPE_SECRET_KEY
+   # Continúa con todas las API keys y secretos necesarios
+   ```
+
+   b. Para variables de entorno en el cliente (frontend), utiliza la consola de Firebase:
+   - Ve a Project Settings > Service accounts > Environment Variables
+   - Agrega las variables con el prefijo VITE_ que necesita el frontend, como VITE_FIREBASE_API_KEY, VITE_STRIPE_PUBLIC_KEY, etc.
+   
+   c. Alternativamente, puedes configurar las variables de entorno mediante la CLI de Firebase:
+   ```bash
+   firebase functions:config:get > .runtimeconfig.json
+   ```
+   
+   d. La aplicación ya contiene un archivo `.env.firebase` con la estructura necesaria. Las variables se reemplazarán con los valores reales del entorno de Firebase durante el despliegue.
 
 ## Configuración de Firebase
 
@@ -24,6 +42,27 @@ La aplicación Fitness AI está configurada con los siguientes parámetros:
 - **Dominio de autenticación**: `erudite-creek-431302-q3.firebaseapp.com`
 
 ## Pasos para el Despliegue
+
+### Método Automatizado (Recomendado)
+
+Se ha incluido un script automatizado que simplifica el proceso de despliegue:
+
+1. **Ejecutar el script de despliegue**:
+   ```bash
+   ./deploy-to-firebase.sh
+   ```
+   
+   Este script realizará automáticamente los siguientes pasos:
+   - Verificará que Firebase CLI esté instalado
+   - Te ayudará a autenticarte en Firebase
+   - Seleccionará el proyecto correcto
+   - Construirá la aplicación
+   - Desplegará a Firebase Hosting
+   - Te dará la opción de desplegar también las funciones
+
+### Método Manual
+
+Si prefieres realizar los pasos manualmente, sigue estas instrucciones:
 
 1. **Autenticación en Firebase**:
    ```bash
