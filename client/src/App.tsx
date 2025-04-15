@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, createContext, useContext, lazy, Suspense } from "react";
 import { Switch, Route, Link, useLocation } from "wouter";
 import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
@@ -66,7 +66,6 @@ import {
 import { Button } from "@/components/ui/button";
 
 // Auth context
-import { createContext, useContext } from "react";
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -389,6 +388,13 @@ function Router() {
           <Route path="/admin/api-status" component={AdminApiStatusPage}/>
           <Route path="/admin/billing" component={ApiStatusPage}/>
           <Route path="/admin/deployment-readiness" component={DeploymentReadinessDashboard}/>
+          
+          {/* Admin Manager routes */}
+          <Route path="/admin/users" component={lazy(() => import('./pages/admin/UserManagement'))}/>
+          <Route path="/admin/membership-plans" component={lazy(() => import('./pages/admin/MembershipPlans'))}/>
+          <Route path="/admin/system-integrity" component={lazy(() => import('./pages/admin/SystemIntegrity'))}/>
+          <Route path="/admin/platform-operations" component={lazy(() => import('./pages/admin/SystemIntegrity'))}/> {/* Temporal mientras se desarrolla */}
+          <Route path="/admin/feature-toggles" component={lazy(() => import('./pages/admin/MembershipPlans'))}/> {/* Temporal mientras se desarrolla */}
         </>
       )}
       
