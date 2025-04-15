@@ -214,12 +214,14 @@ function Router() {
       '/programs',
       '/contact',
       '/features',
-      '/access'
+      '/access',
+      '/workout'
     ];
     const isPublicRoute = publicRoutes.includes(location) || 
                           location.startsWith('/status/') || 
                           location.startsWith('/dashboard/') ||
-                          location === '/dashboard';
+                          location === '/dashboard' ||
+                          location.startsWith('/workout');
                           
     if (!isAuthenticated && !isPublicRoute) {
       setLocation('/bridge');
