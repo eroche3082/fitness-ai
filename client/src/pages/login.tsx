@@ -28,28 +28,34 @@ export default function LoginPage() {
 
     if (loginMethod === 'credentials') {
       try {
+        console.log("Intentando login con:", username, password);
         const success = login(username, password);
+        console.log("Resultado del login:", success);
+        
         if (success) {
           setLocation('/dashboard');
         } else {
-          setError('Invalid credentials. Try with demo/demo123');
+          setError('Credenciales inválidas. Prueba con demo/demo123');
         }
       } catch (err) {
-        setError('An error occurred while logging in');
+        console.error("Error de login:", err);
+        setError('Ocurrió un error durante el inicio de sesión');
       } finally {
         setIsLoading(false);
       }
     } else {
       // Handle access code login
       try {
+        console.log("Intentando login con código:", accessCode);
         // For demo purposes, any code starting with FIT- will work
         if (accessCode && accessCode.startsWith('FIT-')) {
           setLocation('/dashboard');
         } else {
-          setError('Invalid access code. Try with ' + generatedCode);
+          setError('Código de acceso inválido. Prueba con ' + generatedCode);
         }
       } catch (err) {
-        setError('An error occurred while processing your access code');
+        console.error("Error de código de acceso:", err);
+        setError('Ocurrió un error al procesar tu código de acceso');
       } finally {
         setIsLoading(false);
       }
@@ -65,15 +71,18 @@ export default function LoginPage() {
     // Short timeout to ensure the state updates before login attempt
     setTimeout(() => {
       try {
+        console.log("Intentando login con cuenta demo");
         const success = login('demo', 'demo123');
+        console.log("Resultado del login demo:", success);
+        
         if (success) {
           setLocation('/dashboard');
         } else {
-          setError('Error using demo account. Please try again.');
+          setError('Error al usar la cuenta demo. Inténtalo de nuevo.');
           console.error('Demo login failed');
         }
       } catch (err) {
-        setError('An unexpected error occurred with the demo account');
+        setError('Ocurrió un error inesperado con la cuenta demo');
         console.error('Demo login error:', err);
       } finally {
         setIsLoading(false);
@@ -194,11 +203,11 @@ export default function LoginPage() {
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                       </svg>
-                      Logging in...
+                      Iniciando sesión...
                     </span>
                   ) : (
                     <span className="flex items-center justify-center">
-                      Login
+                      Iniciar Sesión
                       <ArrowRight className="ml-2 h-4 w-4" />
                     </span>
                   )}
