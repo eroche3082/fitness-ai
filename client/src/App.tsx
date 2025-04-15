@@ -30,6 +30,8 @@ import MealPlansPage from "./pages/meal-plans";
 import GoalsPage from "./pages/goals";
 import CommunityPage from "./pages/community";
 import WorkoutRedirect from "./pages/WorkoutRedirect";
+import WorkoutLibrary from "./pages/workout-library";
+import WorkoutDetails from "./pages/workout-details/[id]";
 import { UserProvider } from "./contexts/UserContext";
 import { ChatProvider } from "./contexts/ChatContext";
 import FitnessSystemInitializer from "./components/FitnessSystemInitializer";
@@ -215,13 +217,15 @@ function Router() {
       '/contact',
       '/features',
       '/access',
-      '/workout'
+      '/workout',
+      '/workout-library'
     ];
     const isPublicRoute = publicRoutes.includes(location) || 
                           location.startsWith('/status/') || 
                           location.startsWith('/dashboard/') ||
                           location === '/dashboard' ||
-                          location.startsWith('/workout');
+                          location.startsWith('/workout') ||
+                          location.startsWith('/workout-details/');
                           
     if (!isAuthenticated && !isPublicRoute) {
       setLocation('/bridge');
@@ -246,6 +250,8 @@ function Router() {
       <Route path="/dashboard" component={DashboardPage} />
       <Route path="/admin" component={AdminPanelPage} />
       <Route path="/workout" component={WorkoutRedirect} />
+      <Route path="/workout-library" component={WorkoutLibrary} />
+      <Route path="/workout-details/:id" component={WorkoutDetails} />
       
       {/* Status routes */}
       <Route path="/status/landing">

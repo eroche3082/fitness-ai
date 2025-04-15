@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import QRCode from 'qrcode';
 
 interface QRCodeDisplayProps {
@@ -8,58 +8,41 @@ interface QRCodeDisplayProps {
   background?: string;
 }
 
-const QRCodeDisplay: React.FC<QRCodeDisplayProps> = ({
-  code,
-  size = 200,
+const QRCodeDisplay: React.FC<QRCodeDisplayProps> = ({ 
+  code, 
+  size = 200, 
   foreground = '#000000',
   background = '#ffffff'
 }) => {
-  const [qrDataUrl, setQrDataUrl] = useState<string>('');
-
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  
   useEffect(() => {
-    if (code) {
-      generateQRCode();
-    }
-  }, [code, size, foreground, background]);
-
-  const generateQRCode = async () => {
-    try {
-      // Generate a workout URL based on the code
-      // This creates a real, functional QR code that links to the workout page
-      const workoutUrl = `${window.location.origin}/workout?code=${code}`;
-      
-      const dataUrl = await QRCode.toDataURL(workoutUrl, {
+    if (!canvasRef.current) return;
+    
+    // Generate QR code with workout code
+    const url = `${window.location.origin}/workout?code=${code}`;
+    
+    QRCode.toCanvas(
+      canvasRef.current, 
+      url, 
+      {
         width: size,
-        margin: 1,
+        margin: 2,
         color: {
           dark: foreground,
           light: background
         }
-      });
-      setQrDataUrl(dataUrl);
-    } catch (error: unknown) {
-      console.error('QR Code generation error:', error);
-    }
-  };
-
-  if (!qrDataUrl) {
-    return (
-      <div 
-        className="flex items-center justify-center" 
-        style={{ width: `${size}px`, height: `${size}px` }}
-      >
-        <div className="animate-spin h-8 w-8 border-4 border-primary border-t-transparent rounded-full"></div>
-      </div>
+      },
+      (error) => {
+        if (error) console.error('Error generating QR code:', error);
+      }
     );
-  }
-
+  }, [code, size, foreground, background]);
+  
   return (
-    <img 
-      src={qrDataUrl} 
-      alt={`QR Code for ${code}`} 
-      className="rounded-md" 
-      style={{ width: `${size}px`, height: `${size}px` }}
-    />
+    <div className="flex items-center justify-center">
+      <canvas ref={canvasRef} />
+    </div>
   );
 };
 
