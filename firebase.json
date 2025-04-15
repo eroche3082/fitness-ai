@@ -1,6 +1,7 @@
 {
   "hosting": {
-    "public": "dist/public",
+    "site": "fitnessai",
+    "public": "dist",
     "ignore": [
       "firebase.json",
       "**/.*",
@@ -10,6 +11,42 @@
       {
         "source": "/api/**",
         "function": "api"
+      },
+      {
+        "source": "/login",
+        "destination": "/index.html"
+      },
+      {
+        "source": "/signup",
+        "destination": "/index.html"
+      },
+      {
+        "source": "/dashboard/**",
+        "destination": "/index.html"
+      },
+      {
+        "source": "/admin/**",
+        "destination": "/index.html"
+      },
+      {
+        "source": "/superadmin/**",
+        "destination": "/index.html"
+      },
+      {
+        "source": "/pricing",
+        "destination": "/index.html"
+      },
+      {
+        "source": "/features",
+        "destination": "/index.html"
+      },
+      {
+        "source": "/workout/**",
+        "destination": "/index.html"
+      },
+      {
+        "source": "/chat",
+        "destination": "/index.html"
       },
       {
         "source": "**",
