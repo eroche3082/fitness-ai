@@ -15,6 +15,7 @@ import {
   BarChart2,
   Play,
 } from 'lucide-react';
+import ChatWidget from '@/components/ChatWidget';
 import {
   heroBackground,
   hero,
@@ -670,6 +671,9 @@ export default function BridgeLanding() {
           }
         }
       `}} />
+      
+      {/* Chat Widget */}
+      <ChatWidget />
     </div>
   );
 }
