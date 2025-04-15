@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import { useNavigate } from 'wouter';
+import { useLocation } from 'wouter';
 import { 
   AlertTriangle, 
   BarChart4, 
@@ -21,7 +21,7 @@ const Sidebar = ({ activeTab, setActiveTab }: {
   activeTab: string, 
   setActiveTab: (tab: string) => void 
 }) => {
-  const navigate = useNavigate();
+  const [, navigate] = useLocation();
   
   const handleLogout = () => {
     // Lógica de logout

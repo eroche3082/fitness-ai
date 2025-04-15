@@ -28,6 +28,14 @@ import { registerUserProfileRoutes } from "./services/user-profile-service";
 import billingStatusRoutes from "./routes/billing-status-routes";
 import deploymentReadinessRoutes from "./routes/deployment-readiness-routes";
 import { registerPatchRoutes } from "./routes/patch-routes";
+import { 
+  createSession, 
+  checkSession, 
+  faceAuth, 
+  authenticateSession, 
+  cancelSession, 
+  logout 
+} from "./superadmin";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Initialize Gemini configuration
@@ -293,6 +301,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Register Smart Patch System routes
   registerPatchRoutes(app);
   console.log("🩹 Smart Patch System routes registered successfully");
+  
+  // Super Admin routes
+  apiRouter.post("/superadmin/create-session", createSession);
+  apiRouter.get("/superadmin/check-session", checkSession);
+  apiRouter.post("/superadmin/face-auth", faceAuth);
+  apiRouter.post("/superadmin/authenticate-session", authenticateSession);
+  apiRouter.post("/superadmin/cancel-session", cancelSession);
+  apiRouter.post("/superadmin/logout", logout);
+  console.log("🔒 Super Admin routes registered successfully");
 
   // Stripe payment integration
   if (!process.env.STRIPE_SECRET_KEY) {

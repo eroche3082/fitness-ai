@@ -70,9 +70,12 @@ const FaceRecognition = ({ sessionId, onSuccess, onError }: {
         // Capturar la imagen
         const video = videoRef.current;
         const canvas = canvasRef.current;
+        
+        if (!video || !canvas) return;
+        
         const context = canvas.getContext('2d');
         
-        if (video && context) {
+        if (context) {
           canvas.width = video.videoWidth;
           canvas.height = video.videoHeight;
           context.drawImage(video, 0, 0, canvas.width, canvas.height);

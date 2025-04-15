@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'wouter';
+import { useLocation } from 'wouter';
 import QRCode from 'qrcode';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -10,7 +10,7 @@ const SuperAdminQRLogin = () => {
   const [qrSessionId, setQrSessionId] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(true);
   const [checkingStatus, setCheckingStatus] = useState<boolean>(false);
-  const navigate = useNavigate();
+  const [, navigate] = useLocation();
   const { toast } = useToast();
 
   // Genera un ID de sesión único para este QR
