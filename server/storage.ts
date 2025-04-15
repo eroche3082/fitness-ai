@@ -17,11 +17,16 @@ import {
 
 export interface IStorage {
   // User operations
-  getUser(id: number): Promise<User & { profile?: any } | undefined>;
-  getUserByUsername(username: string): Promise<User & { profile?: any } | undefined>;
-  getUserByAccessCode(accessCode: string): Promise<User & { profile?: any } | undefined>;
-  getUserById(id: string): Promise<User & { profile?: any } | undefined>;
+  getUser(id: number): Promise<User & { profile?: UserProfile } | undefined>;
+  getUserByUsername(username: string): Promise<User & { profile?: UserProfile } | undefined>;
+  getUserByAccessCode(accessCode: string): Promise<User & { profile?: UserProfile } | undefined>;
+  getUserById(id: string): Promise<User & { profile?: UserProfile } | undefined>;
   createUser(user: InsertUser): Promise<User>;
+  
+  // User profile operations
+  getUserProfile(userId: number): Promise<UserProfile | undefined>;
+  createUserProfile(userProfile: InsertUserProfile): Promise<UserProfile>;
+  updateUserProfile(userId: number, data: Partial<InsertUserProfile>): Promise<UserProfile | undefined>;
   
   // Smart Patch System operations
   getHealthMetrics(userId: number, type: string, days?: number): Promise<any[]>;
@@ -34,7 +39,7 @@ export interface IStorage {
     stripePaymentId?: string,
     referredBy?: string,
     referralCount?: number
-  }): Promise<User & { profile?: any } | undefined>;
+  }): Promise<User & { profile?: UserProfile } | undefined>;
   
   // Conversation operations
   getConversation(id: number): Promise<Conversation | undefined>;
@@ -66,10 +71,10 @@ export interface IStorage {
   }): Promise<any>;
   
   // Avatar operations
-  getUserAvatars(userId: string | number): Promise<Avatar[]>;
-  saveUserAvatar(userId: string | number, avatar: Avatar): Promise<Avatar>;
-  setUserActiveAvatar(userId: string | number, avatarId: string, avatarUrl: string): Promise<boolean>;
-  deleteUserAvatar(userId: string | number, avatarId: string): Promise<boolean>;
+  getAvatarsByUserId(userId: number): Promise<Avatar[]>;
+  getAvatarById(avatarId: string): Promise<Avatar | undefined>;
+  createAvatar(avatar: InsertAvatar): Promise<Avatar>;
+  deleteAvatar(avatarId: string): Promise<boolean>;
 }
 
 export class MemStorage implements IStorage {
@@ -81,7 +86,8 @@ export class MemStorage implements IStorage {
   private accessCodeActivities: Map<string, any[]>;
   private healthMetrics: Map<number, any[]>;
   private patchHistory: Map<number, any[]>;
-  private userAvatars: Map<string, Avatar[]>;
+  private userProfiles: Map<number, UserProfile>;
+  private avatars: Map<string, Avatar>;
   
   private userId: number = 1;
   private conversationId: number = 1;
@@ -98,7 +104,8 @@ export class MemStorage implements IStorage {
     this.accessCodeActivities = new Map();
     this.healthMetrics = new Map();
     this.patchHistory = new Map();
-    this.userAvatars = new Map();
+    this.userProfiles = new Map();
+    this.avatars = new Map();
     
     // Create a default user for testing
     const defaultUser: User = {
@@ -110,24 +117,28 @@ export class MemStorage implements IStorage {
       language: 'en',
       workoutPreference: null,
       fitnessGoal: null,
-      lastActive: new Date()
+      lastActive: new Date(),
+      stripeCustomerId: null,
+      stripeSubscriptionId: null,
+      subscriptionStatus: null,
+      subscriptionPlan: 'free'
     };
     
-    // Add profile property separately to avoid TypeScript errors
-    const userWithProfile = defaultUser as any;
-    userWithProfile.profile = {
-      language: 'en',
-      onboardingCompleted: true,
-      onboardingStep: 10,
-      uniqueCode: 'FIT-BEG-2565',
-      category: 'BEG',
-      unlockedLevels: ['level-1', 'level-2', 'level-3'],
-      premiumFeatures: [],
-      paymentStatus: 'free',
-      referralCount: 0
+    // Create a default profile for the user
+    const defaultProfile: UserProfile = {
+      id: 1,
+      userId: 1,
+      activeAvatarId: null,
+      avatarUrl: null,
+      preferredTheme: 'dark',
+      preferredLanguage: 'es',
+      settings: {},
+      preferences: {},
+      lastUpdated: new Date()
     };
     
-    this.users.set(1, userWithProfile);
+    this.users.set(1, defaultUser);
+    this.userProfiles.set(1, defaultProfile);
   }
   
   // User operations
@@ -317,90 +328,101 @@ export class MemStorage implements IStorage {
     return this.patchHistory.get(userId) || [];
   }
   
-  // Avatar operations
-  async getUserAvatars(userId: string | number): Promise<Avatar[]> {
-    const userIdStr = userId.toString();
-    return this.userAvatars.get(userIdStr) || [];
+  // User Profile methods
+  async getUserProfile(userId: number): Promise<UserProfile | undefined> {
+    return this.userProfiles.get(userId);
   }
-  
-  async saveUserAvatar(userId: string | number, avatar: Avatar): Promise<Avatar> {
-    const userIdStr = userId.toString();
-    const userAvatars = await this.getUserAvatars(userIdStr);
+
+  async createUserProfile(userProfile: InsertUserProfile): Promise<UserProfile> {
+    const id = userProfile.userId; // Use the userId as the profile id for simplicity
+    const profile: UserProfile = { ...userProfile, id, lastUpdated: new Date() };
+    this.userProfiles.set(id, profile);
+    return profile;
+  }
+
+  async updateUserProfile(userId: number, data: Partial<InsertUserProfile>): Promise<UserProfile | undefined> {
+    const profile = await this.getUserProfile(userId);
+    if (!profile) {
+      // If profile doesn't exist, create a new one
+      return this.createUserProfile({
+        userId,
+        activeAvatarId: data.activeAvatarId || null,
+        avatarUrl: data.avatarUrl || null,
+        preferredTheme: data.preferredTheme || 'dark',
+        preferredLanguage: data.preferredLanguage || 'es',
+        settings: data.settings || {},
+        preferences: data.preferences || {}
+      });
+    }
+
+    // Update existing profile
+    const updatedProfile = { ...profile, ...data, lastUpdated: new Date() };
+    this.userProfiles.set(userId, updatedProfile);
+    return updatedProfile;
+  }
+
+  // Avatar operations
+  async getAvatarsByUserId(userId: number): Promise<Avatar[]> {
+    // Return all avatars belonging to this userId
+    return Array.from(this.avatars.values()).filter(
+      avatar => avatar.userId === userId
+    );
+  }
+
+  async getAvatarById(avatarId: string): Promise<Avatar | undefined> {
+    return this.avatars.get(avatarId);
+  }
+
+  async createAvatar(avatar: InsertAvatar): Promise<Avatar> {
+    // Make sure the ID exists or generate one if not provided
+    const id = avatar.id;
     
-    // Add the new avatar to the list
-    userAvatars.push(avatar);
-    this.userAvatars.set(userIdStr, userAvatars);
+    // Create the avatar
+    const newAvatar: Avatar = { 
+      ...avatar, 
+      generatedOn: avatar.generatedOn || new Date()
+    };
     
-    // Update user profile with active avatar if this is their first avatar
+    this.avatars.set(id, newAvatar);
+    
+    // Update user profile if it's their first avatar
+    const userAvatars = await this.getAvatarsByUserId(Number(avatar.userId));
     if (userAvatars.length === 1) {
-      const numId = typeof userId === 'string' ? parseInt(userId, 10) : userId;
-      await this.updateUser(numId, {
-        profile: {
-          activeAvatarId: avatar.id,
-          activeAvatarUrl: avatar.imageUrl
-        }
+      await this.updateUserProfile(Number(avatar.userId), {
+        activeAvatarId: id,
+        avatarUrl: avatar.imageUrl
       });
     }
     
-    return avatar;
+    return newAvatar;
   }
-  
-  async setUserActiveAvatar(userId: string | number, avatarId: string, avatarUrl: string): Promise<boolean> {
-    const userIdStr = userId.toString();
-    const userAvatars = await this.getUserAvatars(userIdStr);
-    
-    // Verify that the avatar exists for this user
-    const avatarExists = userAvatars.some(avatar => avatar.id === avatarId);
-    if (!avatarExists) {
+
+  async deleteAvatar(avatarId: string): Promise<boolean> {
+    const avatar = await this.getAvatarById(avatarId);
+    if (!avatar) {
       return false;
     }
     
-    // Update user profile with active avatar
-    const numId = typeof userId === 'string' ? parseInt(userId, 10) : userId;
-    await this.updateUser(numId, {
-      profile: {
-        activeAvatarId: avatarId,
-        activeAvatarUrl: avatarUrl
-      }
-    });
+    // Delete the avatar
+    this.avatars.delete(avatarId);
     
-    return true;
-  }
-  
-  async deleteUserAvatar(userId: string | number, avatarId: string): Promise<boolean> {
-    const userIdStr = userId.toString();
-    let userAvatars = await this.getUserAvatars(userIdStr);
-    
-    // Find the avatar index
-    const avatarIndex = userAvatars.findIndex(avatar => avatar.id === avatarId);
-    if (avatarIndex === -1) {
-      return false;
-    }
-    
-    // Remove the avatar
-    userAvatars.splice(avatarIndex, 1);
-    this.userAvatars.set(userIdStr, userAvatars);
-    
-    // If this was the active avatar, update the user profile to use another avatar or clear it
-    const user = await this.getUserById(userIdStr);
-    if (user && (user as any).profile?.activeAvatarId === avatarId) {
-      const numId = typeof userId === 'string' ? parseInt(userId, 10) : userId;
+    // Update user profile if this was the active avatar
+    const profile = await this.getUserProfile(Number(avatar.userId));
+    if (profile && profile.activeAvatarId === avatarId) {
+      // Find another avatar for this user or set to null
+      const userAvatars = await this.getAvatarsByUserId(Number(avatar.userId));
       
-      // Use the first available avatar or clear if none left
       if (userAvatars.length > 0) {
-        const newActiveAvatar = userAvatars[0];
-        await this.updateUser(numId, {
-          profile: {
-            activeAvatarId: newActiveAvatar.id,
-            activeAvatarUrl: newActiveAvatar.imageUrl
-          }
+        // Use the first available avatar
+        await this.updateUserProfile(Number(avatar.userId), {
+          activeAvatarId: userAvatars[0].id,
+          avatarUrl: userAvatars[0].imageUrl
         });
       } else {
-        await this.updateUser(numId, {
-          profile: {
-            activeAvatarId: null,
-            activeAvatarUrl: null
-          }
+        // No more avatars, clear avatar
+        await this.updateUserProfile(Number(avatar.userId), {
+          activeAvatarId: null,
+          avatarUrl: null
         });
       }
     }
