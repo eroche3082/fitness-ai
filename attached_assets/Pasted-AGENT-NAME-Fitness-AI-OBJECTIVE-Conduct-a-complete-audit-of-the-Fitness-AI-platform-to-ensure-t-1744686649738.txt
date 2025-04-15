@@ -1,0 +1,50 @@
+AGENT NAME: Fitness AI
+
+OBJECTIVE:  
+Conduct a complete audit of the Fitness AI platform to ensure that all core systems, interfaces, and AI interactions are fully functional and ready for deployment to Firebase Hosting. This includes layout integrity, assistant behavior, fitness-related features, and visual coherence.
+
+PHASE CHECKLIST:
+
+1. UI STRUCTURE & DESIGN ALIGNMENT
+- [ ] Is the homepage visually consistent with the Fitness AI branding?
+- [ ] Are all top menu tabs working properly? (Home, Features, Pricing, AI Assistant, Login, Sign Up)
+- [ ] Are all footer links cleaned and functional?
+- [ ] Are layout colors, fonts, and sections consistent throughout the platform?
+
+2. ONBOARDING & USER FLOW
+- [ ] Is the onboarding flow working (name, preferences, goals)?
+- [ ] Does it correctly direct the user to the dashboard or recommended workouts?
+- [ ] Are sign-up and login flows functional using access code and/or credentials?
+
+3. AI ASSISTANT & SUPPORT FEATURES
+- [ ] Is the Fitness AI Assistant active and available from both the floating icon and the main menu?
+- [ ] Can it answer fitness-specific queries (workouts, nutrition, goals, etc.)?
+- [ ] Is the assistant styled correctly (not using the Aurora avatar or incorrect labels)?
+
+4. CONTENT & FEATURE MODULES
+- [ ] Are tabs like “Workout Plans”, “AI Coach”, “Nutrition”, “Progress” functional?
+- [ ] Are visual sections like “Future of Fitness” aligned and error-free?
+- [ ] Are background images, overlays, or texts (e.g. CrossFit Coach section) clashing or misaligned?
+
+5. DESIGN INTEGRITY
+- [ ] Are all components responsive across desktop, tablet, and mobile?
+- [ ] Are there any scroll limitations or blocked views on any screen?
+- [ ] Are images (e.g. the elderly woman placeholder) replaced with relevant visuals?
+
+6. SYSTEM CONNECTIONS & CONFIGS
+- [ ] Are all APIs connected: Firebase, Google Cloud, Gemini, Stripe?
+- [ ] Is the `.env` file complete and tested?
+- [ ] Is the `firebase.json` configured and targeting the correct public directory?
+
+7. FINAL READINESS CHECK
+- [ ] Are console errors, broken components, or sample data removed?
+- [ ] Are CTA buttons, membership plans, and checkout flows functional?
+- [ ] Are you able to navigate from homepage to dashboard without disruptions?
+
+FINAL OUTPUT:
+Return a complete report including:
+- ✅ All validated and working features
+- ⚠️ Features requiring improvement
+- ❌ Broken or missing features
+- Deployment Readiness Score (0–100%)
+- Final Status: LAUNCH READY or NOT READY
