@@ -38,11 +38,11 @@ const FeaturesShowcase: React.FC = () => {
   ];
 
   return (
-    <div className="py-20 bg-white">
+    <div className="py-20 bg-black">
       <div className="container mx-auto px-4">
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">Powered by Advanced Features</h2>
-          <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white">Powered by Advanced Features</h2>
+          <p className="text-lg text-gray-400 max-w-3xl mx-auto">
             Explore our comprehensive suite of AI-powered features designed to transform 
             your fitness journey with personalized guidance and tracking.
           </p>
@@ -60,9 +60,9 @@ const FeaturesShowcase: React.FC = () => {
         {/* Feature grid representation below image */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto mb-20">
           {coreFeatures.map((feature, index) => (
-            <div key={index} className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
-              <h3 className="text-lg font-semibold mb-3">{feature.title}</h3>
-              <p className="text-gray-600 text-sm">
+            <div key={index} className="bg-black border border-gray-800 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
+              <h3 className="text-lg font-semibold mb-3 text-green-500">{feature.title}</h3>
+              <p className="text-gray-400 text-sm">
                 {feature.description}
               </p>
             </div>
