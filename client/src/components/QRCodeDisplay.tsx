@@ -24,7 +24,11 @@ const QRCodeDisplay: React.FC<QRCodeDisplayProps> = ({
 
   const generateQRCode = async () => {
     try {
-      const dataUrl = await QRCode.toDataURL(code, {
+      // Generate a workout URL based on the code
+      // This creates a real, functional QR code that links to the workout page
+      const workoutUrl = `${window.location.origin}/workout?code=${code}`;
+      
+      const dataUrl = await QRCode.toDataURL(workoutUrl, {
         width: size,
         margin: 1,
         color: {

@@ -4,12 +4,10 @@ import QRCodeDisplay from './QRCodeDisplay';
 import { Smartphone, ArrowRight, QrCode, Dumbbell, Award } from 'lucide-react';
 
 const QRCodeDemoSection: React.FC = () => {
-  // Example access codes for different levels
+  // Real access codes that map to our workout programs
   const accessCodes = {
     beginner: 'FIT-BEG-2748',
-    intermediate: 'FIT-INT-3951',
     advanced: 'FIT-ADV-4287',
-    pro: 'FIT-PRO-6529',
     vip: 'FIT-VIP-9872'
   };
 
@@ -19,8 +17,8 @@ const QRCodeDemoSection: React.FC = () => {
         <div className="text-center mb-12">
           <h2 className="text-3xl md:text-4xl font-bold mb-4 text-white">Access Your Workouts Anywhere</h2>
           <p className="text-lg text-gray-400 max-w-3xl mx-auto">
-            Scan your personalized QR code to instantly access your AI-generated fitness routines on any device. 
-            Share with your trainer or training partner in seconds.
+            Scan the QR code with your phone to instantly access personalized workout routines. 
+            Try it now - our QR codes are fully functional!
           </p>
         </div>
 

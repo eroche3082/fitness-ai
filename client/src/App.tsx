@@ -29,6 +29,7 @@ import WorkoutHistoryPage from "./pages/workout-history";
 import MealPlansPage from "./pages/meal-plans";
 import GoalsPage from "./pages/goals";
 import CommunityPage from "./pages/community";
+import WorkoutRedirect from "./pages/WorkoutRedirect";
 import { UserProvider } from "./contexts/UserContext";
 import { ChatProvider } from "./contexts/ChatContext";
 import FitnessSystemInitializer from "./components/FitnessSystemInitializer";
@@ -242,6 +243,7 @@ function Router() {
       <Route path="/dashboard/:code" component={DashboardPage} />
       <Route path="/dashboard" component={DashboardPage} />
       <Route path="/admin" component={AdminPanelPage} />
+      <Route path="/workout" component={WorkoutRedirect} />
       
       {/* Status routes */}
       <Route path="/status/landing">
