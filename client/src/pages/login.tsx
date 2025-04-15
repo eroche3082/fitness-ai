@@ -7,6 +7,9 @@ import { Label } from '@/components/ui/label';
 import { ArrowRight, Activity, Check } from 'lucide-react';
 import { generateUniqueCode } from '../lib/userCodeGenerator';
 
+// Importar estilos CSS para la página de login
+import '../styles/app-mobile.css';
+
 export default function LoginPage() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -79,20 +82,20 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-900">
+    <div className="min-h-screen bg-black text-white">
       {/* Header */}
-      <header className="w-full py-4 fixed top-0 z-50 bg-white shadow-sm">
+      <header className="w-full py-4 fixed top-0 z-50 bg-black shadow-md border-b border-gray-800">
         <div className="container mx-auto px-4 md:px-6 flex justify-between items-center">
           <div className="flex items-center">
             <Button 
               variant="link" 
               onClick={() => setLocation('/bridge')}
-              className="flex items-center text-gray-900 hover:text-green-500 transition-colors"
+              className="flex items-center text-white hover:text-green-500 transition-colors"
             >
-              <Activity className="h-6 w-6 mr-2" />
+              <Activity className="h-6 w-6 mr-2 text-green-500" />
               <h1 className="text-2xl font-bold tracking-tighter">
-                <span className="text-gray-900">FITNESS</span>
-                <span className="text-blue-600">AI</span>
+                <span className="text-white">FITNESS</span>
+                <span className="text-green-500">AI</span>
               </h1>
             </Button>
           </div>
@@ -103,19 +106,19 @@ export default function LoginPage() {
       <main className="container mx-auto px-4 py-24 flex items-center justify-center min-h-screen">
         <div className="w-full max-w-md">
           <div className="text-center mb-8">
-            <h2 className="text-3xl font-bold mb-2">AI Assistant</h2>
-            <p className="text-gray-600">Log in to access your fitness platform</p>
+            <h2 className="text-3xl font-bold mb-2 text-white">AI Assistant</h2>
+            <p className="text-gray-400">Log in to access your fitness platform</p>
           </div>
 
-          <div className="bg-white p-8 rounded-lg shadow-md border border-gray-200">
+          <div className="bg-black p-8 rounded-lg shadow-lg border border-gray-800">
             {/* Tab Navigation */}
-            <div className="flex rounded-md bg-gray-100 p-1 mb-6">
+            <div className="flex rounded-md bg-gray-900 p-1 mb-6">
               <button
                 onClick={() => setLoginMethod('credentials')}
                 className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors 
                   ${loginMethod === 'credentials'
-                    ? 'bg-white text-gray-900 shadow-sm' 
-                    : 'hover:bg-gray-200 text-gray-700'
+                    ? 'bg-black text-green-500 shadow-sm border border-green-500' 
+                    : 'hover:bg-gray-800 text-gray-400'
                   }`}
               >
                 Credentials
@@ -124,8 +127,8 @@ export default function LoginPage() {
                 onClick={() => setLoginMethod('accessCode')}
                 className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors 
                   ${loginMethod === 'accessCode'
-                    ? 'bg-white text-gray-900 shadow-sm' 
-                    : 'hover:bg-gray-200 text-gray-700'
+                    ? 'bg-black text-green-500 shadow-sm border border-green-500' 
+                    : 'hover:bg-gray-800 text-gray-400'
                   }`}
               >
                 Access Code
@@ -134,7 +137,7 @@ export default function LoginPage() {
 
             {/* Error Message */}
             {error && (
-              <div className="bg-red-100 text-red-800 p-3 rounded-md text-sm mb-6">
+              <div className="bg-red-900/30 text-red-400 border border-red-800 p-3 rounded-md text-sm mb-6">
                 {error}
               </div>
             )}
@@ -142,31 +145,31 @@ export default function LoginPage() {
             {/* Credentials Form */}
             {loginMethod === 'credentials' ? (
               <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="bg-blue-50 text-blue-800 p-3 rounded-md text-sm mb-4">
-                  <p className="font-semibold mb-1">Login with any of these accounts:</p>
+                <div className="bg-gray-900 text-gray-300 border border-gray-700 p-3 rounded-md text-sm mb-4">
+                  <p className="font-semibold mb-1 text-green-400">Login con cualquiera de estas cuentas:</p>
                   <ul className="list-disc list-inside text-xs space-y-1">
-                    <li><strong>Username:</strong> demo | <strong>Password:</strong> demo123</li>
-                    <li><strong>Username:</strong> admin | <strong>Password:</strong> admin123456</li>
-                    <li><strong>Username:</strong> testuser | <strong>Password:</strong> password</li>
+                    <li><strong className="text-white">Username:</strong> demo | <strong className="text-white">Password:</strong> demo123</li>
+                    <li><strong className="text-white">Username:</strong> admin | <strong className="text-white">Password:</strong> admin123456</li>
+                    <li><strong className="text-white">Username:</strong> testuser | <strong className="text-white">Password:</strong> password</li>
                   </ul>
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="username" className="text-gray-700">
+                  <Label htmlFor="username" className="text-gray-300">
                     Username
                   </Label>
                   <Input
                     id="username"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
-                    className="border-gray-300"
+                    className="bg-gray-900 border-gray-700 text-white focus:border-green-500 focus:ring-green-500"
                     placeholder="example: admin"
                     required
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="password" className="text-gray-700">
+                  <Label htmlFor="password" className="text-gray-300">
                     Password
                   </Label>
                   <Input
@@ -174,7 +177,7 @@ export default function LoginPage() {
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="border-gray-300"
+                    className="bg-gray-900 border-gray-700 text-white focus:border-green-500 focus:ring-green-500"
                     placeholder="example: admin123456"
                     required
                   />
@@ -183,7 +186,7 @@ export default function LoginPage() {
                 <Button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2"
+                  className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2"
                 >
                   {isLoading ? (
                     <span className="flex items-center">
@@ -205,16 +208,16 @@ export default function LoginPage() {
               // Access Code Form
               <div className="space-y-6">
                 <div>
-                  <h3 className="text-lg font-medium mb-2">Your Access Code</h3>
-                  <p className="text-sm text-gray-600 mb-4">
-                    Enter the access code generated during onboarding.
+                  <h3 className="text-lg font-medium mb-2 text-white">Tu Código de Acceso</h3>
+                  <p className="text-sm text-gray-400 mb-4">
+                    Ingresa el código que recibiste durante tu registro.
                   </p>
                   
                   <form onSubmit={handleSubmit}>
                     <Input
                       value={accessCode}
                       onChange={(e) => setAccessCode(e.target.value)}
-                      className="border-gray-300 mb-4"
+                      className="bg-gray-900 border-gray-700 text-white focus:border-green-500 focus:ring-green-500 mb-4"
                       placeholder={`Example: ${generatedCode}`}
                       required
                     />
@@ -222,34 +225,34 @@ export default function LoginPage() {
                     <Button
                       type="submit"
                       disabled={isLoading}
-                      className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2"
+                      className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold py-2"
                     >
-                      Access Dashboard
+                      Acceder al Dashboard
                     </Button>
                   </form>
                 </div>
                 
-                <div className="bg-blue-50 rounded-md p-4 text-center">
-                  <p className="text-sm text-blue-800 mb-2">Your code from onboarding:</p>
-                  <p className="text-xl font-bold text-blue-700">{generatedCode}</p>
+                <div className="bg-gray-900 border border-gray-700 rounded-md p-4 text-center">
+                  <p className="text-sm text-green-400 mb-2">Tu código personal:</p>
+                  <p className="text-xl font-bold text-green-500">{generatedCode}</p>
                 </div>
                 
-                <div className="text-center text-sm text-gray-600">
-                  <p>Access your personalized dashboard using the code generated during onboarding.</p>
+                <div className="text-center text-sm text-gray-400">
+                  <p>Accede a tu dashboard personalizado usando el código generado durante tu registro.</p>
                 </div>
               </div>
             )}
 
             {loginMethod === 'credentials' && (
-              <div className="mt-6 pt-6 border-t border-gray-200 text-center">
-                <p className="text-gray-600 mb-4">Don't have an account? Try the demo</p>
+              <div className="mt-6 pt-6 border-t border-gray-800 text-center">
+                <p className="text-gray-400 mb-4">¿No tienes una cuenta? Prueba el demo</p>
                 <Button
                   variant="outline"
                   onClick={handleDemoLogin}
                   disabled={isLoading}
-                  className="w-full border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white"
+                  className="w-full border-green-600 text-green-500 hover:bg-green-600 hover:text-white"
                 >
-                  Use Demo Account
+                  Usar Cuenta Demo
                 </Button>
               </div>
             )}
@@ -258,9 +261,9 @@ export default function LoginPage() {
           <div className="text-center mt-6">
             <button
               onClick={() => setLocation('/bridge')}
-              className="text-blue-600 hover:text-blue-500 font-medium"
+              className="text-green-500 hover:text-green-400 font-medium"
             >
-              ← Back to main page
+              ← Volver a la página principal
             </button>
           </div>
         </div>
