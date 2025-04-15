@@ -38,6 +38,7 @@ import SuperAdminDashboard from "./pages/superadmin/Dashboard";
 import MobileAuth from "./pages/superadmin/MobileAuth";
 import { UserProvider } from "./contexts/UserContext";
 import { ChatProvider } from "./contexts/ChatContext";
+import { ConfigProvider } from "./contexts/ConfigContext";
 import FitnessSystemInitializer from "./components/FitnessSystemInitializer";
 import MiniChatbot from "./components/MiniChatbot";
 import MobileNavigation from "./components/MobileNavigation";
