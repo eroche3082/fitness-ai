@@ -51,17 +51,17 @@ const FeaturesShowcase: React.FC = () => {
         {/* Use actual image from mockup */}
         <div className="max-w-5xl mx-auto mb-16">
           <img 
-            src="https://fitness-dashboard.vercel.app/features.png" 
+            src="/images/features.png" 
             alt="Fitness AI Features" 
-            className="w-full h-auto"
+            className="w-full h-auto rounded-lg shadow-lg"
           />
         </div>
 
         {/* Feature grid representation below image */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-20">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto mb-20">
           {coreFeatures.map((feature, index) => (
             <div key={index} className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow">
-              <h3 className="text-xl font-semibold mb-3">{feature.title}</h3>
+              <h3 className="text-lg font-semibold mb-3">{feature.title}</h3>
               <p className="text-gray-600 text-sm">
                 {feature.description}
               </p>
