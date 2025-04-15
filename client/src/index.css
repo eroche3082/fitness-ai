@@ -1,9 +1,9 @@
+/* Import app-specific mobile styles */
+@import './styles/app-mobile.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-/* Import app-specific mobile styles */
-@import './styles/app-mobile.css';
 
 :root {
   /* Fitness AI Theme Colors */
