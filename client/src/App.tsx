@@ -32,6 +32,10 @@ import CommunityPage from "./pages/community";
 import WorkoutRedirect from "./pages/WorkoutRedirect";
 import WorkoutLibrary from "./pages/workout-library";
 import WorkoutDetails from "./pages/workout-details/[id]";
+// SuperAdmin pages imports
+import SuperAdminQRLogin from "./pages/superadmin/SuperAdminQRLogin";
+import SuperAdminDashboard from "./pages/superadmin/Dashboard";
+import MobileAuth from "./pages/superadmin/MobileAuth";
 import { UserProvider } from "./contexts/UserContext";
 import { ChatProvider } from "./contexts/ChatContext";
 import FitnessSystemInitializer from "./components/FitnessSystemInitializer";
@@ -220,7 +224,9 @@ function Router() {
       '/features',
       '/access',
       '/workout',
-      '/workout-library'
+      '/workout-library',
+      '/superadmin',
+      '/superadmin/mobile-auth'
     ];
     const isPublicRoute = publicRoutes.includes(location) || 
                           location.startsWith('/status/') || 
@@ -254,6 +260,11 @@ function Router() {
       <Route path="/workout" component={WorkoutRedirect} />
       <Route path="/workout-library" component={WorkoutLibrary} />
       <Route path="/workout-details/:id" component={WorkoutDetails} />
+      
+      {/* SuperAdmin routes */}
+      <Route path="/superadmin" component={SuperAdminQRLogin} />
+      <Route path="/superadmin/dashboard" component={SuperAdminDashboard} />
+      <Route path="/superadmin/mobile-auth" component={MobileAuth} />
       
       {/* Status routes */}
       <Route path="/status/landing">

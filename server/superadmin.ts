@@ -158,9 +158,10 @@ export const logout = async (req: Request, res: Response) => {
 function cleanupExpiredSessions() {
   const now = Date.now();
   
-  for (const [sessionId, session] of adminSessions.entries()) {
+  // Convert to array for compatibility with all TypeScript targets
+  Array.from(adminSessions.entries()).forEach(([sessionId, session]) => {
     if (session.expiresAt < now) {
       adminSessions.delete(sessionId);
     }
-  }
+  });
 }
