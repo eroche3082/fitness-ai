@@ -77,6 +77,8 @@ export const avatars = pgTable("avatars", {
   userId: integer("user_id").notNull().references(() => users.id),
   name: text("name").notNull(),
   imageUrl: text("image_url").notNull(),
+  modelUrl: text("model_url"),  // Para almacenar la URL del modelo 3D (Ready Player Me)
+  avatarType: text("avatar_type").default("default"),  // 'default', 'readyplayerme', etc.
   generatedOn: timestamp("generated_on").defaultNow(),
 });
 
@@ -138,6 +140,8 @@ export const insertAvatarSchema = createInsertSchema(avatars).pick({
   userId: true,
   name: true,
   imageUrl: true,
+  modelUrl: true,
+  avatarType: true,
   generatedOn: true,
 });
 
