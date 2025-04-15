@@ -395,15 +395,92 @@ export default function UserManagementPage() {
                   <div>
                     <div className="flex flex-col items-center mb-6 pb-6 border-b border-gray-800">
                       <div className="w-20 h-20 rounded-full bg-gray-800 flex items-center justify-center mb-4">
-                        <span className="text-3xl font-bold text-green-500">
-                          {selectedUser.name.charAt(0)}
-                        </span>
+                        {selectedUser.avatarUrl ? (
+                          <img 
+                            src={selectedUser.avatarUrl} 
+                            alt={`Avatar de ${selectedUser.name}`}
+                            className="w-full h-full rounded-full object-cover"
+                          />
+                        ) : (
+                          <span className="text-3xl font-bold text-green-500">
+                            {selectedUser.name.charAt(0)}
+                          </span>
+                        )}
                       </div>
                       <h3 className="text-xl font-bold text-white mb-1">{selectedUser.name}</h3>
                       <p className="text-gray-400">{selectedUser.email}</p>
                       <div className="mt-3 flex space-x-2">
                         {renderStatus(selectedUser.status)}
                         {renderCategory(selectedUser.category)}
+                      </div>
+                      <div className="mt-4 w-full space-y-2">
+                        <h4 className="text-sm font-medium text-gray-400 mb-3">Gestión de Avatares</h4>
+                        
+                        <div className="flex flex-col space-y-3">
+                          {/* Selector de avatares 2D */}
+                          <div className="flex items-center">
+                            <span className="text-gray-400 text-sm mr-2">Avatar 2D:</span>
+                            <AvatarSelector
+                              userId={parseInt(selectedUser.id)}
+                              currentAvatarUrl={selectedUser.avatarUrl}
+                              size="md"
+                              onSelectAvatar={(avatar: { id: string; imageUrl: string }) => {
+                                logAdminActivity(`Changed avatar for user: ${selectedUser.name} (${selectedUser.id})`);
+                                
+                                // Actualizar el usuario con la nueva imagen de avatar
+                                const updatedUsers = users.map(user => 
+                                  user.id === selectedUser.id ? { 
+                                    ...user, 
+                                    avatarUrl: avatar.imageUrl,
+                                    avatarId: avatar.id
+                                  } : user
+                                );
+                                setUsers(updatedUsers);
+                                
+                                // Actualizar el usuario seleccionado
+                                setSelectedUser({
+                                  ...selectedUser,
+                                  avatarUrl: avatar.imageUrl,
+                                  avatarId: avatar.id
+                                });
+                              }}
+                            />
+                          </div>
+                          
+                          {/* Importador de avatares 3D */}
+                          <div className="pb-1">
+                            <ReadyPlayerMeAvatar 
+                              userId={parseInt(selectedUser.id)} 
+                              isAdmin={true}
+                              onAvatarCreated={(avatar: { id: string; imageUrl: string }) => {
+                                logAdminActivity(`Created 3D avatar for user: ${selectedUser.name} (${selectedUser.id})`);
+                                
+                                // Actualizar el usuario con la nueva imagen de avatar
+                                const updatedUsers = users.map(user => 
+                                  user.id === selectedUser.id ? { 
+                                    ...user, 
+                                    avatarUrl: avatar.imageUrl,
+                                    avatarId: avatar.id
+                                  } : user
+                                );
+                                setUsers(updatedUsers);
+                                
+                                // Actualizar el usuario seleccionado
+                                setSelectedUser({
+                                  ...selectedUser,
+                                  avatarUrl: avatar.imageUrl,
+                                  avatarId: avatar.id
+                                });
+                                
+                                toast({
+                                  title: "Avatar 3D creado",
+                                  description: `Se ha creado un nuevo avatar 3D para ${selectedUser.name}`,
+                                  variant: "default"
+                                });
+                              }}
+                            />
+                          </div>
+                        </div>
                       </div>
                     </div>
 
