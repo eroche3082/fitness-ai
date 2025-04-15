@@ -393,7 +393,7 @@ export default function BridgeLanding() {
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Starter Plan */}
-            <div className="bg-gray-800 rounded-lg overflow-hidden transform transition-all duration-300 hover:scale-105 hover:shadow-xl border border-gray-700">
+            <div className="bg-black rounded-lg overflow-hidden transform transition-all duration-300 hover:scale-105 hover:shadow-xl border border-gray-700">
               <div className="p-8">
                 <h3 className="text-2xl font-bold mb-2">Starter</h3>
                 <div className="text-4xl font-bold mb-4">
@@ -444,7 +444,7 @@ export default function BridgeLanding() {
             </div>
             
             {/* Pro Plan */}
-            <div className="bg-gray-800 rounded-lg overflow-hidden shadow-lg transform transition-all duration-300 hover:scale-105 hover:shadow-xl relative border-2 border-green-500">
+            <div className="bg-black rounded-lg overflow-hidden shadow-lg transform transition-all duration-300 hover:scale-105 hover:shadow-xl relative border-2 border-green-500">
               <div className="absolute top-0 right-0 bg-green-500 text-black font-bold py-1 px-4 text-sm">
                 MOST POPULAR
               </div>
@@ -498,7 +498,7 @@ export default function BridgeLanding() {
             </div>
             
             {/* Elite Plan */}
-            <div className="bg-gray-800 rounded-lg overflow-hidden transform transition-all duration-300 hover:scale-105 hover:shadow-xl border border-gray-700">
+            <div className="bg-black rounded-lg overflow-hidden transform transition-all duration-300 hover:scale-105 hover:shadow-xl border border-gray-700">
               <div className="p-8">
                 <h3 className="text-2xl font-bold mb-2">Elite</h3>
                 <div className="text-4xl font-bold mb-4">
@@ -563,7 +563,7 @@ export default function BridgeLanding() {
             </div>
             <div className="flex flex-col sm:flex-row gap-4">
               <Link to="/signup">
-                <Button className="py-6 px-8 bg-black text-white hover:bg-gray-800 text-lg font-medium min-w-[200px]">
+                <Button className="py-6 px-8 bg-black text-white hover:bg-black text-lg font-medium min-w-[200px]">
                   Get Started Today
                 </Button>
               </Link>

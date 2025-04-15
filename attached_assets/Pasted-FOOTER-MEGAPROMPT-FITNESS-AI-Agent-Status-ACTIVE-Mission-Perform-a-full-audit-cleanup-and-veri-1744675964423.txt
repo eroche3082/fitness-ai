@@ -1,0 +1,87 @@
+FOOTER MEGAPROMPT – FITNESS AI
+Agent Status: ACTIVE
+Mission: Perform a full audit, cleanup, and verification of the entire footer section of the Fitness AI application to meet launch standards.
+
+1. SOCIAL MEDIA ICONS (Left Column)
+ Instagram, Facebook, Twitter icons
+
+Must be linked to official, verified social accounts.
+
+If the link is #, blank, or placeholder → REMOVE IMMEDIATELY
+
+If accounts don’t exist yet, comment out or remove until real links are available.
+
+2. COLUMN: "PROGRAMS"
+Check each listed item:
+
+All Programs
+
+Strength Training
+
+Cardio
+
+HIIT Workouts
+
+Mobility
+
+Requirements:
+
+Each must link to a working section of the app or scroll target.
+
+If a program is not fully built or leads nowhere → REMOVE or mark as coming soon in UI.
+
+Consider replacing static text with dynamic routing for seamless flow.
+
+3. COLUMN: "QUICK LINKS"
+Check functionality of:
+
+Features
+
+Login
+
+Sign Up
+
+Contact
+
+Actions:
+
+Each link must be fully functional and direct to the correct screen/component.
+
+If any route is broken or inactive → Fix or remove before launch
+
+4. COLUMN: "CONTACT"
+Current values:
+
+Contact Us (link)
+
+24/7 AI-Powered Support
+
+Orders:
+
+Contact Us link must open a valid contact form, support ticket, or email modal
+
+If 24/7 AI-Powered Support is not functional (e.g., if chatbot doesn’t handle support), edit wording or temporarily remove
+
+5. BOTTOM BAR – LEGAL LINKS
+Privacy Policy and Terms of Service must point to actual legal documents/pages.
+
+If they don’t exist yet → Replace with a “Coming Soon” modal or disable the links
+
+6. VISUAL CONSISTENCY CHECK
+Footer must match the brand palette (green/black/white)
+
+Avoid excessive spacing, broken layout, or visibility issues on mobile
+
+Ensure font size and button styles match global theme
+
+7. FINAL REPORT BACK
+Submit a Footer Verification Report with:
+
+✅ All links that are working and connected to real destinations
+
+❌ All elements that were removed or deactivated
+
+⚠️ Any placeholder links still pending implementation
+
+Suggestions for enhancements (e.g., newsletter input box, live support badge, additional quick links)
+
