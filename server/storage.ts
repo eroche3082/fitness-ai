@@ -11,6 +11,15 @@ import {
   type InsertProgress
 } from "@shared/schema";
 
+// Definición de los tipos de avatar
+export interface Avatar {
+  id: string;
+  name: string;
+  imageUrl: string;
+  generatedOn: string;
+  userId: string | number;
+}
+
 export interface IStorage {
   // User operations
   getUser(id: number): Promise<User & { profile?: any } | undefined>;
@@ -60,6 +69,12 @@ export interface IStorage {
     payment?: string,
     referredBy?: string
   }): Promise<any>;
+  
+  // Avatar operations
+  getUserAvatars(userId: string | number): Promise<Avatar[]>;
+  saveUserAvatar(userId: string | number, avatar: Avatar): Promise<Avatar>;
+  setUserActiveAvatar(userId: string | number, avatarId: string, avatarUrl: string): Promise<boolean>;
+  deleteUserAvatar(userId: string | number, avatarId: string): Promise<boolean>;
 }
 
 export class MemStorage implements IStorage {
@@ -71,6 +86,7 @@ export class MemStorage implements IStorage {
   private accessCodeActivities: Map<string, any[]>;
   private healthMetrics: Map<number, any[]>;
   private patchHistory: Map<number, any[]>;
+  private userAvatars: Map<string, Avatar[]>;
   
   private userId: number = 1;
   private conversationId: number = 1;
@@ -87,6 +103,7 @@ export class MemStorage implements IStorage {
     this.accessCodeActivities = new Map();
     this.healthMetrics = new Map();
     this.patchHistory = new Map();
+    this.userAvatars = new Map();
     
     // Create a default user for testing
     const defaultUser: User = {
@@ -303,6 +320,97 @@ export class MemStorage implements IStorage {
   async getUserPatchHistory(userId: number): Promise<any[]> {
     // Return patch history for a user
     return this.patchHistory.get(userId) || [];
+  }
+  
+  // Avatar operations
+  async getUserAvatars(userId: string | number): Promise<Avatar[]> {
+    const userIdStr = userId.toString();
+    return this.userAvatars.get(userIdStr) || [];
+  }
+  
+  async saveUserAvatar(userId: string | number, avatar: Avatar): Promise<Avatar> {
+    const userIdStr = userId.toString();
+    const userAvatars = await this.getUserAvatars(userIdStr);
+    
+    // Add the new avatar to the list
+    userAvatars.push(avatar);
+    this.userAvatars.set(userIdStr, userAvatars);
+    
+    // Update user profile with active avatar if this is their first avatar
+    if (userAvatars.length === 1) {
+      const numId = typeof userId === 'string' ? parseInt(userId, 10) : userId;
+      await this.updateUser(numId, {
+        profile: {
+          activeAvatarId: avatar.id,
+          activeAvatarUrl: avatar.imageUrl
+        }
+      });
+    }
+    
+    return avatar;
+  }
+  
+  async setUserActiveAvatar(userId: string | number, avatarId: string, avatarUrl: string): Promise<boolean> {
+    const userIdStr = userId.toString();
+    const userAvatars = await this.getUserAvatars(userIdStr);
+    
+    // Verify that the avatar exists for this user
+    const avatarExists = userAvatars.some(avatar => avatar.id === avatarId);
+    if (!avatarExists) {
+      return false;
+    }
+    
+    // Update user profile with active avatar
+    const numId = typeof userId === 'string' ? parseInt(userId, 10) : userId;
+    await this.updateUser(numId, {
+      profile: {
+        activeAvatarId: avatarId,
+        activeAvatarUrl: avatarUrl
+      }
+    });
+    
+    return true;
+  }
+  
+  async deleteUserAvatar(userId: string | number, avatarId: string): Promise<boolean> {
+    const userIdStr = userId.toString();
+    let userAvatars = await this.getUserAvatars(userIdStr);
+    
+    // Find the avatar index
+    const avatarIndex = userAvatars.findIndex(avatar => avatar.id === avatarId);
+    if (avatarIndex === -1) {
+      return false;
+    }
+    
+    // Remove the avatar
+    userAvatars.splice(avatarIndex, 1);
+    this.userAvatars.set(userIdStr, userAvatars);
+    
+    // If this was the active avatar, update the user profile to use another avatar or clear it
+    const user = await this.getUserById(userIdStr);
+    if (user && (user as any).profile?.activeAvatarId === avatarId) {
+      const numId = typeof userId === 'string' ? parseInt(userId, 10) : userId;
+      
+      // Use the first available avatar or clear if none left
+      if (userAvatars.length > 0) {
+        const newActiveAvatar = userAvatars[0];
+        await this.updateUser(numId, {
+          profile: {
+            activeAvatarId: newActiveAvatar.id,
+            activeAvatarUrl: newActiveAvatar.imageUrl
+          }
+        });
+      } else {
+        await this.updateUser(numId, {
+          profile: {
+            activeAvatarId: null,
+            activeAvatarUrl: null
+          }
+        });
+      }
+    }
+    
+    return true;
   }
 }
 
