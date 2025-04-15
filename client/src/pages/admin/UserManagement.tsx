@@ -8,6 +8,8 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { Switch } from '@/components/ui/switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { AvatarSelector } from '@/components/ui/AvatarSelector';
+import ReadyPlayerMeAvatar from '@/components/ui/ReadyPlayerMeAvatar';
 import { 
   Table, 
   TableBody, 
@@ -42,6 +44,8 @@ interface User {
   category: UserCategory;
   lastLogin: string;
   accessCode?: string;
+  avatarUrl?: string;
+  avatarId?: string;
 }
 
 // Datos de muestra
