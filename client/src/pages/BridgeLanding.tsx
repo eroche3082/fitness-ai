@@ -106,7 +106,7 @@ export default function BridgeLanding() {
               Our AI-powered fitness platform revolutionizes how you train, track, and transform your body with personalized coaching and real-time feedback
             </p>
             <div className="mt-10 flex flex-wrap gap-4 animate-fade-in-up animation-delay-500">
-              <Link to="/signup">
+              <Link to="/login">
                 <Button className="bridge-button bg-green-500 text-black hover:bg-green-600 py-3 px-8 text-lg rounded-sm transition-all duration-300 transform hover:translate-y-[-3px]">
                   Get Started
                 </Button>
@@ -603,22 +603,21 @@ export default function BridgeLanding() {
             <div>
               <h5 className="text-lg font-bold mb-6 uppercase">Programs</h5>
               <ul className="space-y-3">
-                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Strength Training</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">CrossFit</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">HIIT Workouts</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Cardio</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Mobility</a></li>
+                <li><Link to="/programs" className="text-gray-400 hover:text-white transition-colors">All Programs</Link></li>
+                <li><Link to="/programs?category=strength" className="text-gray-400 hover:text-white transition-colors">Strength Training</Link></li>
+                <li><Link to="/programs?category=cardio" className="text-gray-400 hover:text-white transition-colors">Cardio</Link></li>
+                <li><Link to="/programs?category=hiit" className="text-gray-400 hover:text-white transition-colors">HIIT Workouts</Link></li>
+                <li><Link to="/programs?category=mobility" className="text-gray-400 hover:text-white transition-colors">Mobility</Link></li>
               </ul>
             </div>
             
             <div>
-              <h5 className="text-lg font-bold mb-6 uppercase">About</h5>
+              <h5 className="text-lg font-bold mb-6 uppercase">Quick Links</h5>
               <ul className="space-y-3">
-                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Our Team</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Membership</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">AI Technology</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Testimonials</a></li>
-                <li><a href="#" className="text-gray-400 hover:text-white transition-colors">Careers</a></li>
+                <li><Link to="/features" className="text-gray-400 hover:text-white transition-colors">Features</Link></li>
+                <li><Link to="/login" className="text-gray-400 hover:text-white transition-colors">Login</Link></li>
+                <li><Link to="/signup" className="text-gray-400 hover:text-white transition-colors">Sign Up</Link></li>
+                <li><Link to="/contact" className="text-gray-400 hover:text-white transition-colors">Contact</Link></li>
               </ul>
             </div>
             
@@ -626,19 +625,13 @@ export default function BridgeLanding() {
               <h5 className="text-lg font-bold mb-6 uppercase">Contact</h5>
               <ul className="space-y-3">
                 <li className="flex items-start">
-                  <span className="text-gray-400">123 Fitness Street, New York, NY 10001</span>
+                  <span className="text-gray-400">Get in touch with our support team</span>
                 </li>
                 <li className="flex items-start">
-                  <span className="text-gray-400">info@fitnessai.com</span>
+                  <Link to="/contact" className="text-green-500 hover:text-white transition-colors">Contact Us</Link>
                 </li>
                 <li className="flex items-start">
-                  <span className="text-gray-400">+1 (555) 123-4567</span>
-                </li>
-                <li className="flex items-start">
-                  <span className="text-gray-400">Mon-Fri: 6am-10pm</span>
-                </li>
-                <li className="flex items-start">
-                  <span className="text-gray-400">Sat-Sun: 8am-8pm</span>
+                  <span className="text-gray-400">24/7 AI-Powered Support</span>
                 </li>
               </ul>
             </div>
@@ -649,8 +642,8 @@ export default function BridgeLanding() {
               <p className="text-gray-400 text-sm">© 2025 Fitness AI. All rights reserved.</p>
               <div className="mt-4 md:mt-0">
                 <ul className="flex space-x-6">
-                  <li><a href="#" className="text-gray-400 hover:text-white text-sm">Privacy Policy</a></li>
-                  <li><a href="#" className="text-gray-400 hover:text-white text-sm">Terms of Service</a></li>
+                  <li><Link to="/privacy" className="text-gray-400 hover:text-white text-sm">Privacy Policy</Link></li>
+                  <li><Link to="/terms" className="text-gray-400 hover:text-white text-sm">Terms of Service</Link></li>
                 </ul>
               </div>
             </div>

@@ -1,0 +1,114 @@
+[ FITNESS AI – FULL HOMEPAGE & UI COMPLIANCE REPORT ]
+
+Phase: Final Homepage Review Before Launch
+
+Your mission is to perform a full SCAN and QA report for the **homepage only** of Fitness AI. This includes all layout, content, button functionality, chat, visual coherence, and homepage UX.
+
+---
+
+### 1. LANGUAGE & VISUAL COHERENCE
+
+- [ ] Confirm all homepage content is in **ENGLISH ONLY**
+- [ ] Ensure design style is consistent throughout (text, background, layout)
+- [ ] The **"Features Grid" and "Dashboard Section"** must match the rest of the site’s theme (black/dark background, matching fonts and contrast)
+- [ ] Replace the **photo of the elderly woman with white hair** (doesn’t match brand tone) with a more consistent image
+- [ ] Fix overlapping or misaligned text elements such as **“Training Power / CrossFit Coach”** (currently interfering with visuals)
+
+---
+
+### 2. NAVBAR VERIFICATION
+
+Navbar must have the following and be **fully functional**:
+
+| Tab         | Linked To        | Notes                     |
+|-------------|------------------|---------------------------|
+| Home        | `/`              | Main landing section      |
+| Features    | `/features`      | Scroll or new page w/ 20+ features list |
+| Programs    | `/programs`      | Must be active            |
+| Contact Us  | `/contact`       | Form or direct link       |
+| Login       | `/login`         | Credentials + access code |
+| Sign Up     | `/signup`        | Full registration form    |
+
+✅ Ensure login supports both **Credentials + Access Code** (check both work)
+
+---
+
+### 3. HOMEPAGE BUTTON FUNCTIONALITY
+
+Verify the following buttons work properly:
+
+| Button                | Action Required               |
+|-----------------------|-------------------------------|
+| Get Started (Hero)    | Connect to /login             |
+| Explore Programs      | Navigate to /programs         |
+| Get Started Today     | Same as “Sign Up” or CTA      |
+| Choose Pro / Elite    | Connect to proper Stripe flow or signup |
+
+---
+
+### 4. CHAT SYSTEM CHECK
+
+- [ ] Confirm the **ChatBot widget is visible** (bottom right)
+- [ ] It must **respond properly** or be removed if inactive
+- [ ] Label should match the app tone (Not “Not Your Typical Fitness” unless that is the branding)
+
+---
+
+### 5. MEMBERSHIP & QR SECTION
+
+- [ ] Confirm all **QR codes** are working or marked as samples
+- [ ] Confirm the **Membership section** is clear, has:
+  - Price
+  - Features per tier
+  - Call to Action button per tier
+- [ ] Titles must match the Fitness AI tone (not generic)
+
+---
+
+### 6. FOOTER VERIFICATION
+
+Perform full cleanup of the **footer**:
+
+- ❌ REMOVE or replace any **fake contact info**
+   - `123 Fitness Street, NY`
+   - `info@fitnessai.com`
+   - `+1 (555) 123-4567`
+- ❌ Remove links that go nowhere (Our Team, Membership, Testimonials, Careers) unless active
+- ✅ Retain valid Terms of Service and Privacy Policy if working
+
+---
+
+### 7. UI AND CONTENT REVIEW
+
+| Section                      | Task                                     |
+|-----------------------------|------------------------------------------|
+| Features Grid (20+)         | Must match visual branding of homepage   |
+| AI Dashboard Preview        | Should not appear if user not logged in  |
+| QR Access System            | Ensure visuals are clean, usable         |
+| Testimonials / Stats        | Only include if accurate and verified    |
+
+---
+
+### 8. FINAL REPORT FORMAT
+
+Return your full report with:
+
+**A. WORKING ELEMENTS**  
+List all homepage features that are confirmed operational
+
+**B. BROKEN OR MISSING ELEMENTS**  
+List anything that was removed, is not linked, or is inactive
+
+**C. UI INCONSISTENCIES & RECOMMENDED FIXES**  
+Any part of the homepage that visually breaks the flow or design consistency
+
+---
+
+### IMPORTANT – HOMEPAGE MUST BE LAUNCH READY
+Do not proceed to deployment unless:
+
+- [ ] All links, buttons, and routes work
+- [ ] All visuals and sections follow a unified theme
+- [ ] Chat is working OR removed
+- [ ] Footer contains only validated, real content
+- [ ] No broken pages, placeholder content, or overlapping text
