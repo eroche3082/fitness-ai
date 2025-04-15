@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, boolean, timestamp, jsonb } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, timestamp, jsonb, json } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -58,6 +58,28 @@ export const progress = pgTable("progress", {
   notes: text("notes"),
 });
 
+// User Profiles for additional user data
+export const userProfiles = pgTable("user_profiles", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull().references(() => users.id).unique(),
+  activeAvatarId: text("active_avatar_id"),
+  avatarUrl: text("avatar_url"),
+  preferredTheme: text("preferred_theme").default("dark"),
+  preferredLanguage: text("preferred_language").default("es"),
+  settings: json("settings").$type<Record<string, any>>(),
+  preferences: json("preferences").$type<Record<string, any>>(),
+  lastUpdated: timestamp("last_updated").defaultNow(),
+});
+
+// Avatars table for user avatars
+export const avatars = pgTable("avatars", {
+  id: text("id").primaryKey(),
+  userId: integer("user_id").notNull().references(() => users.id),
+  name: text("name").notNull(),
+  imageUrl: text("image_url").notNull(),
+  generatedOn: timestamp("generated_on").defaultNow(),
+});
+
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).pick({
   username: true,
@@ -101,6 +123,24 @@ export const insertProgressSchema = createInsertSchema(progress).pick({
   notes: true,
 });
 
+export const insertUserProfileSchema = createInsertSchema(userProfiles).pick({
+  userId: true,
+  activeAvatarId: true,
+  avatarUrl: true,
+  preferredTheme: true,
+  preferredLanguage: true,
+  settings: true,
+  preferences: true,
+});
+
+export const insertAvatarSchema = createInsertSchema(avatars).pick({
+  id: true,
+  userId: true,
+  name: true,
+  imageUrl: true,
+  generatedOn: true,
+});
+
 // Types
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
@@ -116,3 +156,9 @@ export type Workout = typeof workouts.$inferSelect;
 
 export type InsertProgress = z.infer<typeof insertProgressSchema>;
 export type Progress = typeof progress.$inferSelect;
+
+export type InsertUserProfile = z.infer<typeof insertUserProfileSchema>;
+export type UserProfile = typeof userProfiles.$inferSelect;
+
+export type InsertAvatar = z.infer<typeof insertAvatarSchema>;
+export type Avatar = typeof avatars.$inferSelect;

@@ -8,17 +8,12 @@ import {
   type Workout,
   type InsertWorkout,
   type Progress,
-  type InsertProgress
+  type InsertProgress,
+  type Avatar,
+  type InsertAvatar,
+  type UserProfile,
+  type InsertUserProfile
 } from "@shared/schema";
-
-// Definición de los tipos de avatar
-export interface Avatar {
-  id: string;
-  name: string;
-  imageUrl: string;
-  generatedOn: string;
-  userId: string | number;
-}
 
 export interface IStorage {
   // User operations

@@ -1,53 +1,90 @@
 import { Request, Response, NextFunction } from 'express';
 import { storage } from '../storage';
 
-// Declarar la extensión del tipo Request para TypeScript
+// Tipos para extender Express Request con user y session
 declare global {
   namespace Express {
     interface Request {
-      user?: any;
-      isAuthenticated(): boolean;
+      user?: any; // Tipo de usuario debe coincidir con tu schema
+      session: {
+        userId?: number;
+        isAuthenticated?: boolean;
+        userRole?: string;
+      };
     }
   }
 }
 
-// Middleware para verificar si el usuario está autenticado
+// Middleware simple de autenticación
 export const isAuthenticated = async (req: Request, res: Response, next: NextFunction) => {
-  // Verificar si hay una sesión de usuario
   if (req.session && req.session.userId) {
-    // Obtener usuario desde el almacenamiento
-    const user = await storage.getUser(req.session.userId);
-    
-    if (user) {
-      // Agregar el usuario a la solicitud para su uso en rutas siguientes
-      req.user = user;
-      return next();
+    // El usuario está autenticado
+    try {
+      const user = await storage.getUser(req.session.userId);
+      if (user) {
+        req.user = user;
+        next();
+        return;
+      }
+    } catch (error) {
+      console.error('Error en el middleware de autenticación:', error);
+    }
+  }
+
+  // Si no hay autenticación, responder con 401
+  res.status(401).json({ message: 'No autenticado' });
+};
+
+// Middleware para verificar roles (admin)
+export const isAdmin = async (req: Request, res: Response, next: NextFunction) => {
+  if (req.session && req.session.userId && req.session.userRole === 'admin') {
+    try {
+      const user = await storage.getUser(req.session.userId);
+      if (user) {
+        req.user = user;
+        next();
+        return;
+      }
+    } catch (error) {
+      console.error('Error en el middleware de verificación de admin:', error);
     }
   }
   
-  // Si no hay usuario autenticado, devolver un error 401
-  return res.status(401).json({ error: 'No autorizado. Inicie sesión para continuar.' });
+  res.status(403).json({ message: 'Acceso denegado. Se requieren permisos de administrador.' });
 };
 
-// Middleware para verificar si el usuario es administrador
-export const isAdmin = (req: Request, res: Response, next: NextFunction) => {
-  if (req.user && req.user.isAdmin) {
-    return next();
+// Middleware para verificar que un usuario accede solo a sus propios recursos
+export const isResourceOwner = (userIdParam: string) => {
+  return (req: Request, res: Response, next: NextFunction) => {
+    const resourceUserId = parseInt(req.params[userIdParam]);
+    
+    if (isNaN(resourceUserId)) {
+      return res.status(400).json({ message: 'ID de usuario inválido' });
+    }
+    
+    if (req.user && req.user.id === resourceUserId) {
+      next();
+      return;
+    }
+    
+    // Si es admin, también permitir el acceso
+    if (req.session && req.session.userRole === 'admin') {
+      next();
+      return;
+    }
+    
+    res.status(403).json({ message: 'Acceso denegado. No puedes acceder a recursos de otros usuarios.' });
+  };
+};
+
+// Función auxiliar para verificar la autenticación sin bloquear la solicitud
+export const getUserIfAuthenticated = async (req: Request) => {
+  if (req.session && req.session.userId) {
+    try {
+      return await storage.getUser(req.session.userId);
+    } catch (error) {
+      console.error('Error obteniendo el usuario autenticado:', error);
+    }
   }
-  
-  return res.status(403).json({ error: 'Acceso denegado. Requiere permisos de administrador.' });
-};
-
-// Middleware para verificar si el usuario es super administrador
-export const isSuperAdmin = (req: Request, res: Response, next: NextFunction) => {
-  if (req.user && req.user.isSuperAdmin) {
-    return next();
-  }
-  
-  return res.status(403).json({ error: 'Acceso denegado. Requiere permisos de super administrador.' });
-};
-
-// Función de ayuda para verificar si un usuario está autenticado
-export const checkAuthenticated = (req: Request): boolean => {
-  return !!(req.session && req.session.userId);
+  return null;
 };

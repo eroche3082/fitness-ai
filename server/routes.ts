@@ -36,6 +36,7 @@ import {
   cancelSession, 
   logout 
 } from "./superadmin";
+import avatarsRouter from "./routes/avatars";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Initialize Gemini configuration
@@ -310,6 +311,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   apiRouter.post("/superadmin/cancel-session", cancelSession);
   apiRouter.post("/superadmin/logout", logout);
   console.log("🔒 Super Admin routes registered successfully");
+  
+  // Avatar System routes
+  apiRouter.use('/', avatarsRouter);
+  console.log("🖼️ Avatar System routes registered successfully");
 
   // Stripe payment integration
   if (!process.env.STRIPE_SECRET_KEY) {

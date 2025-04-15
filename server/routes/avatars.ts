@@ -1,144 +1,189 @@
 import { Router } from 'express';
-import { storage } from '../storage';
-import { isAuthenticated } from '../middleware/auth';
 import path from 'path';
+import { isAuthenticated, isResourceOwner } from '../middleware/auth';
+import { storage } from '../storage';
 import fs from 'fs';
 import { v4 as uuidv4 } from 'uuid';
 
-const avatarsRouter = Router();
+const router = Router();
 
-// Obtener avatars por ID de usuario
-avatarsRouter.get('/users/:userId/avatars', isAuthenticated, async (req, res) => {
+// Ruta para obtener todos los avatares de un usuario
+router.get('/users/:userId/avatars', isAuthenticated, isResourceOwner('userId'), async (req, res) => {
   try {
-    const userId = req.params.userId;
+    const userId = parseInt(req.params.userId);
     
-    // Verificar si el usuario tiene permiso para acceder a estos avatars
-    if (req.user.id !== userId && !req.user.isAdmin) {
-      return res.status(403).json({ 
-        error: 'No tienes permiso para acceder a estos avatars' 
-      });
+    if (isNaN(userId)) {
+      return res.status(400).json({ message: 'ID de usuario inválido' });
     }
     
-    const userAvatars = await storage.getUserAvatars(userId);
-    
-    res.json({ avatars: userAvatars });
+    const avatars = await storage.getAvatarsByUserId(userId);
+    res.json({ avatars });
   } catch (error) {
-    console.error('Error al obtener avatars:', error);
-    res.status(500).json({ 
-      error: 'Error al obtener los avatars del usuario' 
-    });
+    console.error('Error al obtener avatares:', error);
+    res.status(500).json({ message: 'Error al obtener avatares' });
   }
 });
 
-// Establecer avatar activo para un usuario
-avatarsRouter.post('/users/:userId/avatar', isAuthenticated, async (req, res) => {
+// Ruta para obtener un avatar específico
+router.get('/users/:userId/avatars/:avatarId', isAuthenticated, isResourceOwner('userId'), async (req, res) => {
   try {
-    const userId = req.params.userId;
+    const userId = parseInt(req.params.userId);
+    const avatarId = req.params.avatarId;
+    
+    if (isNaN(userId)) {
+      return res.status(400).json({ message: 'ID de usuario inválido' });
+    }
+    
+    const avatar = await storage.getAvatarById(avatarId);
+    
+    if (!avatar || avatar.userId !== userId) {
+      return res.status(404).json({ message: 'Avatar no encontrado' });
+    }
+    
+    res.json({ avatar });
+  } catch (error) {
+    console.error('Error al obtener avatar:', error);
+    res.status(500).json({ message: 'Error al obtener avatar' });
+  }
+});
+
+// Ruta para establecer el avatar activo de un usuario
+router.post('/users/:userId/avatar', isAuthenticated, isResourceOwner('userId'), async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId);
     const { avatarId, avatarUrl } = req.body;
     
-    // Verificar si el usuario tiene permiso
-    if (req.user.id !== userId && !req.user.isAdmin) {
-      return res.status(403).json({ 
-        error: 'No tienes permiso para actualizar este avatar' 
-      });
+    if (isNaN(userId) || !avatarId) {
+      return res.status(400).json({ message: 'Datos inválidos' });
     }
     
-    // Actualizar avatar activo del usuario
-    await storage.setUserActiveAvatar(userId, avatarId, avatarUrl);
+    // Verificar que el avatar pertenece al usuario
+    const avatar = await storage.getAvatarById(avatarId);
     
-    res.json({ 
-      success: true,
-      message: 'Avatar actualizado correctamente'
+    if (!avatar || avatar.userId !== userId) {
+      return res.status(404).json({ message: 'Avatar no encontrado' });
+    }
+    
+    // Actualizar el perfil del usuario con el avatar activo
+    await storage.updateUserProfile(userId, {
+      activeAvatarId: avatarId,
+      avatarUrl: avatarUrl || avatar.imageUrl
     });
+    
+    res.json({ success: true, message: 'Avatar actualizado correctamente' });
   } catch (error) {
-    console.error('Error al actualizar avatar:', error);
-    res.status(500).json({ 
-      error: 'Error al actualizar el avatar del usuario' 
-    });
+    console.error('Error al establecer avatar activo:', error);
+    res.status(500).json({ message: 'Error al establecer avatar activo' });
   }
 });
 
-// Generar un nuevo avatar con SmartBotics (versión simulada)
-avatarsRouter.post('/avatars/generate', isAuthenticated, async (req, res) => {
+// Ruta para eliminar un avatar
+router.delete('/users/:userId/avatars/:avatarId', isAuthenticated, isResourceOwner('userId'), async (req, res) => {
+  try {
+    const userId = parseInt(req.params.userId);
+    const avatarId = req.params.avatarId;
+    
+    if (isNaN(userId)) {
+      return res.status(400).json({ message: 'ID de usuario inválido' });
+    }
+    
+    // Verificar que el avatar pertenece al usuario
+    const avatar = await storage.getAvatarById(avatarId);
+    
+    if (!avatar || avatar.userId !== userId) {
+      return res.status(404).json({ message: 'Avatar no encontrado' });
+    }
+    
+    // Si es un avatar personalizado (no predeterminado), eliminar el archivo
+    if (avatar.imageUrl.startsWith('/avatars/uploads/')) {
+      const filePath = path.join(process.cwd(), 'public', avatar.imageUrl);
+      try {
+        if (fs.existsSync(filePath)) {
+          fs.unlinkSync(filePath);
+        }
+      } catch (fileError) {
+        console.error('Error al eliminar archivo de avatar:', fileError);
+      }
+    }
+    
+    // Eliminar el avatar de la base de datos
+    await storage.deleteAvatar(avatarId);
+    
+    // Si era el avatar activo, establecer null
+    const user = await storage.getUser(userId);
+    if (user && user.profile && user.profile.activeAvatarId === avatarId) {
+      await storage.updateUserProfile(userId, {
+        activeAvatarId: null,
+        avatarUrl: null
+      });
+    }
+    
+    res.json({ success: true, message: 'Avatar eliminado correctamente' });
+  } catch (error) {
+    console.error('Error al eliminar avatar:', error);
+    res.status(500).json({ message: 'Error al eliminar avatar' });
+  }
+});
+
+// Ruta para generar un nuevo avatar
+router.post('/avatars/generate', isAuthenticated, async (req, res) => {
   try {
     const { userId, style = 'fitness' } = req.body;
     
-    // Verificar si el usuario tiene permiso
-    if (req.user.id !== userId && !req.user.isAdmin) {
-      return res.status(403).json({ 
-        error: 'No tienes permiso para generar avatars para este usuario' 
-      });
+    if (!userId) {
+      return res.status(400).json({ message: 'ID de usuario requerido' });
     }
     
-    // Simular proceso de generación (en un entorno real, esto invocaría un servicio de generación de imágenes)
-    await new Promise(resolve => setTimeout(resolve, 2000)); // Simular demora
+    // Obtener la lista de avatares predeterminados
+    const publicDir = path.join(process.cwd(), 'public', 'avatars');
+    let availableAvatars: string[] = [];
     
-    // Seleccionar un avatar base aleatorio (en un entorno real usaríamos un servicio IA para generar uno)
-    const baseAvatars = ['male-athletic', 'female-athletic', 'male-casual', 'female-casual', 'neutral-1', 'neutral-2'];
-    const randomBase = baseAvatars[Math.floor(Math.random() * baseAvatars.length)];
+    try {
+      const files = fs.readdirSync(publicDir);
+      availableAvatars = files
+        .filter(file => file.endsWith('.svg') && (
+          file.startsWith(style) || 
+          file.includes(style) || 
+          file.includes('neutral') || 
+          style === 'any'
+        ))
+        .map(file => `/avatars/${file}`);
+    } catch (fsError) {
+      console.error('Error al leer directorio de avatares:', fsError);
+      // Usar avatares por defecto si no se pueden leer
+      availableAvatars = [
+        '/avatars/neutral-1.svg',
+        '/avatars/neutral-2.svg',
+        '/avatars/female-athletic.svg'
+      ];
+    }
     
-    // Generar un identificador único para el avatar
-    const avatarId = `smartbotics-${style}-${uuidv4().substring(0, 8)}`;
+    if (availableAvatars.length === 0) {
+      return res.status(404).json({ message: 'No se encontraron avatares con el estilo solicitado' });
+    }
     
-    // En una implementación real, aquí generaríamos o modificaríamos una imagen
-    // Para este ejemplo, usamos uno de los SVG preexistentes con un identificador único
-    const avatarUrl = `/avatars/${randomBase}.svg?v=${Date.now()}`; // Añadir timestamp para evitar caché
+    // Seleccionar un avatar aleatorio
+    const randomAvatar = availableAvatars[Math.floor(Math.random() * availableAvatars.length)];
+    const avatarName = path.basename(randomAvatar, '.svg');
     
-    // Crear el objeto avatar
-    const newAvatar = {
-      id: avatarId,
-      name: `${style.charAt(0).toUpperCase() + style.slice(1)} Avatar`,
-      imageUrl: avatarUrl,
-      generatedOn: new Date().toISOString(),
-      userId: userId
-    };
-    
-    // Guardar el avatar en la base de datos
-    await storage.saveUserAvatar(userId, newAvatar);
+    // Crear el avatar en la base de datos
+    const avatar = await storage.createAvatar({
+      id: uuidv4(),
+      userId: parseInt(userId.toString()),
+      name: `${style.charAt(0).toUpperCase() + style.slice(1)} ${avatarName}`,
+      imageUrl: randomAvatar,
+      generatedOn: new Date()
+    });
     
     res.json({ 
-      success: true,
-      avatar: newAvatar
+      success: true, 
+      message: 'Avatar generado correctamente',
+      avatar
     });
   } catch (error) {
     console.error('Error al generar avatar:', error);
-    res.status(500).json({ 
-      error: 'Error al generar el avatar SmartBotics' 
-    });
+    res.status(500).json({ message: 'Error al generar avatar' });
   }
 });
 
-// Eliminar un avatar generado
-avatarsRouter.delete('/users/:userId/avatars/:avatarId', isAuthenticated, async (req, res) => {
-  try {
-    const { userId, avatarId } = req.params;
-    
-    // Verificar si el usuario tiene permiso
-    if (req.user.id !== userId && !req.user.isAdmin) {
-      return res.status(403).json({ 
-        error: 'No tienes permiso para eliminar este avatar' 
-      });
-    }
-    
-    // Eliminar el avatar
-    const result = await storage.deleteUserAvatar(userId, avatarId);
-    
-    if (!result) {
-      return res.status(404).json({ 
-        error: 'Avatar no encontrado' 
-      });
-    }
-    
-    res.json({ 
-      success: true,
-      message: 'Avatar eliminado correctamente'
-    });
-  } catch (error) {
-    console.error('Error al eliminar avatar:', error);
-    res.status(500).json({ 
-      error: 'Error al eliminar el avatar' 
-    });
-  }
-});
-
-export default avatarsRouter;
+export default router;
