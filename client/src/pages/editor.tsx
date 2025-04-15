@@ -1,610 +1,437 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation } from 'wouter';
-import { useAuth } from '../App';
 import { useConfig } from '../contexts/ConfigContext';
-import { useToast } from '@/hooks/use-toast';
-import { 
-  Card, 
-  CardContent, 
-  CardDescription, 
-  CardFooter, 
-  CardHeader, 
-  CardTitle 
-} from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { Switch } from '@/components/ui/switch';
-import { Separator } from '@/components/ui/separator';
-import { AlertCircle, Check, Save, Eye, EyeOff, RefreshCw, Globe, Layout, Palette, Type } from 'lucide-react';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import PreviewPanel from '../components/editor/PreviewPanel';
 import ImageUploader from '../components/editor/ImageUploader';
 import ColorPicker from '../components/editor/ColorPicker';
 import FontSelector from '../components/editor/FontSelector';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Loader2, SaveIcon, CheckCircle, Smartphone, Tablet, Monitor, Info } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { useToast } from '@/hooks/use-toast';
 
-export default function EditorPage() {
-  const { userRole } = useAuth();
-  const [, setLocation] = useLocation();
-  const { config, isLoading, error, updateAppConfig, applyConfig } = useConfig();
-  const { toast } = useToast();
-  
-  // Estado local para edición
-  const [editedConfig, setEditedConfig] = useState(config);
-  const [isSaving, setIsSaving] = useState(false);
+const EditorPage: React.FC = () => {
+  const { config, isLoading, error, updateSiteConfig } = useConfig();
   const [previewMode, setPreviewMode] = useState<'desktop' | 'mobile' | 'tablet'>('desktop');
-  const [activeTab, setActiveTab] = useState('general');
-  const [showPreview, setShowPreview] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
+  const [localConfig, setLocalConfig] = useState(config);
+  const { toast } = useToast();
 
-  // Actualizar el estado local cuando cambia la configuración
+  // Actualizar la configuración local cuando se carga el config
   useEffect(() => {
-    setEditedConfig(config);
+    if (config) {
+      setLocalConfig(config);
+    }
   }, [config]);
 
-  // Verificar permisos
-  useEffect(() => {
-    if (userRole !== 'admin' && userRole !== 'manager') {
-      toast({
-        title: 'Acceso restringido',
-        description: 'No tienes permisos para acceder al editor visual.',
-        variant: 'destructive'
-      });
-      setLocation('/');
-    }
-  }, [userRole, setLocation, toast]);
+  // Si no hay configuración todavía, mostrar pantalla de carga
+  if (isLoading || !localConfig) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="h-10 w-10 text-green-500 animate-spin mx-auto mb-4" />
+          <h2 className="text-xl font-bold text-white">Cargando editor...</h2>
+          <p className="text-gray-400">Obteniendo la configuración actual</p>
+        </div>
+      </div>
+    );
+  }
 
-  // Maneja cambios en campos de texto
-  const handleTextChange = (field: keyof typeof editedConfig, value: string) => {
-    setEditedConfig(prev => ({
-      ...prev,
-      [field]: value
-    }));
-  };
+  // Si hay un error, mostrar mensaje
+  if (error) {
+    return (
+      <div className="min-h-screen bg-black flex items-center justify-center">
+        <div className="text-center max-w-md p-6 bg-gray-900 rounded-lg">
+          <div className="text-red-500 text-5xl mb-4">!</div>
+          <h2 className="text-xl font-bold text-white mb-2">Error al cargar el editor</h2>
+          <p className="text-gray-400 mb-4">{error}</p>
+          <Button
+            onClick={() => window.location.reload()}
+            className="bg-green-600 hover:bg-green-700"
+          >
+            Reintentar
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
-  // Maneja cambios en la visibilidad de secciones
-  const handleSectionToggle = (section: keyof typeof editedConfig.visible_sections) => {
-    setEditedConfig(prev => ({
-      ...prev,
-      visible_sections: {
-        ...prev.visible_sections,
-        [section]: !prev.visible_sections[section]
+  // Manejar cambios en los campos de configuración
+  const handleConfigChange = (path: string, value: any) => {
+    setLocalConfig((prevConfig) => {
+      // Copia profunda del objeto para evitar modificaciones directas
+      const newConfig = JSON.parse(JSON.stringify(prevConfig));
+      
+      // Dividir la ruta por puntos para acceder a propiedades anidadas
+      const pathParts = path.split('.');
+      let current = newConfig;
+      
+      // Navegar por el objeto hasta la penúltima parte de la ruta
+      for (let i = 0; i < pathParts.length - 1; i++) {
+        current = current[pathParts[i]];
       }
-    }));
+      
+      // Actualizar la propiedad final con el nuevo valor
+      current[pathParts[pathParts.length - 1]] = value;
+      
+      return newConfig;
+    });
   };
 
-  // Maneja cambios en menú de encabezado
-  const handleMenuChange = (value: string) => {
-    const menuItems = value.split(',').map(item => item.trim());
-    setEditedConfig(prev => ({
-      ...prev,
-      header_menu: menuItems
-    }));
-  };
-
-  // Maneja cambios de color
-  const handleColorChange = (color: string) => {
-    setEditedConfig(prev => ({
-      ...prev,
-      primary_color: color
-    }));
-  };
-
-  // Maneja cambios de fuente
-  const handleFontChange = (font: string) => {
-    setEditedConfig(prev => ({
-      ...prev,
-      font_family: font
-    }));
-  };
-
-  // Maneja cambios de layout
-  const handleLayoutChange = (layout: 'dark' | 'light') => {
-    setEditedConfig(prev => ({
-      ...prev,
-      layout
-    }));
-  };
-
-  // Maneja cambios en la forma de los botones
-  const handleButtonShapeChange = (shape: 'rounded' | 'square' | 'pill') => {
-    setEditedConfig(prev => ({
-      ...prev,
-      button_shape: shape
-    }));
-  };
-
-  // Actualiza la URL de la imagen del héroe
-  const handleHeroImageChange = (url: string) => {
-    setEditedConfig(prev => ({
-      ...prev,
-      hero_image_url: url
-    }));
-  };
-
-  // Actualiza la URL del logo
-  const handleLogoChange = (url: string) => {
-    setEditedConfig(prev => ({
-      ...prev,
-      logo_url: url
-    }));
-  };
-
-  // Guardar los cambios
+  // Guardar la configuración
   const handleSave = async () => {
+    setIsSaving(true);
+    
     try {
-      setIsSaving(true);
-      await updateAppConfig(editedConfig);
+      await updateSiteConfig(localConfig);
+      setSaveSuccess(true);
       
       toast({
-        title: 'Cambios guardados',
-        description: 'Los cambios han sido guardados y aplicados correctamente.',
-        variant: 'default'
+        title: "Configuración guardada",
+        description: "Los cambios se han aplicado correctamente.",
+        variant: "default",
       });
-    } catch (err: any) {
+      
+      // Reiniciar el estado de éxito después de 3 segundos
+      setTimeout(() => {
+        setSaveSuccess(false);
+      }, 3000);
+    } catch (err) {
+      console.error('Error al guardar:', err);
+      
       toast({
-        title: 'Error al guardar',
-        description: err.message || 'No se pudieron guardar los cambios.',
-        variant: 'destructive'
+        title: "Error al guardar",
+        description: "No se pudieron guardar los cambios. Inténtalo de nuevo.",
+        variant: "destructive",
       });
     } finally {
       setIsSaving(false);
     }
   };
 
-  // Aplicar cambios solo para previsualización
-  const handlePreview = () => {
-    applyConfig(editedConfig);
-    
-    toast({
-      title: 'Modo de vista previa',
-      description: 'Los cambios han sido aplicados solo para previsualización. No olvides guardar.',
-      variant: 'default'
-    });
-  };
-
-  // Cancelar cambios
-  const handleCancel = () => {
-    setEditedConfig(config);
-    
-    toast({
-      title: 'Cambios descartados',
-      description: 'Se ha restaurado la configuración original.',
-      variant: 'default'
-    });
-  };
-
-  if (isLoading) {
-    return (
-      <div className="flex justify-center items-center h-screen bg-black">
-        <div className="text-center">
-          <RefreshCw className="h-8 w-8 animate-spin text-green-500 mx-auto" />
-          <p className="mt-4 text-white">Cargando configuración...</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-black text-white">
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold tracking-tight text-green-500">
-            Editor Visual de Fitness AI
-          </h1>
-          <div className="flex space-x-2">
-            <Button 
-              variant="outline" 
-              size="sm"
-              onClick={() => setShowPreview(!showPreview)}
-              className="text-white border-gray-700"
-            >
-              {showPreview ? <EyeOff className="h-4 w-4 mr-2" /> : <Eye className="h-4 w-4 mr-2" />}
-              {showPreview ? 'Ocultar Vista Previa' : 'Mostrar Vista Previa'}
-            </Button>
-            <Button
-              variant="default"
-              size="sm"
-              onClick={() => setLocation('/')}
-              className="bg-gray-800 hover:bg-gray-700"
-            >
-              <Globe className="h-4 w-4 mr-2" />
-              Ver Sitio
-            </Button>
-          </div>
-        </div>
-
-        {error && (
-          <Alert variant="destructive" className="mb-6">
-            <AlertCircle className="h-4 w-4" />
-            <AlertTitle>Error</AlertTitle>
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
-        )}
-
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Panel de Edición */}
-          <div className="lg:col-span-2">
-            <Card className="bg-gray-900 border-gray-800">
-              <CardHeader>
-                <CardTitle>Configuración del Sitio</CardTitle>
-                <CardDescription>
-                  Edita y personaliza la apariencia y contenido de Fitness AI
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <Tabs 
-                  defaultValue="general" 
-                  value={activeTab}
-                  onValueChange={setActiveTab}
-                  className="w-full"
-                >
-                  <TabsList className="mb-6 grid grid-cols-4 bg-gray-800">
-                    <TabsTrigger value="general">General</TabsTrigger>
-                    <TabsTrigger value="appearance">Apariencia</TabsTrigger>
-                    <TabsTrigger value="sections">Secciones</TabsTrigger>
-                    <TabsTrigger value="media">Imágenes</TabsTrigger>
-                  </TabsList>
-
-                  {/* Pestaña General */}
-                  <TabsContent value="general" className="space-y-6">
-                    <div className="grid gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="homepageTitle">Título Principal</Label>
-                        <Input
-                          id="homepageTitle"
-                          value={editedConfig.homepage_title}
-                          onChange={(e) => handleTextChange('homepage_title', e.target.value)}
-                          className="bg-gray-800 border-gray-700 text-white"
-                        />
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <Label htmlFor="homepageSubtitle">Subtítulo</Label>
-                        <Textarea
-                          id="homepageSubtitle"
-                          value={editedConfig.homepage_subtitle}
-                          onChange={(e) => handleTextChange('homepage_subtitle', e.target.value)}
-                          className="bg-gray-800 border-gray-700 text-white"
-                          rows={2}
-                        />
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <Label htmlFor="ctaText">Texto del Botón CTA</Label>
-                        <Input
-                          id="ctaText"
-                          value={editedConfig.cta_text}
-                          onChange={(e) => handleTextChange('cta_text', e.target.value)}
-                          className="bg-gray-800 border-gray-700 text-white"
-                        />
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <Label htmlFor="headerMenu">Menú de Navegación (separado por comas)</Label>
-                        <Input
-                          id="headerMenu"
-                          value={editedConfig.header_menu.join(', ')}
-                          onChange={(e) => handleMenuChange(e.target.value)}
-                          className="bg-gray-800 border-gray-700 text-white"
-                        />
-                        <p className="text-xs text-gray-400">
-                          Los elementos del menú aparecerán en el orden indicado
-                        </p>
-                      </div>
-                    </div>
-                  </TabsContent>
-
-                  {/* Pestaña Apariencia */}
-                  <TabsContent value="appearance" className="space-y-6">
-                    <div className="grid gap-6">
-                      <div className="space-y-2">
-                        <Label>Color Primario</Label>
-                        <div className="mb-4">
-                          <ColorPicker
-                            color={editedConfig.primary_color}
-                            onChange={handleColorChange}
-                          />
-                        </div>
-                      </div>
-                      
-                      <Separator className="bg-gray-700" />
-                      
-                      <div className="space-y-2">
-                        <Label>Fuente Principal</Label>
-                        <FontSelector
-                          value={editedConfig.font_family}
-                          onChange={handleFontChange}
-                        />
-                      </div>
-                      
-                      <Separator className="bg-gray-700" />
-                      
-                      <div className="space-y-2">
-                        <Label>Esquema de Colores</Label>
-                        <div className="flex space-x-4">
-                          <div 
-                            className={`p-4 border cursor-pointer ${
-                              editedConfig.layout === 'dark' 
-                                ? 'border-green-500' 
-                                : 'border-gray-700'
-                            }`}
-                            onClick={() => handleLayoutChange('dark')}
-                          >
-                            <div className="h-24 w-40 bg-black border border-gray-700 flex items-center justify-center">
-                              <div className="text-white bg-gray-900 p-2 w-32 text-center">
-                                <div className="text-green-500 text-sm">Oscuro</div>
-                              </div>
-                            </div>
-                          </div>
-                          
-                          <div 
-                            className={`p-4 border cursor-pointer ${
-                              editedConfig.layout === 'light' 
-                                ? 'border-green-500' 
-                                : 'border-gray-700'
-                            }`}
-                            onClick={() => handleLayoutChange('light')}
-                          >
-                            <div className="h-24 w-40 bg-white border border-gray-300 flex items-center justify-center">
-                              <div className="text-black bg-gray-100 p-2 w-32 text-center">
-                                <div className="text-green-600 text-sm">Claro</div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                      
-                      <Separator className="bg-gray-700" />
-                      
-                      <div className="space-y-2">
-                        <Label>Forma de Botones</Label>
-                        <div className="flex space-x-4">
-                          <div 
-                            className={`p-2 border cursor-pointer ${
-                              editedConfig.button_shape === 'square' 
-                                ? 'border-green-500' 
-                                : 'border-gray-700'
-                            }`}
-                            onClick={() => handleButtonShapeChange('square')}
-                          >
-                            <div className="h-10 w-24 bg-green-500 text-center flex items-center justify-center text-white text-sm">
-                              Cuadrado
-                            </div>
-                          </div>
-                          
-                          <div 
-                            className={`p-2 border cursor-pointer ${
-                              editedConfig.button_shape === 'rounded' 
-                                ? 'border-green-500' 
-                                : 'border-gray-700'
-                            }`}
-                            onClick={() => handleButtonShapeChange('rounded')}
-                          >
-                            <div className="h-10 w-24 bg-green-500 rounded-md text-center flex items-center justify-center text-white text-sm">
-                              Redondeado
-                            </div>
-                          </div>
-                          
-                          <div 
-                            className={`p-2 border cursor-pointer ${
-                              editedConfig.button_shape === 'pill' 
-                                ? 'border-green-500' 
-                                : 'border-gray-700'
-                            }`}
-                            onClick={() => handleButtonShapeChange('pill')}
-                          >
-                            <div className="h-10 w-24 bg-green-500 rounded-full text-center flex items-center justify-center text-white text-sm">
-                              Píldora
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </TabsContent>
-
-                  {/* Pestaña Secciones */}
-                  <TabsContent value="sections" className="space-y-6">
-                    <div className="space-y-4">
-                      <h3 className="text-lg font-medium">Visibilidad de Secciones</h3>
-                      <p className="text-sm text-gray-400">
-                        Controla qué secciones son visibles en la página principal
-                      </p>
-                      
-                      <div className="space-y-4">
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <Label htmlFor="chatSection" className="text-base">Chat/Asistente</Label>
-                            <p className="text-xs text-gray-400">Mostrar el widget de chatbot en la página</p>
-                          </div>
-                          <Switch
-                            id="chatSection"
-                            checked={editedConfig.visible_sections.chat}
-                            onCheckedChange={() => handleSectionToggle('chat')}
-                            className="data-[state=checked]:bg-green-500"
-                          />
-                        </div>
-                        
-                        <Separator className="bg-gray-700" />
-                        
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <Label htmlFor="featuresSection" className="text-base">Características</Label>
-                            <p className="text-xs text-gray-400">Mostrar sección de características y beneficios</p>
-                          </div>
-                          <Switch
-                            id="featuresSection"
-                            checked={editedConfig.visible_sections.features}
-                            onCheckedChange={() => handleSectionToggle('features')}
-                            className="data-[state=checked]:bg-green-500"
-                          />
-                        </div>
-                        
-                        <Separator className="bg-gray-700" />
-                        
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <Label htmlFor="pricingSection" className="text-base">Precios</Label>
-                            <p className="text-xs text-gray-400">Mostrar sección de precios y comparativa</p>
-                          </div>
-                          <Switch
-                            id="pricingSection"
-                            checked={editedConfig.visible_sections.pricing}
-                            onCheckedChange={() => handleSectionToggle('pricing')}
-                            className="data-[state=checked]:bg-green-500"
-                          />
-                        </div>
-                        
-                        <Separator className="bg-gray-700" />
-                        
-                        <div className="flex items-center justify-between">
-                          <div>
-                            <Label htmlFor="plansSection" className="text-base">Planes</Label>
-                            <p className="text-xs text-gray-400">Mostrar sección de planes de entrenamiento</p>
-                          </div>
-                          <Switch
-                            id="plansSection"
-                            checked={editedConfig.visible_sections.plans}
-                            onCheckedChange={() => handleSectionToggle('plans')}
-                            className="data-[state=checked]:bg-green-500"
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </TabsContent>
-
-                  {/* Pestaña Imágenes */}
-                  <TabsContent value="media" className="space-y-6">
-                    <div className="grid gap-6">
-                      <div className="space-y-2">
-                        <Label>Imagen de Cabecera (Hero)</Label>
-                        <ImageUploader
-                          currentImageUrl={editedConfig.hero_image_url || ''}
-                          onImageSelected={handleHeroImageChange}
-                          className="h-40"
-                        />
-                      </div>
-                      
-                      <Separator className="bg-gray-700" />
-                      
-                      <div className="space-y-2">
-                        <Label>Logo</Label>
-                        <ImageUploader
-                          currentImageUrl={editedConfig.logo_url || ''}
-                          onImageSelected={handleLogoChange}
-                          className="h-24"
-                        />
-                      </div>
-                    </div>
-                  </TabsContent>
-                </Tabs>
-              </CardContent>
-              <CardFooter className="flex justify-between border-t border-gray-800 pt-6">
-                <Button 
-                  variant="outline"
-                  onClick={handleCancel}
-                  className="border-gray-700 text-white"
-                >
-                  Cancelar
-                </Button>
-                <div className="flex space-x-2">
-                  <Button 
-                    variant="outline"
-                    onClick={handlePreview}
-                    className="border-green-500 text-green-500"
-                  >
-                    <Eye className="h-4 w-4 mr-2" />
-                    Previsualizar
-                  </Button>
-                  <Button 
-                    onClick={handleSave}
-                    disabled={isSaving}
-                    className="bg-green-500 text-white hover:bg-green-600"
-                  >
-                    {isSaving ? (
-                      <>
-                        <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
-                        Guardando...
-                      </>
-                    ) : (
-                      <>
-                        <Save className="h-4 w-4 mr-2" />
-                        Guardar Cambios
-                      </>
-                    )}
-                  </Button>
-                </div>
-              </CardFooter>
-            </Card>
+      {/* Header del editor */}
+      <header className="border-b border-gray-800 bg-gray-900 py-4">
+        <div className="container max-w-7xl mx-auto px-4 flex justify-between items-center">
+          <div>
+            <h1 className="text-2xl font-bold">Editor Visual - Fitness AI</h1>
+            <p className="text-gray-400 text-sm">Personaliza el aspecto y contenido de tu sitio</p>
           </div>
           
-          {/* Panel de Vista Previa */}
-          {showPreview && (
-            <div className="lg:col-span-1">
-              <Card className="bg-gray-900 border-gray-800 sticky top-4">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-base flex justify-between items-center">
-                    <span>Vista Previa</span>
-                    <div className="flex space-x-2">
-                      <Button 
-                        size="sm" 
-                        variant="outline"
-                        className={`px-2 py-1 h-8 ${previewMode === 'desktop' ? 'bg-gray-700' : 'bg-transparent'}`}
-                        onClick={() => setPreviewMode('desktop')}
-                      >
-                        <Palette className="h-4 w-4" />
-                      </Button>
-                      <Button 
-                        size="sm" 
-                        variant="outline"
-                        className={`px-2 py-1 h-8 ${previewMode === 'tablet' ? 'bg-gray-700' : 'bg-transparent'}`}
-                        onClick={() => setPreviewMode('tablet')}
-                      >
-                        <Layout className="h-4 w-4" />
-                      </Button>
-                      <Button 
-                        size="sm" 
-                        variant="outline"
-                        className={`px-2 py-1 h-8 ${previewMode === 'mobile' ? 'bg-gray-700' : 'bg-transparent'}`}
-                        onClick={() => setPreviewMode('mobile')}
-                      >
-                        <Type className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className={`
-                    overflow-hidden rounded-md border border-gray-700
-                    ${previewMode === 'desktop' ? 'w-full' : ''}
-                    ${previewMode === 'tablet' ? 'w-[768px] max-w-full mx-auto' : ''}
-                    ${previewMode === 'mobile' ? 'w-[320px] max-w-full mx-auto' : ''}
-                  `}>
-                    <PreviewPanel config={editedConfig} previewMode={previewMode} />
-                  </div>
-                </CardContent>
-              </Card>
+          <div className="flex items-center gap-4">
+            {/* Selector de dispositivo para la vista previa */}
+            <div className="flex items-center border border-gray-700 rounded-md p-1 bg-gray-800">
+              <Button
+                size="sm"
+                variant={previewMode === 'mobile' ? 'default' : 'ghost'}
+                onClick={() => setPreviewMode('mobile')}
+                className={previewMode === 'mobile' ? 'bg-green-600 hover:bg-green-700' : ''}
+              >
+                <Smartphone className="h-4 w-4" />
+              </Button>
+              <Button
+                size="sm"
+                variant={previewMode === 'tablet' ? 'default' : 'ghost'}
+                onClick={() => setPreviewMode('tablet')}
+                className={previewMode === 'tablet' ? 'bg-green-600 hover:bg-green-700' : ''}
+              >
+                <Tablet className="h-4 w-4" />
+              </Button>
+              <Button
+                size="sm"
+                variant={previewMode === 'desktop' ? 'default' : 'ghost'}
+                onClick={() => setPreviewMode('desktop')}
+                className={previewMode === 'desktop' ? 'bg-green-600 hover:bg-green-700' : ''}
+              >
+                <Monitor className="h-4 w-4" />
+              </Button>
             </div>
-          )}
+            
+            {/* Botón de guardar */}
+            <Button
+              onClick={handleSave}
+              disabled={isSaving}
+              className="bg-green-600 hover:bg-green-700"
+            >
+              {isSaving ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Guardando...
+                </>
+              ) : saveSuccess ? (
+                <>
+                  <CheckCircle className="h-4 w-4 mr-2" />
+                  ¡Guardado!
+                </>
+              ) : (
+                <>
+                  <SaveIcon className="h-4 w-4 mr-2" />
+                  Guardar cambios
+                </>
+              )}
+            </Button>
+          </div>
         </div>
-        
-        <div className="mt-8 text-sm text-gray-400">
-          <p>
-            <span className="font-semibold">Nota:</span> Los cambios se aplicarán inmediatamente a todos los usuarios activos después de guardar.
-          </p>
-          {userRole === 'admin' && (
-            <p className="mt-2">
-              <span className="text-green-500">•</span> Como Super Administrador, puedes editar todas las propiedades del sitio.
-            </p>
-          )}
-          {userRole === 'manager' && (
-            <p className="mt-2">
-              <span className="text-green-500">•</span> Como Admin Manager, puedes editar la mayoría de las propiedades visuales.
-            </p>
-          )}
+      </header>
+      
+      {/* Contenido principal */}
+      <main className="container max-w-7xl mx-auto px-4 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+          {/* Panel de configuración */}
+          <div className="lg:col-span-2">
+            <Tabs defaultValue="appearance" className="w-full">
+              <TabsList className="w-full bg-gray-900 border border-gray-800">
+                <TabsTrigger value="appearance" className="data-[state=active]:bg-green-600">
+                  Apariencia
+                </TabsTrigger>
+                <TabsTrigger value="content" className="data-[state=active]:bg-green-600">
+                  Contenido
+                </TabsTrigger>
+                <TabsTrigger value="sections" className="data-[state=active]:bg-green-600">
+                  Secciones
+                </TabsTrigger>
+              </TabsList>
+              
+              {/* Pestaña de apariencia */}
+              <TabsContent value="appearance" className="space-y-4 mt-4">
+                <Card className="bg-gray-900 border-gray-800">
+                  <CardHeader>
+                    <CardTitle>Tema y colores</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div>
+                      <Label htmlFor="primary-color">Color principal</Label>
+                      <ColorPicker
+                        color={localConfig.primary_color}
+                        onChange={(color) => handleConfigChange('primary_color', color)}
+                        className="mt-1"
+                      />
+                    </div>
+                    
+                    <div>
+                      <FontSelector
+                        value={localConfig.font_family}
+                        onChange={(font) => handleConfigChange('font_family', font)}
+                      />
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="layout" className="mb-2 block">Tema</Label>
+                      <Select
+                        value={localConfig.layout}
+                        onValueChange={(value) => handleConfigChange('layout', value)}
+                      >
+                        <SelectTrigger id="layout" className="bg-gray-800 border-gray-700">
+                          <SelectValue placeholder="Seleccionar tema" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-gray-800 border-gray-700">
+                          <SelectItem value="dark">Oscuro</SelectItem>
+                          <SelectItem value="light">Claro</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="button-shape" className="mb-2 block">Forma de botones</Label>
+                      <Select
+                        value={localConfig.button_shape}
+                        onValueChange={(value) => handleConfigChange('button_shape', value)}
+                      >
+                        <SelectTrigger id="button-shape" className="bg-gray-800 border-gray-700">
+                          <SelectValue placeholder="Seleccionar forma" />
+                        </SelectTrigger>
+                        <SelectContent className="bg-gray-800 border-gray-700">
+                          <SelectItem value="rounded">Redondeado</SelectItem>
+                          <SelectItem value="squared">Cuadrado</SelectItem>
+                          <SelectItem value="pill">Píldora</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </CardContent>
+                </Card>
+                
+                <Card className="bg-gray-900 border-gray-800">
+                  <CardHeader>
+                    <CardTitle>Imágenes</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <ImageUploader
+                      currentImageUrl={localConfig.hero_image_url}
+                      onImageUpload={(url) => handleConfigChange('hero_image_url', url)}
+                      section="hero"
+                    />
+                  </CardContent>
+                </Card>
+              </TabsContent>
+              
+              {/* Pestaña de contenido */}
+              <TabsContent value="content" className="space-y-4 mt-4">
+                <Card className="bg-gray-900 border-gray-800">
+                  <CardHeader>
+                    <CardTitle>Textos principales</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div>
+                      <Label htmlFor="homepage-title">Título de la página</Label>
+                      <Input
+                        id="homepage-title"
+                        value={localConfig.homepage_title}
+                        onChange={(e) => handleConfigChange('homepage_title', e.target.value)}
+                        className="mt-1 bg-gray-800 border-gray-700"
+                      />
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="homepage-subtitle">Subtítulo</Label>
+                      <Textarea
+                        id="homepage-subtitle"
+                        value={localConfig.homepage_subtitle}
+                        onChange={(e) => handleConfigChange('homepage_subtitle', e.target.value)}
+                        className="mt-1 bg-gray-800 border-gray-700"
+                        rows={3}
+                      />
+                    </div>
+                    
+                    <div>
+                      <Label htmlFor="cta-text">Texto del botón principal</Label>
+                      <Input
+                        id="cta-text"
+                        value={localConfig.cta_text}
+                        onChange={(e) => handleConfigChange('cta_text', e.target.value)}
+                        className="mt-1 bg-gray-800 border-gray-700"
+                      />
+                    </div>
+                  </CardContent>
+                </Card>
+                
+                <Card className="bg-gray-900 border-gray-800">
+                  <CardHeader>
+                    <CardTitle>Menú de navegación</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div>
+                      <Label htmlFor="header-menu" className="mb-2 block">
+                        Items del menú
+                        <TooltipProvider>
+                          <Tooltip>
+                            <TooltipTrigger asChild>
+                              <Info className="h-4 w-4 ml-2 inline-block text-gray-400" />
+                            </TooltipTrigger>
+                            <TooltipContent className="bg-gray-800 border-gray-700">
+                              <p>Separa cada item del menú con una coma</p>
+                            </TooltipContent>
+                          </Tooltip>
+                        </TooltipProvider>
+                      </Label>
+                      <Input
+                        id="header-menu"
+                        value={localConfig.header_menu.join(', ')}
+                        onChange={(e) => {
+                          const menuItems = e.target.value.split(',').map(item => item.trim());
+                          handleConfigChange('header_menu', menuItems);
+                        }}
+                        className="bg-gray-800 border-gray-700"
+                        placeholder="Inicio, Programas, Planes, ..."
+                      />
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+              
+              {/* Pestaña de secciones */}
+              <TabsContent value="sections" className="space-y-4 mt-4">
+                <Card className="bg-gray-900 border-gray-800">
+                  <CardHeader>
+                    <CardTitle>Visibilidad de secciones</CardTitle>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="show-features" className="cursor-pointer">
+                        Mostrar sección de características
+                      </Label>
+                      <Switch
+                        id="show-features"
+                        checked={localConfig.visible_sections.features}
+                        onCheckedChange={(checked) => handleConfigChange('visible_sections.features', checked)}
+                      />
+                    </div>
+                    
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="show-pricing" className="cursor-pointer">
+                        Mostrar sección de precios
+                      </Label>
+                      <Switch
+                        id="show-pricing"
+                        checked={localConfig.visible_sections.pricing}
+                        onCheckedChange={(checked) => handleConfigChange('visible_sections.pricing', checked)}
+                      />
+                    </div>
+                    
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="show-plans" className="cursor-pointer">
+                        Mostrar sección de planes
+                      </Label>
+                      <Switch
+                        id="show-plans"
+                        checked={localConfig.visible_sections.plans}
+                        onCheckedChange={(checked) => handleConfigChange('visible_sections.plans', checked)}
+                      />
+                    </div>
+                    
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="show-chat" className="cursor-pointer">
+                        Mostrar chatbot
+                      </Label>
+                      <Switch
+                        id="show-chat"
+                        checked={localConfig.visible_sections.chat}
+                        onCheckedChange={(checked) => handleConfigChange('visible_sections.chat', checked)}
+                      />
+                    </div>
+                  </CardContent>
+                </Card>
+                
+                <Card className="bg-gray-900 border-gray-800">
+                  <CardHeader>
+                    <CardTitle>Metadatos</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-sm text-gray-400 space-y-1">
+                      <p>
+                        <strong>Última actualización:</strong>{' '}
+                        {new Date(localConfig.last_updated.date).toLocaleString()}
+                      </p>
+                      <p>
+                        <strong>Por:</strong> {localConfig.last_updated.by}
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            </Tabs>
+          </div>
+          
+          {/* Panel de vista previa */}
+          <div className="lg:col-span-3">
+            <div className="sticky top-4">
+              <h2 className="text-xl font-bold mb-4">Vista previa</h2>
+              <div className="bg-gray-900 p-4 rounded-lg border border-gray-800">
+                <PreviewPanel config={localConfig} previewMode={previewMode} />
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
+      </main>
     </div>
   );
-}
+};
+
+export default EditorPage;

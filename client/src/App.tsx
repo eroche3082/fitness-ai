@@ -390,6 +390,9 @@ function Router() {
           <Route path="/admin/billing" component={ApiStatusPage}/>
           <Route path="/admin/deployment-readiness" component={DeploymentReadinessDashboard}/>
           
+          {/* Editor route - only for admin and manager roles */}
+          <Route path="/editor" component={lazy(() => import('./pages/editor'))}/>
+          
           {/* Admin Manager routes */}
           <Route path="/admin/users" component={lazy(() => import('./pages/admin/UserManagement'))}/>
           <Route path="/admin/membership-plans" component={lazy(() => import('./pages/admin/MembershipPlans'))}/>
@@ -470,27 +473,29 @@ function App() {
         <AuthProvider>
           <UserProvider>
             <ChatProvider>
-              {/* App Loading Screen for Mobile */}
-              <MobileAppLoader />
-              
-              {/* System initializer and main application components */}
-              <FitnessSystemInitializer />
-              <Router />
-              {/* Only show navigation for authenticated users */}
-              {useAuth().isAuthenticated && <MainNavigation />}
-              
-              {/* Content with margin for sidebar when authenticated */}
-              {useAuth().isAuthenticated && (
-                <div style={{ marginLeft: '260px' }} className="p-4">
-                  {/* Additional content can go here */}
-                </div>
-              )}
-              
-              {/* Add the floating chatbot to all pages, according to MEGAPROMPT */}
-              <MiniChatbot />
-              
-              {/* Add mobile navigation for responsive design */}
-              <MobileNavigation />
+              <ConfigProvider>
+                {/* App Loading Screen for Mobile */}
+                <MobileAppLoader />
+                
+                {/* System initializer and main application components */}
+                <FitnessSystemInitializer />
+                <Router />
+                {/* Only show navigation for authenticated users */}
+                {useAuth().isAuthenticated && <MainNavigation />}
+                
+                {/* Content with margin for sidebar when authenticated */}
+                {useAuth().isAuthenticated && (
+                  <div style={{ marginLeft: '260px' }} className="p-4">
+                    {/* Additional content can go here */}
+                  </div>
+                )}
+                
+                {/* Add the floating chatbot to all pages, according to MEGAPROMPT */}
+                <MiniChatbot />
+                
+                {/* Add mobile navigation for responsive design */}
+                <MobileNavigation />
+              </ConfigProvider>
             </ChatProvider>
           </UserProvider>
         </AuthProvider>

@@ -1,148 +1,129 @@
-import { 
-  doc, 
-  getDoc, 
-  setDoc, 
-  updateDoc, 
-  onSnapshot, 
-  Unsubscribe 
-} from "firebase/firestore";
-import { firestore } from "../firebaseConfig";
+import { doc, getDoc, setDoc, onSnapshot, Unsubscribe } from 'firebase/firestore';
+import { db } from '../firebaseConfig';
 
-// Interfaz para la configuración de la aplicación
 export interface FitnessConfig {
-  primary_color: string;
-  font_family: string;
-  layout: "dark" | "light";
-  button_shape: "rounded" | "square" | "pill";
+  // Información básica del sitio
   homepage_title: string;
   homepage_subtitle: string;
   cta_text: string;
+  primary_color: string;
+  
+  // Estilos generales
+  font_family: string;
+  button_shape: 'rounded' | 'pill' | 'square';
+  layout: 'dark' | 'light';
+  
+  // Imágenes
+  hero_image_url: string;
+  logo_url: string;
+  
+  // Navegación
   header_menu: string[];
+  
+  // Controles de visibilidad
   visible_sections: {
-    chat: boolean;
+    hero: boolean;
     features: boolean;
     pricing: boolean;
     plans: boolean;
+    testimonials: boolean;
+    chat: boolean;
+    footer: boolean;
   };
-  hero_image_url?: string;
-  logo_url?: string;
-  last_updated?: {
-    timestamp: number;
-    user_id: string;
-    user_role: string;
-  };
+  
+  // Metadatos
+  last_updated: string;
+  updated_by: string;
 }
 
-// Configuración por defecto
-export const defaultConfig: FitnessConfig = {
-  primary_color: "#11ff00",
-  font_family: "Roboto",
-  layout: "dark",
-  button_shape: "rounded",
-  homepage_title: "Welcome to Fitness AI",
-  homepage_subtitle: "Train smarter with your personal AI coach",
-  cta_text: "Get Started",
-  header_menu: ["Home", "Features", "Pricing", "Assistant"],
+const DEFAULT_CONFIG: FitnessConfig = {
+  homepage_title: 'Transforma tu cuerpo y mente con Fitness AI',
+  homepage_subtitle: 'Coaching personalizado en tiempo real, seguimiento de progreso y planes adaptados a tus objetivos',
+  cta_text: 'Comenzar ahora',
+  primary_color: '#11ff00',
+  
+  font_family: 'Roboto',
+  button_shape: 'pill',
+  layout: 'dark',
+  
+  hero_image_url: '',
+  logo_url: '',
+  
+  header_menu: ['Inicio', 'Características', 'Planes', 'Contacto'],
+  
   visible_sections: {
-    chat: true,
+    hero: true,
     features: true,
     pricing: true,
-    plans: true
-  }
+    plans: true,
+    testimonials: true,
+    chat: true,
+    footer: true
+  },
+  
+  last_updated: new Date().toISOString(),
+  updated_by: 'system'
 };
 
-const CONFIG_PATH = "config/fitnessai";
+const CONFIG_PATH = 'config/fitnessai';
 
 /**
- * Obtiene la configuración actual de Firestore
- * @returns Promesa con la configuración
+ * Obtiene la configuración actual desde Firestore
  */
 export async function getConfig(): Promise<FitnessConfig> {
   try {
-    const docRef = doc(firestore, CONFIG_PATH);
+    const docRef = doc(db, CONFIG_PATH);
     const docSnap = await getDoc(docRef);
     
     if (docSnap.exists()) {
       return docSnap.data() as FitnessConfig;
     } else {
-      // Si no existe el documento, lo creamos con la configuración por defecto
-      await setDoc(docRef, defaultConfig);
-      return defaultConfig;
+      console.log('No existe configuración, usando valores por defecto');
+      await setConfig(DEFAULT_CONFIG);
+      return DEFAULT_CONFIG;
     }
   } catch (error) {
-    console.error("Error fetching config:", error);
-    return defaultConfig;
+    console.error('Error al cargar la configuración:', error);
+    return DEFAULT_CONFIG;
   }
 }
 
 /**
- * Actualiza la configuración en Firestore
- * @param config La nueva configuración
- * @param userId ID del usuario que realiza el cambio
- * @param userRole Rol del usuario que realiza el cambio
- * @returns Promesa que se resuelve cuando se completa la actualización
+ * Guarda la configuración en Firestore
  */
-export async function updateConfig(
-  config: Partial<FitnessConfig>, 
-  userId: string, 
-  userRole: string
-): Promise<void> {
+export async function setConfig(config: FitnessConfig): Promise<void> {
   try {
-    const docRef = doc(firestore, CONFIG_PATH);
-    const updateData = {
+    // Actualizar timestamp y otros metadatos
+    const updatedConfig = {
       ...config,
-      last_updated: {
-        timestamp: Date.now(),
-        user_id: userId,
-        user_role: userRole
-      }
+      last_updated: new Date().toISOString(),
+      // Aquí podrías obtener el usuario actual del contexto de auth
+      updated_by: 'editor_user'
     };
     
-    await updateDoc(docRef, updateData);
-    console.log("Config updated successfully");
+    const docRef = doc(db, CONFIG_PATH);
+    await setDoc(docRef, updatedConfig);
+    console.log('Configuración guardada con éxito');
   } catch (error) {
-    console.error("Error updating config:", error);
-    throw new Error("Failed to update configuration");
+    console.error('Error al guardar la configuración:', error);
+    throw error;
   }
 }
 
 /**
- * Suscribe a cambios en la configuración en tiempo real
- * @param callback Función a llamar cuando cambia la configuración
- * @returns Función para cancelar la suscripción
+ * Se suscribe a cambios en la configuración
  */
-export function subscribeToConfigChanges(
-  callback: (config: FitnessConfig) => void
-): Unsubscribe {
-  const docRef = doc(firestore, CONFIG_PATH);
+export function subscribeToConfig(callback: (config: FitnessConfig) => void): Unsubscribe {
+  const docRef = doc(db, CONFIG_PATH);
   
   return onSnapshot(docRef, (docSnap) => {
     if (docSnap.exists()) {
       callback(docSnap.data() as FitnessConfig);
     } else {
-      callback(defaultConfig);
+      // Si no existe, usar valores por defecto
+      callback(DEFAULT_CONFIG);
     }
   }, (error) => {
-    console.error("Error listening to config changes:", error);
+    console.error('Error al escuchar cambios en la configuración:', error);
   });
-}
-
-/**
- * Registra un cambio de configuración en el historial de auditoría
- * @param userId ID del usuario que realizó el cambio
- * @param userRole Rol del usuario
- * @param changes Cambios realizados
- */
-export async function logConfigChange(
-  userId: string,
-  userRole: string,
-  changes: Record<string, any>
-): Promise<void> {
-  try {
-    // Implementar la lógica para registrar cambios en el historial
-    // Esto podría ser en una colección separada en Firestore
-    console.log("Changes logged:", { userId, userRole, changes, timestamp: new Date() });
-  } catch (error) {
-    console.error("Error logging config changes:", error);
-  }
 }

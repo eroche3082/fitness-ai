@@ -1,190 +1,363 @@
 import React from 'react';
 import { FitnessConfig } from '../../services/fitnessConfigService';
-import { Activity, Check, ArrowRight } from 'lucide-react';
 
 interface PreviewPanelProps {
   config: FitnessConfig;
   previewMode: 'desktop' | 'mobile' | 'tablet';
 }
 
-export default function PreviewPanel({ config, previewMode }: PreviewPanelProps) {
-  // Aplicar estilos dinámicos basados en la configuración
-  const buttonStyle = {
-    backgroundColor: config.primary_color,
-    color: '#000000',
-    padding: '0.5rem 1rem',
-    borderRadius: 
-      config.button_shape === 'rounded' ? '0.375rem' : 
-      config.button_shape === 'pill' ? '9999px' : 
-      '0',
-    fontFamily: config.font_family,
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    fontSize: '0.875rem',
-    fontWeight: 'bold',
+const PreviewPanel: React.FC<PreviewPanelProps> = ({ config, previewMode }) => {
+  // Helper para generar estilos de botones basados en la configuración
+  const getButtonStyles = () => {
+    let borderRadius = '0.375rem';  // rounded por defecto
+    
+    if (config.button_shape === 'squared') {
+      borderRadius = '0';
+    } else if (config.button_shape === 'pill') {
+      borderRadius = '9999px';
+    }
+    
+    return {
+      backgroundColor: config.primary_color,
+      borderRadius,
+      padding: previewMode === 'mobile' ? '0.5rem 1rem' : '0.75rem 1.5rem',
+      fontSize: previewMode === 'mobile' ? '0.875rem' : '1rem',
+      fontWeight: 'bold',
+      color: '#ffffff',
+      display: 'inline-flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      transition: 'all 0.2s ease-in-out',
+      border: 'none',
+      cursor: 'pointer',
+    };
   };
-  
-  const headingStyle = {
-    fontFamily: config.font_family,
-    color: '#ffffff',
-    marginBottom: '0.5rem',
+
+  // Obtener tamaño de texto responsivo
+  const getResponsiveTextSize = (size: 'h1' | 'h2' | 'p') => {
+    switch (size) {
+      case 'h1':
+        return previewMode === 'mobile' ? '1.75rem' : previewMode === 'tablet' ? '2.25rem' : '3rem';
+      case 'h2':
+        return previewMode === 'mobile' ? '1.25rem' : previewMode === 'tablet' ? '1.5rem' : '1.75rem';
+      case 'p':
+        return previewMode === 'mobile' ? '0.875rem' : '1rem';
+    }
   };
-  
-  const subheadingStyle = {
-    fontFamily: config.font_family,
-    color: '#9ca3af',
-    marginBottom: '1rem',
+
+  // Aplicar tema global (claro/oscuro)
+  const themeStyles = {
+    backgroundColor: config.layout === 'dark' ? '#000000' : '#ffffff',
+    color: config.layout === 'dark' ? '#ffffff' : '#333333',
   };
 
   return (
     <div 
-      className="w-full overflow-hidden"
-      style={{ 
-        backgroundColor: config.layout === 'dark' ? '#000000' : '#ffffff',
-        color: config.layout === 'dark' ? '#ffffff' : '#000000',
+      style={{
+        ...themeStyles,
+        fontFamily: config.font_family,
+        borderRadius: '0.5rem',
+        overflow: 'hidden',
+        minHeight: previewMode === 'mobile' ? '480px' : '640px',
       }}
+      className="shadow-lg border border-gray-800"
     >
       {/* Header */}
-      <div className="p-4 border-b border-gray-800 flex justify-between items-center">
-        <div className="flex items-center">
-          <Activity className="h-5 w-5 mr-2" style={{ color: config.primary_color }} />
-          <h2 className="text-lg font-bold" style={{ fontFamily: config.font_family }}>
-            FITNESS<span style={{ color: config.primary_color }}>AI</span>
-          </h2>
-        </div>
-        <div className="hidden md:flex space-x-4">
-          {config.header_menu.map((item, index) => (
-            <a 
-              key={index} 
-              href="#" 
-              className="text-sm hover:text-opacity-80"
-              style={{ color: config.layout === 'dark' ? '#ffffff' : '#000000', fontFamily: config.font_family }}
-            >
-              {item}
-            </a>
-          ))}
-        </div>
-      </div>
-
-      {/* Hero Section */}
-      <div className="relative min-h-[200px] flex items-center p-4 overflow-hidden">
-        {config.hero_image_url && (
-          <div 
-            className="absolute inset-0 z-0 opacity-50 bg-cover bg-center"
-            style={{ 
-              backgroundImage: `url(${config.hero_image_url})`,
-              filter: 'brightness(0.5)'
-            }}
-          />
-        )}
-        <div className="relative z-10 max-w-full">
+      <header 
+        style={{ 
+          padding: previewMode === 'mobile' ? '1rem' : '1.5rem',
+          backgroundColor: config.layout === 'dark' ? '#111111' : '#f5f5f5',
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          borderBottom: `1px solid ${config.layout === 'dark' ? '#222222' : '#e5e5e5'}`
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center' }}>
           <h1 
-            className="text-2xl md:text-3xl font-bold" 
-            style={headingStyle}
+            style={{ 
+              fontSize: previewMode === 'mobile' ? '1.25rem' : '1.5rem',
+              fontWeight: 'bold',
+              color: config.primary_color
+            }}
           >
-            {config.homepage_title}
+            Fitness AI
           </h1>
-          <p 
-            className="text-sm md:text-base" 
-            style={subheadingStyle}
-          >
-            {config.homepage_subtitle}
-          </p>
-          <button style={buttonStyle}>
-            {config.cta_text}
-            <ArrowRight className="h-4 w-4 ml-2" />
-          </button>
         </div>
-      </div>
+        
+        <nav>
+          <ul style={{ display: 'flex', gap: previewMode === 'mobile' ? '0.5rem' : '1rem' }}>
+            {config.header_menu.slice(0, previewMode === 'mobile' ? 3 : 5).map((item, index) => (
+              <li key={index}>
+                <a 
+                  href="#" 
+                  onClick={(e) => e.preventDefault()}
+                  style={{ 
+                    color: config.layout === 'dark' ? '#e5e5e5' : '#333333',
+                    fontSize: previewMode === 'mobile' ? '0.75rem' : '0.875rem',
+                    textDecoration: 'none'
+                  }}
+                >
+                  {item}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      </header>
 
-      {/* Features Section Placeholder */}
+      {/* Hero section */}
+      <section 
+        style={{ 
+          padding: previewMode === 'mobile' ? '2rem 1rem' : '4rem 2rem',
+          textAlign: 'center',
+          backgroundImage: config.hero_image_url ? `linear-gradient(rgba(0,0,0,0.65), rgba(0,0,0,0.65)), url(${config.hero_image_url})` : 'none',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundColor: config.layout === 'dark' ? '#111111' : '#f5f5f5',
+        }}
+      >
+        <h1 
+          style={{ 
+            fontSize: getResponsiveTextSize('h1'),
+            fontWeight: 'bold',
+            marginBottom: previewMode === 'mobile' ? '0.75rem' : '1rem',
+            color: config.hero_image_url ? '#ffffff' : (config.layout === 'dark' ? '#ffffff' : '#333333'),
+          }}
+        >
+          {config.homepage_title}
+        </h1>
+        
+        <p 
+          style={{ 
+            fontSize: getResponsiveTextSize('p'),
+            maxWidth: '800px',
+            margin: '0 auto',
+            marginBottom: previewMode === 'mobile' ? '1.5rem' : '2rem',
+            color: config.hero_image_url ? '#ffffff' : (config.layout === 'dark' ? '#e5e5e5' : '#666666'),
+          }}
+        >
+          {config.homepage_subtitle}
+        </p>
+        
+        <button style={getButtonStyles()}>
+          {config.cta_text}
+        </button>
+      </section>
+
+      {/* Features section */}
       {config.visible_sections.features && (
-        <div className="p-4 border-t border-gray-800">
+        <section 
+          style={{ 
+            padding: previewMode === 'mobile' ? '2rem 1rem' : '4rem 2rem',
+            backgroundColor: config.layout === 'dark' ? '#0a0a0a' : '#ffffff',
+            borderTop: `1px solid ${config.layout === 'dark' ? '#222222' : '#e5e5e5'}`
+          }}
+        >
           <h2 
-            className="text-xl font-semibold mb-3" 
-            style={headingStyle}
+            style={{ 
+              fontSize: getResponsiveTextSize('h2'),
+              fontWeight: 'bold',
+              textAlign: 'center',
+              marginBottom: previewMode === 'mobile' ? '1.5rem' : '2.5rem',
+            }}
           >
             Características
           </h2>
-          <div className="grid grid-cols-2 gap-2">
-            {[1, 2, 3, 4].map(item => (
-              <div key={item} className="flex items-start p-2 bg-opacity-10" style={{ backgroundColor: config.layout === 'dark' ? '#1f2937' : '#f3f4f6' }}>
-                <Check className="h-4 w-4 mr-2 flex-shrink-0 mt-0.5" style={{ color: config.primary_color }} />
-                <span className="text-xs" style={{ fontFamily: config.font_family }}>
-                  Característica {item}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Pricing Section Placeholder */}
-      {config.visible_sections.pricing && (
-        <div className="p-4 border-t border-gray-800">
-          <h2 
-            className="text-xl font-semibold mb-3" 
-            style={headingStyle}
-          >
-            Precios
-          </h2>
-          <div className="grid grid-cols-2 gap-2">
-            {['Básico', 'Premium'].map(plan => (
-              <div 
-                key={plan} 
-                className="p-2 rounded-sm text-center"
-                style={{ 
-                  backgroundColor: config.layout === 'dark' ? '#1f2937' : '#f3f4f6',
-                  fontFamily: config.font_family,
-                  border: `1px solid ${config.primary_color}`
-                }}
-              >
-                <div className="font-semibold" style={{ color: config.primary_color }}>{plan}</div>
-                <div className="text-xs mt-1">Desde $9.99/mes</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Plans Section Placeholder */}
-      {config.visible_sections.plans && (
-        <div className="p-4 border-t border-gray-800">
-          <h2 
-            className="text-xl font-semibold mb-3" 
-            style={headingStyle}
-          >
-            Planes
-          </h2>
+          
           <div 
-            className="p-2 text-xs"
             style={{ 
-              backgroundColor: config.layout === 'dark' ? '#1f2937' : '#f3f4f6',
-              fontFamily: config.font_family
+              display: 'grid',
+              gridTemplateColumns: previewMode === 'mobile' ? '1fr' : previewMode === 'tablet' ? '1fr 1fr' : '1fr 1fr 1fr',
+              gap: '1.5rem',
             }}
           >
-            Contenido de los planes de entrenamiento
+            {[
+              'Entrenamiento IA Personalizado',
+              'Seguimiento de Progreso',
+              'Análisis Biométrico',
+              'Rutinas Adaptativas',
+              'Comunidad de Fitness',
+              'Asistente de Voz',
+            ].slice(0, previewMode === 'mobile' ? 3 : 6).map((feature, index) => (
+              <div 
+                key={index} 
+                style={{ 
+                  padding: '1.5rem',
+                  borderRadius: '0.5rem',
+                  backgroundColor: config.layout === 'dark' ? '#111111' : '#f5f5f5',
+                  boxShadow: `0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)`
+                }}
+              >
+                <h3 
+                  style={{ 
+                    fontSize: previewMode === 'mobile' ? '1.125rem' : '1.25rem',
+                    fontWeight: 'bold',
+                    marginBottom: '0.75rem',
+                    color: config.primary_color,
+                  }}
+                >
+                  {feature}
+                </h3>
+                <p 
+                  style={{ 
+                    fontSize: previewMode === 'mobile' ? '0.875rem' : '1rem',
+                    color: config.layout === 'dark' ? '#e5e5e5' : '#666666',
+                  }}
+                >
+                  Descripción de {feature.toLowerCase()}. Aquí se explicaría cómo esta característica beneficia al usuario.
+                </p>
+              </div>
+            ))}
           </div>
-        </div>
+        </section>
       )}
 
-      {/* Chat Widget Placeholder */}
-      {config.visible_sections.chat && (
-        <div className="absolute bottom-4 right-4">
-          <div 
-            className="rounded-full h-10 w-10 flex items-center justify-center"
-            style={{ backgroundColor: config.primary_color }}
+      {/* Pricing section */}
+      {config.visible_sections.pricing && (
+        <section 
+          style={{ 
+            padding: previewMode === 'mobile' ? '2rem 1rem' : '4rem 2rem',
+            backgroundColor: config.layout === 'dark' ? '#111111' : '#f5f5f5',
+            borderTop: `1px solid ${config.layout === 'dark' ? '#222222' : '#e5e5e5'}`
+          }}
+        >
+          <h2 
+            style={{ 
+              fontSize: getResponsiveTextSize('h2'),
+              fontWeight: 'bold',
+              textAlign: 'center',
+              marginBottom: previewMode === 'mobile' ? '1rem' : '1.5rem',
+            }}
           >
-            <span 
-              className="text-sm font-bold"
-              style={{ color: config.layout === 'dark' ? '#000000' : '#ffffff' }}
-            >
-              AI
-            </span>
+            Planes y Precios
+          </h2>
+          
+          <p 
+            style={{ 
+              fontSize: getResponsiveTextSize('p'),
+              textAlign: 'center',
+              maxWidth: '700px',
+              margin: '0 auto',
+              marginBottom: previewMode === 'mobile' ? '1.5rem' : '2.5rem',
+              color: config.layout === 'dark' ? '#e5e5e5' : '#666666',
+            }}
+          >
+            Elige el plan que mejor se adapte a tus necesidades de entrenamiento y objetivos de fitness.
+          </p>
+          
+          <div 
+            style={{ 
+              display: 'grid',
+              gridTemplateColumns: previewMode === 'mobile' ? '1fr' : previewMode === 'tablet' ? '1fr 1fr' : '1fr 1fr 1fr',
+              gap: '1.5rem',
+            }}
+          >
+            {[
+              { name: 'Básico', price: '9.99', features: ['Entrenamientos básicos', 'Seguimiento limitado', 'Soporte por email'] },
+              { name: 'Premium', price: '19.99', features: ['Todos los entrenamientos', 'Análisis avanzado', 'Seguimiento ilimitado', 'Soporte prioritario'] },
+              { name: 'Elite', price: '29.99', features: ['Entrenador IA dedicado', 'Análisis en tiempo real', 'Videoconferencias', 'Soporte 24/7', 'Plan nutricional'] },
+            ].slice(0, previewMode === 'mobile' ? 2 : 3).map((plan, index) => (
+              <div 
+                key={index}
+                style={{ 
+                  padding: '1.5rem',
+                  borderRadius: '0.5rem',
+                  backgroundColor: config.layout === 'dark' ? '#0a0a0a' : '#ffffff',
+                  boxShadow: `0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)`,
+                  border: `1px solid ${config.layout === 'dark' ? '#222222' : '#e5e5e5'}`,
+                  display: 'flex',
+                  flexDirection: 'column',
+                }}
+              >
+                <h3 
+                  style={{ 
+                    fontSize: previewMode === 'mobile' ? '1.25rem' : '1.5rem',
+                    fontWeight: 'bold',
+                    marginBottom: '0.75rem',
+                    color: config.primary_color,
+                  }}
+                >
+                  {plan.name}
+                </h3>
+                
+                <div style={{ margin: '1rem 0' }}>
+                  <span 
+                    style={{ 
+                      fontSize: previewMode === 'mobile' ? '1.5rem' : '2rem',
+                      fontWeight: 'bold',
+                    }}
+                  >
+                    ${plan.price}
+                  </span>
+                  <span style={{ color: config.layout === 'dark' ? '#999999' : '#666666' }}>/mes</span>
+                </div>
+                
+                <ul style={{ margin: '1rem 0', flexGrow: 1 }}>
+                  {plan.features.map((feature, idx) => (
+                    <li 
+                      key={idx}
+                      style={{ 
+                        marginBottom: '0.5rem', 
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.5rem',
+                        fontSize: previewMode === 'mobile' ? '0.875rem' : '1rem',
+                      }}
+                    >
+                      <span style={{ color: config.primary_color }}>✓</span> {feature}
+                    </li>
+                  ))}
+                </ul>
+                
+                <button 
+                  style={{
+                    ...getButtonStyles(),
+                    width: '100%', 
+                    marginTop: '1rem',
+                  }}
+                >
+                  Seleccionar
+                </button>
+              </div>
+            ))}
           </div>
+        </section>
+      )}
+
+      {/* Chatbot Section */}
+      {config.visible_sections.chat && (
+        <div 
+          style={{ 
+            position: 'fixed', 
+            bottom: '20px', 
+            right: '20px',
+            zIndex: 50 
+          }}
+        >
+          <button
+            style={{
+              backgroundColor: config.primary_color,
+              color: '#ffffff',
+              width: '48px',
+              height: '48px',
+              borderRadius: '50%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+              border: 'none',
+              cursor: 'pointer',
+            }}
+          >
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M21 11.5C21.0034 12.8199 20.6951 14.1219 20.1 15.3C19.3944 16.7118 18.3098 17.8992 16.9674 18.7293C15.6251 19.5594 14.0782 19.9994 12.5 20C11.1801 20.0035 9.87812 19.6951 8.7 19.1L3 21L4.9 15.3C4.30493 14.1219 3.99656 12.8199 4 11.5C4.00061 9.92179 4.44061 8.37488 5.27072 7.03258C6.10083 5.69028 7.28825 4.6056 8.7 3.90003C9.87812 3.30496 11.1801 2.99659 12.5 3.00003H13C15.0843 3.11502 17.053 3.99479 18.5291 5.47089C20.0052 6.94699 20.885 8.91568 21 11V11.5Z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </button>
         </div>
       )}
     </div>
   );
-}
+};
+
+export default PreviewPanel;

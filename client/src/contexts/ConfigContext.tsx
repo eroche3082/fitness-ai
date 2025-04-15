@@ -1,103 +1,89 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { 
-  FitnessConfig, 
-  defaultConfig, 
-  getConfig, 
-  updateConfig, 
-  subscribeToConfigChanges 
-} from '../services/fitnessConfigService';
-import { useAuth } from '../App';
+import { FitnessConfig, getConfig, setConfig, subscribeToConfig } from '../services/fitnessConfigService';
 
 interface ConfigContextType {
-  config: FitnessConfig;
+  config: FitnessConfig | null;
   isLoading: boolean;
-  error: string | null;
-  updateAppConfig: (newConfig: Partial<FitnessConfig>) => Promise<void>;
-  applyConfig: (config: FitnessConfig) => void;
+  error: Error | null;
+  updateConfig: (newConfig: Partial<FitnessConfig>) => Promise<void>;
+  reloadConfig: () => Promise<void>;
 }
 
-const ConfigContext = createContext<ConfigContextType | undefined>(undefined);
+// Crear contexto con valores por defecto
+const ConfigContext = createContext<ConfigContextType>({
+  config: null,
+  isLoading: true,
+  error: null,
+  updateConfig: async () => {},
+  reloadConfig: async () => {},
+});
 
-interface ConfigProviderProps {
-  children: ReactNode;
-}
+// Hook personalizado para usar el contexto
+export const useConfig = () => useContext(ConfigContext);
 
-export function ConfigProvider({ children }: ConfigProviderProps) {
-  const [config, setConfig] = useState<FitnessConfig>(defaultConfig);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const { userRole } = useAuth();
+// Proveedor del contexto
+export const ConfigProvider = ({ children }: { children: ReactNode }) => {
+  const [config, setLocalConfig] = useState<FitnessConfig | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [error, setError] = useState<Error | null>(null);
 
+  // Cargar configuración inicial
+  const loadConfig = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+      const loadedConfig = await getConfig();
+      setLocalConfig(loadedConfig);
+    } catch (err) {
+      console.error('Error al cargar la configuración:', err);
+      setError(err instanceof Error ? err : new Error('Error desconocido al cargar la configuración'));
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Actualizar la configuración
+  const updateConfig = async (newConfig: Partial<FitnessConfig>) => {
+    if (!config) return;
+    
+    try {
+      const updatedConfig = { ...config, ...newConfig };
+      await setConfig(updatedConfig);
+      setLocalConfig(updatedConfig);
+    } catch (err) {
+      console.error('Error al actualizar la configuración:', err);
+      setError(err instanceof Error ? err : new Error('Error desconocido al actualizar la configuración'));
+      throw err;
+    }
+  };
+
+  // Efecto para cargar la configuración inicial y suscribirse a cambios
   useEffect(() => {
-    // Cargar la configuración inicial
-    const loadConfig = async () => {
-      try {
-        setIsLoading(true);
-        const initialConfig = await getConfig();
-        setConfig(initialConfig);
-        setError(null);
-      } catch (err) {
-        console.error('Error loading config:', err);
-        setError('Failed to load configuration');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
     loadConfig();
-
-    // Suscribirse a cambios en la configuración
-    const unsubscribe = subscribeToConfigChanges((newConfig) => {
-      setConfig(newConfig);
+    
+    // Suscribirse a los cambios en la configuración
+    const unsubscribe = subscribeToConfig((updatedConfig) => {
+      setLocalConfig(updatedConfig);
     });
-
+    
+    // Limpiar suscripción al desmontar
     return () => {
       unsubscribe();
     };
   }, []);
 
-  // Función para actualizar la configuración
-  const updateAppConfig = async (newConfig: Partial<FitnessConfig>) => {
-    try {
-      if (!userRole || (userRole !== 'admin' && userRole !== 'manager')) {
-        throw new Error('No tienes permiso para modificar la configuración');
-      }
-
-      await updateConfig(newConfig, 'current-user-id', userRole);
-      // No actualizamos el estado aquí porque el listener se encargará de eso
-    } catch (err: any) {
-      console.error('Error updating config:', err);
-      setError(err.message || 'Failed to update configuration');
-      throw err;
-    }
-  };
-
-  // Función para aplicar la configuración sin guardarla en Firestore
-  // Útil para previsualizar cambios antes de guardar
-  const applyConfig = (configToApply: FitnessConfig) => {
-    setConfig(configToApply);
-  };
-
-  const value = {
-    config,
-    isLoading,
-    error,
-    updateAppConfig,
-    applyConfig
-  };
-
+  // Contexto provider
   return (
-    <ConfigContext.Provider value={value}>
+    <ConfigContext.Provider 
+      value={{ 
+        config, 
+        isLoading, 
+        error, 
+        updateConfig,
+        reloadConfig: loadConfig
+      }}
+    >
       {children}
     </ConfigContext.Provider>
   );
-}
-
-// Hook personalizado para usar el contexto
-export function useConfig() {
-  const context = useContext(ConfigContext);
-  if (context === undefined) {
-    throw new Error('useConfig must be used within a ConfigProvider');
-  }
-  return context;
-}
+};

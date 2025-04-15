@@ -1,5 +1,5 @@
 import { collection, addDoc, getDocs, query, where, Timestamp, orderBy } from "firebase/firestore";
-import { firestore } from "../firebaseConfig";
+import { db } from "../firebaseConfig";
 import { FitnessPostContent } from "./generateFitnessPost";
 
 /**
@@ -34,7 +34,7 @@ export async function saveFitnessPost(post: Omit<FitnessPost, "createdAt">): Pro
       createdAt: Timestamp.now()
     };
     
-    const docRef = await addDoc(collection(firestore, "fitness_posts"), postData);
+    const docRef = await addDoc(collection(db, "fitness_posts"), postData);
     return docRef.id;
   } catch (error) {
     console.error("Error saving fitness post:", error);
@@ -93,7 +93,7 @@ export async function createFitnessPost(
 export async function getUserFitnessPosts(userId: string): Promise<FitnessPost[]> {
   try {
     const q = query(
-      collection(firestore, "fitness_posts"),
+      collection(db, "fitness_posts"),
       where("userId", "==", userId),
       orderBy("createdAt", "desc")
     );

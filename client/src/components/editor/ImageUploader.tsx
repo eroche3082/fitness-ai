@@ -1,198 +1,177 @@
-import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Loader, Upload, X } from 'lucide-react';
+import React, { useState, useRef } from 'react';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { storage } from '../../firebaseConfig';
-import { v4 as uuidv4 } from 'uuid';
-import { useToast } from '@/hooks/use-toast';
+import { Button } from '@/components/ui/button';
+import { UploadCloud, X, Check, Image as ImageIcon } from 'lucide-react';
 
 interface ImageUploaderProps {
   currentImageUrl: string;
-  onImageSelected: (url: string) => void;
+  onImageUpload: (url: string) => void;
+  section: string; // Para saber a qué sección pertenece (hero, features, etc.)
   className?: string;
 }
 
-export default function ImageUploader({ 
-  currentImageUrl, 
-  onImageSelected,
-  className = 'h-32' 
-}: ImageUploaderProps) {
+const ImageUploader: React.FC<ImageUploaderProps> = ({
+  currentImageUrl,
+  onImageUpload,
+  section,
+  className = '',
+}) => {
   const [isUploading, setIsUploading] = useState(false);
-  const [inputUrl, setInputUrl] = useState('');
-  const [showUrlInput, setShowUrlInput] = useState(false);
-  const { toast } = useToast();
+  const [previewUrl, setPreviewUrl] = useState<string | null>(currentImageUrl || null);
+  const [uploadSuccess, setUploadSuccess] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Manejar subida de archivos
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Manejar la selección de archivo
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    
     if (!file) return;
-    
-    // Validar que sea una imagen
+
+    // Validar tipo de archivo
     if (!file.type.startsWith('image/')) {
-      toast({
-        title: 'Formato no soportado',
-        description: 'Por favor, sube un archivo de imagen válido (jpg, png, gif, etc.)',
-        variant: 'destructive'
-      });
+      setUploadError('Solo se permiten archivos de imagen.');
       return;
     }
+
+    // Validar tamaño (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      setUploadError('La imagen no debe superar los 5MB.');
+      return;
+    }
+
+    // Crear URL de vista previa
+    const localPreviewUrl = URL.createObjectURL(file);
+    setPreviewUrl(localPreviewUrl);
+    setUploadError(null);
+    
+    // Subir a Firebase Storage
+    uploadImage(file);
+  };
+
+  // Subir imagen a Firebase Storage
+  const uploadImage = async (file: File) => {
+    setIsUploading(true);
+    setUploadSuccess(false);
     
     try {
-      setIsUploading(true);
+      // Crear referencia en Storage
+      const storageRef = ref(storage, `editor_images/${section}_${Date.now()}_${file.name}`);
       
-      // Generar un nombre único para el archivo
-      const fileName = `editor_images/${uuidv4()}-${file.name.replace(/[^a-zA-Z0-9.]/g, '_')}`;
-      const storageRef = ref(storage, fileName);
-      
-      // Subir el archivo
+      // Subir archivo
       await uploadBytes(storageRef, file);
       
-      // Obtener la URL del archivo
+      // Obtener URL de descarga
       const downloadUrl = await getDownloadURL(storageRef);
       
-      // Enviar la URL al componente padre
-      onImageSelected(downloadUrl);
+      // Actualizar estado y notificar al componente padre
+      setUploadSuccess(true);
+      onImageUpload(downloadUrl);
       
-      toast({
-        title: 'Imagen subida correctamente',
-        description: 'La imagen se ha subido y aplicado con éxito.',
-      });
+      // Limpiar después de 3 segundos
+      setTimeout(() => {
+        setUploadSuccess(false);
+      }, 3000);
     } catch (error) {
-      console.error('Error al subir la imagen:', error);
-      toast({
-        title: 'Error al subir la imagen',
-        description: 'No se pudo subir la imagen. Por favor, intenta nuevamente.',
-        variant: 'destructive'
-      });
+      console.error('Error al subir imagen:', error);
+      setUploadError('Error al subir la imagen. Inténtalo de nuevo.');
     } finally {
       setIsUploading(false);
     }
   };
 
-  // Manejar URL externa
-  const handleUrlSubmit = () => {
-    if (!inputUrl) return;
-    
-    // Validación básica de URL
-    if (!inputUrl.match(/^https?:\/\/.*\.(jpg|jpeg|png|gif|webp)$/i)) {
-      toast({
-        title: 'URL no válida',
-        description: 'Por favor, ingresa una URL válida de imagen (jpg, png, gif, webp).',
-        variant: 'destructive'
-      });
-      return;
+  // Abre el selector de archivos
+  const triggerFileInput = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
     }
-    
-    onImageSelected(inputUrl);
-    setShowUrlInput(false);
-    setInputUrl('');
-    
-    toast({
-      title: 'Imagen configurada',
-      description: 'La URL de la imagen se ha aplicado con éxito.',
-    });
   };
 
-  // Eliminar la imagen actual
-  const handleRemoveImage = () => {
-    onImageSelected('');
-    toast({
-      title: 'Imagen eliminada',
-      description: 'La imagen ha sido eliminada.',
-    });
+  // Eliminar imagen
+  const removeImage = () => {
+    setPreviewUrl(null);
+    onImageUpload('');
   };
 
   return (
-    <div>
-      {/* Vista previa de la imagen actual */}
-      {currentImageUrl ? (
-        <div className={`relative ${className} overflow-hidden rounded-md mb-2`}>
-          <img 
-            src={currentImageUrl} 
-            alt="Imagen actual" 
-            className="w-full h-full object-cover"
-          />
-          <Button 
-            variant="destructive" 
-            size="sm"
-            className="absolute top-2 right-2 h-8 w-8 p-0"
-            onClick={handleRemoveImage}
-          >
-            <X className="h-4 w-4" />
-          </Button>
-        </div>
-      ) : (
-        <div className={`bg-gray-800 border border-dashed border-gray-600 rounded-md flex items-center justify-center ${className} mb-2`}>
-          <p className="text-gray-400 text-sm">Vista previa de la imagen</p>
-        </div>
-      )}
-      
-      {/* Opciones de subida */}
-      <div className="grid grid-cols-2 gap-2">
-        <div>
-          <Input
-            type="file"
-            accept="image/*"
-            onChange={handleFileUpload}
-            disabled={isUploading}
-            className="hidden"
-            id="image-upload"
-          />
-          <Button
-            variant="outline"
-            onClick={() => document.getElementById('image-upload')?.click()}
-            disabled={isUploading}
-            className="w-full bg-transparent border-gray-700 text-white hover:bg-gray-700"
-          >
-            {isUploading ? (
-              <>
-                <Loader className="h-4 w-4 mr-2 animate-spin" />
-                Subiendo...
-              </>
-            ) : (
-              <>
-                <Upload className="h-4 w-4 mr-2" />
-                Subir Imagen
-              </>
-            )}
-          </Button>
-        </div>
+    <div className={`space-y-3 ${className}`}>
+      <div className="flex justify-between items-center">
+        <h3 className="text-white font-medium">Imagen para {section}</h3>
         
-        {showUrlInput ? (
-          <div className="col-span-2 mt-2 flex space-x-2">
-            <Input
-              type="text"
-              value={inputUrl}
-              onChange={(e) => setInputUrl(e.target.value)}
-              placeholder="Pegar URL de imagen..."
-              className="bg-gray-800 border-gray-700 text-white"
-            />
-            <Button 
-              onClick={handleUrlSubmit}
-              className="bg-green-500 text-white hover:bg-green-600 shrink-0"
-            >
-              Aplicar
-            </Button>
-            <Button 
-              variant="outline" 
-              className="border-gray-700 text-white hover:bg-gray-700 shrink-0"
-              onClick={() => setShowUrlInput(false)}
-            >
-              Cancelar
-            </Button>
-          </div>
-        ) : (
+        {previewUrl && (
           <Button
-            variant="outline"
-            onClick={() => setShowUrlInput(true)}
-            className="w-full bg-transparent border-gray-700 text-white hover:bg-gray-700"
+            type="button"
+            size="sm"
+            variant="destructive"
+            onClick={removeImage}
+            className="h-8 px-2"
           >
-            URL Externa
+            <X className="h-4 w-4 mr-1" /> Eliminar
           </Button>
         )}
       </div>
+      
+      {/* Vista previa de la imagen */}
+      {previewUrl ? (
+        <div className="relative rounded-md overflow-hidden border border-gray-700 bg-gray-900 aspect-video">
+          <img
+            src={previewUrl}
+            alt={`Vista previa para ${section}`}
+            className="w-full h-full object-cover"
+          />
+        </div>
+      ) : (
+        <div 
+          className="border border-dashed border-gray-700 rounded-md p-8 flex flex-col items-center justify-center bg-gray-900 cursor-pointer hover:bg-gray-800 transition-colors aspect-video"
+          onClick={triggerFileInput}
+        >
+          <ImageIcon className="w-12 h-12 text-gray-500 mb-4" />
+          <p className="text-gray-400 text-center mb-2">Haz clic para seleccionar una imagen</p>
+          <p className="text-gray-500 text-xs text-center">JPEG, PNG, WebP o GIF (max. 5MB)</p>
+        </div>
+      )}
+      
+      {/* Input de archivo (oculto) */}
+      <input
+        type="file"
+        ref={fileInputRef}
+        onChange={handleFileSelect}
+        accept="image/*"
+        className="hidden"
+      />
+      
+      {/* Botón de subida */}
+      <Button
+        type="button"
+        variant="default"
+        onClick={triggerFileInput}
+        disabled={isUploading}
+        className="w-full bg-gray-800 border-gray-700 hover:bg-gray-700"
+      >
+        {isUploading ? (
+          <div className="flex items-center">
+            <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full mr-2"></div>
+            Subiendo...
+          </div>
+        ) : uploadSuccess ? (
+          <div className="flex items-center">
+            <Check className="h-4 w-4 mr-2 text-green-500" />
+            ¡Imagen subida!
+          </div>
+        ) : (
+          <div className="flex items-center">
+            <UploadCloud className="h-4 w-4 mr-2" />
+            {previewUrl ? 'Cambiar imagen' : 'Subir imagen'}
+          </div>
+        )}
+      </Button>
+      
+      {/* Mensaje de error */}
+      {uploadError && (
+        <p className="text-red-500 text-sm">{uploadError}</p>
+      )}
     </div>
   );
-}
+};
+
+export default ImageUploader;
