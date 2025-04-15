@@ -32,11 +32,10 @@ const QRCodeDisplay: React.FC<QRCodeDisplayProps> = ({
           dark: foreground,
           light: background
         }
-      },
-      (error) => {
-        if (error) console.error('Error generating QR code:', error);
       }
-    );
+    ).catch(error => {
+      console.error('Error generating QR code:', error);
+    });
   }, [code, size, foreground, background]);
   
   return (
