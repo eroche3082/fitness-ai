@@ -127,21 +127,3 @@ export async function setConfig(config: FitnessConfig): Promise<void> {
     throw error;
   }
 }
-
-/**
- * Se suscribe a cambios en la configuración
- */
-export function subscribeToConfig(callback: (config: FitnessConfig) => void): Unsubscribe {
-  const docRef = doc(db, CONFIG_PATH);
-  
-  return onSnapshot(docRef, (docSnap) => {
-    if (docSnap.exists()) {
-      callback(docSnap.data() as FitnessConfig);
-    } else {
-      // Si no existe, usar valores por defecto
-      callback(DEFAULT_CONFIG);
-    }
-  }, (error) => {
-    console.error('Error al escuchar cambios en la configuración:', error);
-  });
-}
